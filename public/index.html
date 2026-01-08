@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="theme-color" content="#1a1812" />
+
+    <title>Helmet Legends</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="manifest" href="./manifest.json" />
+
+    <link rel="apple-touch-icon" href="/icon-512.png" />
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+  </head>
+
+  <body class="bg-[#1a1812]">
+    <noscript
+      >Vous devez activer JavaScript pour utiliser cette application.</noscript
+    >
+    <div id="root"></div>
+    <script>
+          if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+              // On utilise le chemin relatif pour être sûr que Sandbox le trouve
+              navigator.serviceWorker
+                .register("./sw.js")
+                .then((reg) => console.log("Service Worker prêt !"))
+                .catch((err) => console.log("Erreur SW:", err));
+            });
+          }
+          <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          // Enregistrement du fichier sw.js qui est dans votre dossier public
+          navigator.serviceWorker.register('./sw.js')
+            .then(reg => {
+              console.log('PWA prête à être installée !');
+            })
+            .catch(err => {
+              console.error('Erreur de configuration PWA :', err);
+            });
+        });
+      }
+    </script>
+  </body>
+</html>
