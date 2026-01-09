@@ -1,6 +1,12 @@
 import React from "react";
 // Ajout de l'icône Printer pour le bouton du bas
-import { ChevronLeft, Edit3, Download, Printer } from "lucide-react";
+import {
+  ChevronLeft,
+  Edit3,
+  Download,
+  Printer,
+  ShieldCheck,
+} from "lucide-react";
 // Importation de votre utilitaire de génération PDF pro
 import { generateHelmetPDF } from "../utils/pdfGenerator";
 
@@ -8,7 +14,7 @@ export default function Details({ setScreen, helmet, onEdit }) {
   if (!helmet) return null;
 
   // On récupère uniquement les photos qui existent vraiment
-  const availablePhotos = Object.entries(helmet.images)
+  const availablePhotos = Object.entries(helmet.images || {})
     .filter(([_, value]) => value !== null)
     .map(([key, value]) => ({ id: key, url: value }));
 
@@ -30,7 +36,7 @@ export default function Details({ setScreen, helmet, onEdit }) {
             {helmet.model}
           </h2>
           <p className="text-[10px] uppercase tracking-[0.3em] text-amber-500 font-bold">
-            Fiche d'Expertise
+            Fiche Technique
           </p>
         </div>
 
@@ -76,7 +82,8 @@ export default function Details({ setScreen, helmet, onEdit }) {
       </div>
 
       {/* Panneau d'informations coulissant */}
-      <div className="bg-[#2a2822] border-t-2 border-[#8a7f5d] p-6 pb-12 max-h-[45vh] overflow-y-auto">
+      <div className="bg-[#2a2822] border-t-2 border-[#8a7f5d] p-6 pb-12 max-h-[50vh] overflow-y-auto">
+        {/* Grille des informations principales */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="p-3 bg-[#1a1812] rounded-xl border border-[#3a3832]">
             <p className="text-[8px] uppercase font-black opacity-40 mb-1">
@@ -96,6 +103,28 @@ export default function Details({ setScreen, helmet, onEdit }) {
           </div>
         </div>
 
+        {/* NOUVEAU : Affichage des Spécifications Techniques ajoutées */}
+        <div className="grid grid-cols-3 gap-2 mb-6">
+          <div className="p-2 bg-[#1a1812]/50 rounded-lg border border-[#3a3832] text-center">
+            <p className="text-[7px] uppercase font-black opacity-40">
+              Taille Coque
+            </p>
+            <p className="text-xs font-bold">{helmet.shellSize || "-"}</p>
+          </div>
+          <div className="p-2 bg-[#1a1812]/50 rounded-lg border border-[#3a3832] text-center">
+            <p className="text-[7px] uppercase font-black opacity-40">
+              Taille Coiffe
+            </p>
+            <p className="text-xs font-bold">{helmet.linerSize || "-"}</p>
+          </div>
+          <div className="p-2 bg-[#1a1812]/50 rounded-lg border border-[#3a3832] text-center">
+            <p className="text-[7px] uppercase font-black opacity-40">
+              Poids (g)
+            </p>
+            <p className="text-xs font-bold">{helmet.weight || "-"}</p>
+          </div>
+        </div>
+
         <div className="space-y-4">
           <div>
             <p className="text-[10px] uppercase font-black opacity-40 tracking-widest mb-1">
@@ -107,14 +136,18 @@ export default function Details({ setScreen, helmet, onEdit }) {
             </p>
           </div>
 
-          {/* NOUVEAU : Grand bouton d'exportation pro en bas */}
+          {/* BOUTON MODIFIÉ : Nom sécurisé et factuel */}
           <button
             onClick={() => generateHelmetPDF(helmet)}
             className="w-full py-4 mt-4 border-2 border-[#8a7f5d] rounded-xl flex items-center justify-center gap-3 text-[10px] uppercase font-black tracking-widest text-[#f0ede0] bg-[#1a1812] hover:bg-amber-900 active:scale-95 transition-all shadow-xl"
           >
             <Printer size={18} className="text-amber-500" />
-            Générer le Certificat d'Expertise (PDF)
+            Générer la Fiche Technique (PDF)
           </button>
+
+          <p className="text-[7px] text-center uppercase opacity-30 italic">
+            Document descriptif basé sur les données saisies par l'utilisateur
+          </p>
         </div>
       </div>
     </div>
