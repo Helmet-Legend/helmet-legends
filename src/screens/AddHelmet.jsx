@@ -1,7 +1,13 @@
-import React, { useState } from "react";
-import { X, ImageIcon } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import {
+  X,
+  ImageIcon,
+  HelpCircle,
+  AlertTriangle,
+  CheckCircle,
+  Info,
+} from "lucide-react";
 import { TexturedButton } from "../components/TexturedButton";
-// 1. On importe votre nouveau compresseur
 import { compressImage } from "../utils/imageCompressor";
 
 const MANUFACTURERS = {
@@ -14,6 +20,16 @@ const MANUFACTURERS = {
   HKP: "SE (Tardif)",
 };
 
+const HELMET_MODELS = [
+  "M35",
+  "M40",
+  "M42",
+  "M38 (Parachutiste)",
+  "Luftschutz (Gladiator)",
+  "M34 Feuerwehr (Pompiers/Police)",
+  "Autre / Prototype",
+];
+
 export default function AddHelmet({ setScreen, onSave, helmet }) {
   const [current, setCurrent] = useState(
     helmet || {
@@ -23,6 +39,13 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
       lotNumber: "",
       provenance: "",
       description: "",
+      shellSize: "",
+      linerSize: "",
+      weight: "",
+      material: "",
+      paintCondition: 50,
+      linerCondition: "",
+      chinstrapState: "",
       images: {
         main: null,
         front: null,
@@ -36,21 +59,74 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
     }
   );
 
-  // 2. Mise à jour de la fonction de téléchargement (plus propre et asynchrone)
+  const [validation, setValidation] = useState({
+    message: "",
+    color: "text-gray-500",
+    icon: null,
+  });
+
+  // --- LOGIQUE D'EXPERTISE AUTOMATIQUE ---
+  useEffect(() => {
+    const lot = parseInt(current.lotNumber);
+    const mkr = current.manufacturer?.toUpperCase();
+    const mdl = current.model;
+
+    if (!lot || !mkr || !mdl) {
+      setValidation({
+        message: "Saisissez l'usine et le lot pour analyse",
+        color: "text-gray-500",
+        icon: <Info size={12} />,
+      });
+      return;
+    }
+
+    if (mdl === "M35") {
+      if (lot > 5500)
+        setValidation({
+          message:
+            "Lot élevé pour un M35. Vérifiez s'il ne s'agit pas d'un M40.",
+          color: "text-orange-500",
+          icon: <AlertTriangle size={12} />,
+        });
+      else
+        setValidation({
+          message: "Plage de lot cohérente pour un M35.",
+          color: "text-green-500",
+          icon: <CheckCircle size={12} />,
+        });
+    } else if (mdl === "M42") {
+      if (mkr === "ET")
+        setValidation({
+          message: "Anomalie : Thale utilisait le code 'CKL' pour les M42.",
+          color: "text-red-500",
+          icon: <AlertTriangle size={12} />,
+        });
+      else
+        setValidation({
+          message: "Configuration classique pour un modèle 1942.",
+          color: "text-green-500",
+          icon: <CheckCircle size={12} />,
+        });
+    } else {
+      setValidation({
+        message: "Données prêtes. Pas d'incohérence majeure détectée.",
+        color: "text-blue-400",
+        icon: <CheckCircle size={12} />,
+      });
+    }
+  }, [current.model, current.manufacturer, current.lotNumber]);
+
   const handleUpload = async (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
-
     try {
-      // On utilise votre utilitaire pour transformer la photo en WebP léger
       const compressed = await compressImage(file);
-      
       setCurrent((prev) => ({
         ...prev,
         images: { ...prev.images, [type]: compressed },
       }));
     } catch (error) {
-      console.error("Erreur lors de la compression :", error);
+      console.error(error);
     }
   };
 
@@ -69,6 +145,26 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
       </div>
 
       <div className="space-y-6">
+        {/* MODÈLE */}
+        <div className="space-y-2">
+          <label className="text-[9px] uppercase font-black text-gray-500 ml-1">
+            Modèle de Casque
+          </label>
+          <select
+            className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm uppercase font-black text-[#f0ede0] outline-none focus:border-amber-600"
+            value={current.model}
+            onChange={(e) => setCurrent({ ...current, model: e.target.value })}
+          >
+            <option value="">-- Sélectionner le Modèle --</option>
+            {HELMET_MODELS.map((m) => (
+              <option key={m} value={m}>
+                {m}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* IDENTIFICATION */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="text-[9px] uppercase font-black text-gray-500 ml-1">
@@ -76,7 +172,7 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
             </label>
             <input
               placeholder="ex: ET"
-              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm uppercase font-bold text-amber-500 outline-none focus:border-amber-600"
+              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm uppercase font-bold text-amber-500 outline-none"
               value={current.manufacturer}
               onChange={(e) =>
                 setCurrent({
@@ -97,7 +193,7 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
             </label>
             <input
               placeholder="ex: 1234"
-              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm uppercase font-bold text-amber-500 outline-none focus:border-amber-600 h-[56px]"
+              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm uppercase font-bold text-amber-500 outline-none h-[56px]"
               value={current.lotNumber}
               onChange={(e) =>
                 setCurrent({ ...current, lotNumber: e.target.value })
@@ -106,15 +202,108 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
           </div>
         </div>
 
-        <input
-          placeholder="MODÈLE (ex: M40 ND)"
-          className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm uppercase font-black text-[#f0ede0] outline-none"
-          value={current.model}
-          onChange={(e) =>
-            setCurrent({ ...current, model: e.target.value.toUpperCase() })
-          }
-        />
+        {/* BANDEAU D'EXPERTISE */}
+        <div
+          className={`p-3 rounded-lg bg-[#1a1812] border border-[#3a3832] flex items-center gap-2 ${validation.color} transition-all`}
+        >
+          {validation.icon}
+          <span className="text-[10px] font-bold uppercase tracking-tight">
+            {validation.message}
+          </span>
+        </div>
 
+        {/* SPÉCIFICATIONS TECHNIQUES COMPLÈTES */}
+        <div className="space-y-4 border-t border-[#3a3832] pt-4">
+          <h3 className="text-[10px] uppercase font-black text-[#8a7f5d]">
+            Spécifications Techniques
+          </h3>
+
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              placeholder="TAILLE COQUE"
+              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm uppercase font-bold text-[#f0ede0] outline-none"
+              value={current.shellSize}
+              onChange={(e) =>
+                setCurrent({
+                  ...current,
+                  shellSize: e.target.value.toUpperCase(),
+                })
+              }
+            />
+            <input
+              placeholder="TAILLE COIFFE"
+              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm uppercase font-bold text-[#f0ede0] outline-none"
+              value={current.linerSize}
+              onChange={(e) =>
+                setCurrent({ ...current, linerSize: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              type="number"
+              placeholder="POIDS (g)"
+              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm font-bold text-[#f0ede0] outline-none"
+              value={current.weight}
+              onChange={(e) =>
+                setCurrent({ ...current, weight: e.target.value })
+              }
+            />
+            <input
+              placeholder="MATÉRIAU"
+              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm uppercase font-bold text-[#f0ede0] outline-none"
+              value={current.material}
+              onChange={(e) =>
+                setCurrent({ ...current, material: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="space-y-2 bg-[#1a1812] p-4 rounded-xl border-2 border-[#3a3832]">
+            <label className="text-[9px] uppercase font-black text-gray-500">
+              État Peinture : {current.paintCondition}%
+            </label>
+            <input
+              type="range"
+              className="w-full accent-amber-600"
+              value={current.paintCondition}
+              onChange={(e) =>
+                setCurrent({ ...current, paintCondition: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <select
+              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-3 rounded-xl text-xs font-bold text-[#f0ede0] outline-none"
+              value={current.linerCondition}
+              onChange={(e) =>
+                setCurrent({ ...current, linerCondition: e.target.value })
+              }
+            >
+              <option value="">ÉTAT COIFFE</option>
+              <option value="Neuve">Neuve</option>
+              <option value="Légèrement portée">Légèrement portée</option>
+              <option value="Usée">Usée</option>
+              <option value="Restaurée">Restaurée</option>
+            </select>
+            <select
+              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-3 rounded-xl text-xs font-bold text-[#f0ede0] outline-none"
+              value={current.chinstrapState}
+              onChange={(e) =>
+                setCurrent({ ...current, chinstrapState: e.target.value })
+              }
+            >
+              <option value="">JUGULAIRE</option>
+              <option value="Présente">Présente</option>
+              <option value="Manquante">Manquante</option>
+              <option value="Restituée">Restituée</option>
+            </select>
+          </div>
+        </div>
+
+        {/* SECTION IMAGES */}
         <div className="pt-4 space-y-3">
           <UploadRow
             type="main"

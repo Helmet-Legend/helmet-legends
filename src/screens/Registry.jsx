@@ -1,9 +1,15 @@
 import React from "react";
-import { X, Trash2, ChevronRight, Search } from "lucide-react";
+// Ajout de l'icône Plus
+import { X, Trash2, ChevronRight, Search, Plus } from "lucide-react";
 
-export default function Registry({ setScreen, collection, remove, setSelectedHelmet }) {
+export default function Registry({
+  setScreen,
+  collection,
+  remove,
+  setSelectedHelmet,
+}) {
   return (
-    <div className="p-6 h-screen overflow-y-auto pb-32 bg-[#2a2822] font-serif text-[#d0c7a8]">
+    <div className="relative p-6 h-screen overflow-y-auto pb-32 bg-[#2a2822] font-serif text-[#d0c7a8]">
       {/* Header avec bouton retour */}
       <div className="flex justify-between items-center mb-8 border-b-2 border-[#8a7f5d] pb-4">
         <h2 className="text-xl font-black italic uppercase tracking-wider text-[#f0ede0]">
@@ -36,11 +42,11 @@ export default function Registry({ setScreen, collection, remove, setSelectedHel
               className="relative bg-[#1a1812] border-2 border-[#3a3832] rounded-2xl overflow-hidden shadow-2xl flex flex-col"
             >
               {/* Image Principale (Optimisée WebP) */}
-              <div 
+              <div
                 className="h-48 w-full bg-[#111] cursor-pointer"
                 onClick={() => setSelectedHelmet(helmet)}
               >
-                {helmet.images.main ? (
+                {helmet.images && helmet.images.main ? (
                   <img
                     src={helmet.images.main}
                     alt={helmet.model}
@@ -71,7 +77,15 @@ export default function Registry({ setScreen, collection, remove, setSelectedHel
 
                 <div className="flex gap-2">
                   <button
-                    onClick={() => remove(helmet.id)}
+                    onClick={() => {
+                      if (
+                        window.confirm(
+                          "Voulez-vous vraiment supprimer cette archive ?"
+                        )
+                      ) {
+                        remove(helmet.id);
+                      }
+                    }}
                     className="p-2 text-red-900/50 hover:text-red-500 transition-colors"
                   >
                     <Trash2 size={18} />
@@ -88,6 +102,17 @@ export default function Registry({ setScreen, collection, remove, setSelectedHel
           ))}
         </div>
       )}
+
+      {/* --- NOUVEAU : BOUTON FLOTTANT D'AJOUT --- */}
+      <button
+        onClick={() => {
+          setSelectedHelmet(null); // Assure qu'on ouvre un formulaire vide
+          setScreen("add"); // Bascule sur l'écran d'ajout
+        }}
+        className="fixed bottom-10 right-6 w-16 h-16 bg-amber-600 rounded-full flex items-center justify-center text-[#1a1812] shadow-2xl active:scale-95 transition-all z-50 border-2 border-[#8a7f5d]"
+      >
+        <Plus size={32} strokeWidth={3} />
+      </button>
     </div>
   );
 }
