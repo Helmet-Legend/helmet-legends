@@ -30,6 +30,21 @@ const HELMET_MODELS = [
   "Autre / Prototype",
 ];
 
+// Listes standards pour les tailles
+const SHELL_SIZES = ["60", "62", "64", "66", "68", "70", "72"];
+const LINER_SIZES = [
+  "52",
+  "53",
+  "54",
+  "55",
+  "56",
+  "57",
+  "58",
+  "59",
+  "60",
+  "61",
+];
+
 export default function AddHelmet({ setScreen, onSave, helmet }) {
   const [current, setCurrent] = useState(
     helmet || {
@@ -65,12 +80,17 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
     icon: null,
   });
 
-  // --- LOGIQUE D'EXPERTISE AUTOMATIQUE ---
+  // Logique pour déterminer si les valeurs sont standards ou manuelles
+  const isStandardMkr = Object.keys(MANUFACTURERS).includes(
+    current.manufacturer
+  );
+  const isStandardShell = SHELL_SIZES.includes(current.shellSize);
+  const isStandardLiner = LINER_SIZES.includes(current.linerSize);
+
   useEffect(() => {
     const lot = parseInt(current.lotNumber);
     const mkr = current.manufacturer?.toUpperCase();
     const mdl = current.model;
-
     if (!lot || !mkr || !mdl) {
       setValidation({
         message: "Saisissez l'usine et le lot pour analyse",
@@ -79,7 +99,6 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
       });
       return;
     }
-
     if (mdl === "M35") {
       if (lot > 5500)
         setValidation({
@@ -164,27 +183,54 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
           </select>
         </div>
 
-        {/* IDENTIFICATION */}
+        {/* USINE & LOT */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="text-[9px] uppercase font-black text-gray-500 ml-1">
               Usine
             </label>
-            <input
-              placeholder="ex: ET"
-              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm uppercase font-bold text-amber-500 outline-none"
-              value={current.manufacturer}
+            <select
+              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm uppercase font-bold text-amber-500 outline-none focus:border-amber-600"
+              value={
+                isStandardMkr
+                  ? current.manufacturer
+                  : current.manufacturer === ""
+                  ? ""
+                  : "AUTRE"
+              }
               onChange={(e) =>
                 setCurrent({
                   ...current,
-                  manufacturer: e.target.value.toUpperCase(),
+                  manufacturer:
+                    e.target.value === "AUTRE" ? "SAISIE..." : e.target.value,
                 })
               }
-            />
-            {MANUFACTURERS[current.manufacturer] && (
-              <p className="text-[9px] text-amber-500 font-bold ml-1">
-                {MANUFACTURERS[current.manufacturer]}
-              </p>
+            >
+              <option value="">-- Usine --</option>
+              {Object.entries(MANUFACTURERS).map(([code, name]) => (
+                <option key={code} value={code}>
+                  {code}
+                </option>
+              ))}
+              <option value="AUTRE">AUTRE</option>
+            </select>
+            {!isStandardMkr && current.manufacturer !== "" && (
+              <input
+                autoFocus
+                placeholder="Code usine..."
+                className="w-full mt-2 bg-[#1a1812] border-2 border-amber-600/30 p-4 rounded-xl text-sm uppercase font-bold text-amber-500"
+                value={
+                  current.manufacturer === "SAISIE..."
+                    ? ""
+                    : current.manufacturer
+                }
+                onChange={(e) =>
+                  setCurrent({
+                    ...current,
+                    manufacturer: e.target.value.toUpperCase(),
+                  })
+                }
+              />
             )}
           </div>
           <div className="space-y-2">
@@ -212,98 +258,102 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
           </span>
         </div>
 
-        {/* SPÉCIFICATIONS TECHNIQUES COMPLÈTES */}
+        {/* TAILLES COQUE & INTERIEURE */}
         <div className="space-y-4 border-t border-[#3a3832] pt-4">
-          <h3 className="text-[10px] uppercase font-black text-[#8a7f5d]">
-            Spécifications Techniques
-          </h3>
-
           <div className="grid grid-cols-2 gap-4">
-            <input
-              placeholder="TAILLE COQUE"
-              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm uppercase font-bold text-[#f0ede0] outline-none"
-              value={current.shellSize}
-              onChange={(e) =>
-                setCurrent({
-                  ...current,
-                  shellSize: e.target.value.toUpperCase(),
-                })
-              }
-            />
-            <input
-              placeholder="TAILLE COIFFE"
-              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm uppercase font-bold text-[#f0ede0] outline-none"
-              value={current.linerSize}
-              onChange={(e) =>
-                setCurrent({ ...current, linerSize: e.target.value })
-              }
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              type="number"
-              placeholder="POIDS (g)"
-              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm font-bold text-[#f0ede0] outline-none"
-              value={current.weight}
-              onChange={(e) =>
-                setCurrent({ ...current, weight: e.target.value })
-              }
-            />
-            <input
-              placeholder="MATÉRIAU"
-              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm uppercase font-bold text-[#f0ede0] outline-none"
-              value={current.material}
-              onChange={(e) =>
-                setCurrent({ ...current, material: e.target.value })
-              }
-            />
-          </div>
-
-          <div className="space-y-2 bg-[#1a1812] p-4 rounded-xl border-2 border-[#3a3832]">
-            <label className="text-[9px] uppercase font-black text-gray-500">
-              État Peinture : {current.paintCondition}%
-            </label>
-            <input
-              type="range"
-              className="w-full accent-amber-600"
-              value={current.paintCondition}
-              onChange={(e) =>
-                setCurrent({ ...current, paintCondition: e.target.value })
-              }
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <select
-              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-3 rounded-xl text-xs font-bold text-[#f0ede0] outline-none"
-              value={current.linerCondition}
-              onChange={(e) =>
-                setCurrent({ ...current, linerCondition: e.target.value })
-              }
-            >
-              <option value="">ÉTAT COIFFE</option>
-              <option value="Neuve">Neuve</option>
-              <option value="Légèrement portée">Légèrement portée</option>
-              <option value="Usée">Usée</option>
-              <option value="Restaurée">Restaurée</option>
-            </select>
-            <select
-              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-3 rounded-xl text-xs font-bold text-[#f0ede0] outline-none"
-              value={current.chinstrapState}
-              onChange={(e) =>
-                setCurrent({ ...current, chinstrapState: e.target.value })
-              }
-            >
-              <option value="">JUGULAIRE</option>
-              <option value="Présente">Présente</option>
-              <option value="Manquante">Manquante</option>
-              <option value="Restituée">Restituée</option>
-            </select>
+            <div className="space-y-2">
+              <label className="text-[9px] uppercase font-black text-gray-500 ml-1">
+                Taille Coque
+              </label>
+              <select
+                className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm font-bold text-[#f0ede0] outline-none"
+                value={
+                  isStandardShell
+                    ? current.shellSize
+                    : current.shellSize === ""
+                    ? ""
+                    : "AUTRE"
+                }
+                onChange={(e) =>
+                  setCurrent({
+                    ...current,
+                    shellSize:
+                      e.target.value === "AUTRE" ? "SAISIE..." : e.target.value,
+                  })
+                }
+              >
+                <option value="">-- Coque --</option>
+                {SHELL_SIZES.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+                <option value="AUTRE">AUTRE</option>
+              </select>
+              {!isStandardShell && current.shellSize !== "" && (
+                <input
+                  autoFocus
+                  placeholder="Taille..."
+                  className="w-full mt-2 bg-[#1a1812] border-2 border-amber-600/30 p-4 rounded-xl text-sm font-bold text-[#f0ede0]"
+                  value={
+                    current.shellSize === "SAISIE..." ? "" : current.shellSize
+                  }
+                  onChange={(e) =>
+                    setCurrent({
+                      ...current,
+                      shellSize: e.target.value.toUpperCase(),
+                    })
+                  }
+                />
+              )}
+            </div>
+            <div className="space-y-2">
+              <label className="text-[9px] uppercase font-black text-gray-500 ml-1">
+                Taille Coiffe
+              </label>
+              <select
+                className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm font-bold text-[#f0ede0] outline-none"
+                value={
+                  isStandardLiner
+                    ? current.linerSize
+                    : current.linerSize === ""
+                    ? ""
+                    : "AUTRE"
+                }
+                onChange={(e) =>
+                  setCurrent({
+                    ...current,
+                    linerSize:
+                      e.target.value === "AUTRE" ? "SAISIE..." : e.target.value,
+                  })
+                }
+              >
+                <option value="">-- Coiffe --</option>
+                {LINER_SIZES.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+                <option value="AUTRE">AUTRE</option>
+              </select>
+              {!isStandardLiner && current.linerSize !== "" && (
+                <input
+                  autoFocus
+                  placeholder="Taille..."
+                  className="w-full mt-2 bg-[#1a1812] border-2 border-amber-600/30 p-4 rounded-xl text-sm font-bold text-[#f0ede0]"
+                  value={
+                    current.linerSize === "SAISIE..." ? "" : current.linerSize
+                  }
+                  onChange={(e) =>
+                    setCurrent({ ...current, linerSize: e.target.value })
+                  }
+                />
+              )}
+            </div>
           </div>
         </div>
 
-        {/* SECTION IMAGES */}
+        {/* IMAGES & NOTES */}
         <div className="pt-4 space-y-3">
           <UploadRow
             type="main"
