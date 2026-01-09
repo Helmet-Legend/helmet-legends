@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { X, ImageIcon } from "lucide-react";
 import { TexturedButton } from "../components/TexturedButton";
+// 1. On importe votre nouveau compresseur
+import { compressImage } from "../utils/imageCompressor";
 
 const MANUFACTURERS = {
   ET: "Eisenhüttenwerke, Thale",
@@ -34,35 +36,22 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
     }
   );
 
-  const handleUpload = (e, type) => {
+  // 2. Mise à jour de la fonction de téléchargement (plus propre et asynchrone)
+  const handleUpload = async (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const img = new Image();
-      img.src = reader.result;
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const MAX = 800;
-        let { width, height } = img;
-        if (width > height && width > MAX) {
-          height *= MAX / width;
-          width = MAX;
-        } else if (height > MAX) {
-          width *= MAX / height;
-          height = MAX;
-        }
-        canvas.width = width;
-        canvas.height = height;
-        canvas.getContext("2d").drawImage(img, 0, 0, width, height);
-        const compressed = canvas.toDataURL("image/jpeg", 0.6);
-        setCurrent((prev) => ({
-          ...prev,
-          images: { ...prev.images, [type]: compressed },
-        }));
-      };
-    };
-    reader.readAsDataURL(file);
+
+    try {
+      // On utilise votre utilitaire pour transformer la photo en WebP léger
+      const compressed = await compressImage(file);
+      
+      setCurrent((prev) => ({
+        ...prev,
+        images: { ...prev.images, [type]: compressed },
+      }));
+    } catch (error) {
+      console.error("Erreur lors de la compression :", error);
+    }
   };
 
   return (
