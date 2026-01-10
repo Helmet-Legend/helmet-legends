@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { TexturedButton } from "../components/TexturedButton";
 import { compressImage } from "../utils/imageCompressor";
+import { translations } from "../data/translations";
 
 const MANUFACTURERS = {
   ET: "Eisenhüttenwerke, Thale",
@@ -16,100 +17,121 @@ const MANUFACTURERS = {
   SE: "Sächsische Emaillier-und Stanzwerke",
   NS: "Vereinigte Deutsche Nickelwerke",
   EF: "Emaillierwerke AG, Fulda",
-  CKL: "Eisenhüttenwerke Thale (Tardif)",
-  HKP: "SE (Tardif)",
+  CKL: "Eisenhüttenwerke Thale (Late)",
+  HKP: "SE (Late)",
 };
 
-const HELMET_MODELS = [
-  "M35",
-  "M40",
-  "M42",
-  "M38 (Parachutiste)",
-  "Luftschutz (Gladiator)",
-  "M34 Feuerwehr (Pompiers/Police)",
-  "Autre / Prototype",
-];
-const SHELL_SIZES = ["60", "62", "64", "66", "68", "70", "72"];
-const LINER_SIZES = [
-  "52",
-  "53",
-  "54",
-  "55",
-  "56",
-  "57",
-  "58",
-  "59",
-  "60",
-  "61",
-];
-const PAINT_OPTIONS = [
-  "100% (Stock)",
-  "90%",
-  "80%",
-  "70%",
-  "60%",
-  "50%",
-  "40%",
-  "30%",
-  "20%",
-  "10%",
-  "REPEINT",
-  "ROUILLÉ",
-];
-const DECAL_OPTIONS = ["Aucun", "Mono-insigne", "Double insignes"];
-
-// --- LOGIQUE D'EXPERTISE CENTRALISÉE (LOTS + INSIGNES) ---
-export const getExpertise = (helmet) => {
+// --- LOGIQUE D'EXPERTISE CENTRALISÉE BILINGUE ---
+export const getExpertise = (helmet, lang) => {
   const lot = parseInt(helmet.lotNumber);
   const mkr = helmet.manufacturer?.toUpperCase();
   const mdl = helmet.model;
   const dec = helmet.decals;
 
+  const isFr = lang === "fr";
+
   if (!lot || !mkr || !mdl)
-    return "Analyse en attente de données complètes (Usine + Lot)...";
+    return isFr
+      ? "Analyse en attente de données complètes (Usine + Lot)..."
+      : "Analysis pending complete data (Factory + Lot)...";
 
-  if (mdl === "M35") {
+  if (mdl.includes("M35")) {
     if (lot > 5500)
-      return `ALERTE : Lot #${lot} très élevé pour un M35. Transition M40 probable. Vérifiez si les évents sont bien rivetés.`;
-    return "M35 : Standard double insignes. Si aucun n'est présent, vérifiez s'il s'agit d'un reconditionnement tardif.";
+      return isFr
+        ? `ALERTE : Lot #${lot} très élevé pour un M35. Transition M40 probable. Vérifiez les évents.`
+        : `ALERT: Lot #${lot} is very high for an M35. M40 transition likely. Check the vents.`;
+    return isFr
+      ? "M35 : Standard double insignes. Vérifiez si reconditionnement tardif."
+      : "M35: Standard double decals. Check for late-war refurbishment.";
   }
 
-  if (mdl === "M40" && dec === "Double insignes") {
-    return "ANOMALIE : Décret de Mars 1940 : arrêt du bouclier tricolore. Un M40 ne devrait être que mono-insigne (sauf Police/SS).";
+  if (mdl.includes("M40") && dec.includes("Double")) {
+    return isFr
+      ? "ANOMALIE : Décret Mars 1940 : fin du bouclier tricolore. M40 mono-insigne standard."
+      : "ANOMALY: March 1940 Decree: end of tricolor shield. M40 is standard single decal.";
   }
 
-  if (mdl === "M42") {
-    if (dec === "Double insignes")
-      return "ALERTE : Un M42 double insignes est historiquement aberrant (Décrets 1940/43). Risque de faux à 99%.";
+  if (mdl.includes("M42")) {
+    if (dec.includes("Double"))
+      return isFr
+        ? "ALERTE : Un M42 double insignes est historiquement aberrant. Risque de faux à 99%."
+        : "ALERT: A double decal M42 is historically incorrect. 99% risk of being fake.";
     if (mkr === "ET")
-      return "ANOMALIE : Thale utilisait le code 'ckl' pour les M42. Le marquage 'ET' est suspect sur ce modèle.";
+      return isFr
+        ? "ANOMALIE : Thale utilisait le code 'ckl' pour les M42. Marquage 'ET' suspect ici."
+        : "ANOMALY: Thale used the 'ckl' code for M42s. 'ET' marking is suspicious here.";
   }
 
-  if (mdl === "M38 (Parachutiste)" && mkr !== "ET" && mkr !== "CKL") {
-    return "ALERTE : Seule l'usine de Thale a produit des M38 authentiques. Risque de copie majeure.";
+  if (mdl.includes("M38") && mkr !== "ET" && mkr !== "CKL") {
+    return isFr
+      ? "ALERTE : Seule l'usine de Thale a produit des M38 authentiques. Copie majeure probable."
+      : "ALERT: Only the Thale factory produced authentic M38s. High risk of copy.";
   }
 
-  return "Configuration conforme aux standards de production majeurs.";
+  return isFr
+    ? "Configuration conforme aux standards de production majeurs."
+    : "Configuration consistent with major production standards.";
 };
 
-export default function AddHelmet({ setScreen, onSave, helmet }) {
+export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
+  const t = translations[lang].add;
+  const isFr = lang === "fr";
+
+  const HELMET_MODELS = isFr
+    ? [
+        "M35",
+        "M40",
+        "M42",
+        "M38 (Parachutiste)",
+        "Luftschutz (Gladiator)",
+        "M34 Feuerwehr (Police)",
+        "Autre",
+      ]
+    : [
+        "M35",
+        "M40",
+        "M42",
+        "M38 (Paratrooper)",
+        "Luftschutz (Gladiator)",
+        "M34 Feuerwehr (Police)",
+        "Other",
+      ];
+
+  const PAINT_OPTIONS = isFr
+    ? ["100% (Stock)", "REPEINT", "ROUILLÉ", "70%", "50%", "20%"]
+    : ["100% (Stock)", "REPAINTED", "RUSTY", "70%", "50%", "20%"];
+
+  const DECAL_OPTIONS = isFr
+    ? ["Aucun", "Mono-insigne", "Double insignes"]
+    : ["None", "Single Decal", "Double Decals"];
+
+  const SHELL_SIZES = ["60", "62", "64", "66", "68", "70", "72"];
+  const LINER_SIZES = [
+    "52",
+    "53",
+    "54",
+    "55",
+    "56",
+    "57",
+    "58",
+    "59",
+    "60",
+    "61",
+  ];
+
   const [current, setCurrent] = useState(
     helmet || {
       id: null,
       model: "",
       manufacturer: "",
       lotNumber: "",
-      provenance: "",
       description: "",
       shellSize: "",
       linerSize: "",
-      weight: "",
-      material: "",
       paintCondition: "",
       linerCondition: "",
       chinstrapState: "",
       decals: "",
-      expertiseMessage: "",
       images: {
         main: null,
         front: null,
@@ -128,33 +150,36 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
     color: "text-gray-500",
     icon: null,
   });
-
-  // État pour gérer l'affichage des bulles d'aide
   const [activeHelp, setActiveHelp] = useState(null);
 
-  const isStandardMkr = Object.keys(MANUFACTURERS).includes(
-    current.manufacturer
-  );
-  const isStandardShell = SHELL_SIZES.includes(current.shellSize);
-  const isStandardLiner = LINER_SIZES.includes(current.linerSize);
-
   useEffect(() => {
-    const msg = getExpertise(current);
+    const msg = getExpertise(current, lang);
     let color = "text-blue-400";
     let icon = <CheckCircle size={14} />;
 
-    if (msg.includes("ALERTE") || msg.includes("ANOMALIE")) {
+    if (
+      msg.includes("ALERTE") ||
+      msg.includes("ALERT") ||
+      msg.includes("ANOMALIE") ||
+      msg.includes("ANOMALY")
+    ) {
       color =
-        msg.includes("faux") || msg.includes("M38")
+        msg.toLowerCase().includes("faux") || msg.toLowerCase().includes("fake")
           ? "text-red-500"
           : "text-orange-500";
       icon = <AlertTriangle size={14} />;
-    } else if (msg.includes("attente")) {
+    } else if (msg.includes("attente") || msg.includes("pending")) {
       color = "text-gray-500";
       icon = <Info size={14} />;
     }
     setValidation({ message: msg, color, icon });
-  }, [current.model, current.manufacturer, current.lotNumber, current.decals]);
+  }, [
+    current.model,
+    current.manufacturer,
+    current.lotNumber,
+    current.decals,
+    lang,
+  ]);
 
   const handleUpload = async (e, type) => {
     const file = e.target.files[0];
@@ -170,13 +195,17 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
     }
   };
 
-  const toggleHelp = (id) => setActiveHelp(activeHelp === id ? null : id);
-
   return (
     <div className="p-6 h-screen overflow-y-auto pb-32 bg-[#2a2822] font-serif text-[#d0c7a8]">
       <div className="flex justify-between items-center mb-8 border-b-2 border-[#8a7f5d] pb-4">
         <h2 className="text-xl font-black italic uppercase">
-          {current.id ? "Modification" : "Archivage"}
+          {current.id
+            ? isFr
+              ? "Modification"
+              : "Edit Record"
+            : isFr
+            ? "Archivage"
+            : "Archiving"}
         </h2>
         <button
           onClick={() => setScreen("registry")}
@@ -191,7 +220,7 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
         <div className="grid grid-cols-1 gap-4">
           <div className="space-y-2">
             <label className="text-[9px] uppercase font-black text-gray-500 ml-1">
-              Modèle
+              {t.labelModel}
             </label>
             <select
               className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm font-black text-[#f0ede0] outline-none"
@@ -200,7 +229,7 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
                 setCurrent({ ...current, model: e.target.value })
               }
             >
-              <option value="">-- Sélectionner --</option>
+              <option value="">-- {isFr ? "Sélectionner" : "Select"} --</option>
               {HELMET_MODELS.map((m) => (
                 <option key={m} value={m}>
                   {m}
@@ -210,7 +239,7 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
           </div>
           <div className="space-y-2">
             <label className="text-[9px] uppercase font-black text-gray-500 ml-1">
-              Insignes (Decals)
+              {t.labelDecal}
             </label>
             <select
               className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm font-bold text-[#f0ede0] outline-none"
@@ -219,7 +248,9 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
                 setCurrent({ ...current, decals: e.target.value })
               }
             >
-              <option value="">-- État des insignes --</option>
+              <option value="">
+                -- {isFr ? "État des insignes" : "Decal state"} --
+              </option>
               {DECAL_OPTIONS.map((opt) => (
                 <option key={opt} value={opt}>
                   {opt}
@@ -234,104 +265,52 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
           <div className="space-y-2 relative">
             <div className="flex items-center gap-1 ml-1">
               <label className="text-[9px] uppercase font-black text-gray-500">
-                Usine
+                {t.labelFactory}
               </label>
               <button
-                onClick={() => toggleHelp("mkr")}
+                onClick={() =>
+                  setActiveHelp(activeHelp === "mkr" ? null : "mkr")
+                }
                 className="text-[#8a7f5d]"
               >
                 <HelpCircle size={10} />
               </button>
             </div>
-
             {activeHelp === "mkr" && (
-              <div className="absolute z-50 top-14 left-0 right-0 bg-[#3a3832] border border-[#8a7f5d] p-3 rounded-lg shadow-xl text-[10px] leading-tight animate-in fade-in zoom-in duration-200">
+              <div className="absolute z-50 top-14 left-0 right-0 bg-[#3a3832] border border-[#8a7f5d] p-3 rounded-lg shadow-xl text-[10px] leading-tight animate-in fade-in zoom-in">
                 <p>
-                  Le code fabricant (ex: ET, Q) est frappé sur le{" "}
-                  <b>flanc intérieur gauche</b> (M35/M40) ou dans la{" "}
-                  <b>nuquière</b> (M42).
+                  {isFr
+                    ? "Le code usine est frappé sur le flanc intérieur gauche ou dans la nuquière."
+                    : "Factory code is stamped on the inner left skirt or rear neck."}
                 </p>
                 <button
                   onClick={() => setActiveHelp(null)}
                   className="mt-2 text-[8px] uppercase font-black text-amber-500 underline"
                 >
-                  Compris
+                  {isFr ? "Compris" : "Got it"}
                 </button>
               </div>
             )}
-
             <select
               className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm font-bold text-amber-500 outline-none"
-              value={
-                isStandardMkr
-                  ? current.manufacturer
-                  : current.manufacturer === ""
-                  ? ""
-                  : "AUTRE"
-              }
+              value={current.manufacturer}
               onChange={(e) =>
-                setCurrent({
-                  ...current,
-                  manufacturer:
-                    e.target.value === "AUTRE" ? "SAISIE..." : e.target.value,
-                })
+                setCurrent({ ...current, manufacturer: e.target.value })
               }
             >
-              <option value="">-- Usine --</option>
-              {Object.entries(MANUFACTURERS).map(([code]) => (
+              <option value="">-- {isFr ? "Usine" : "Factory"} --</option>
+              {Object.keys(MANUFACTURERS).map((code) => (
                 <option key={code} value={code}>
                   {code}
                 </option>
               ))}
-              <option value="AUTRE">AUTRE</option>
             </select>
-            {!isStandardMkr && current.manufacturer !== "" && (
-              <input
-                autoFocus
-                className="w-full mt-2 bg-[#1a1812] border-2 border-amber-600/30 p-4 rounded-xl text-sm text-amber-500 uppercase outline-none"
-                value={
-                  current.manufacturer === "SAISIE..."
-                    ? ""
-                    : current.manufacturer
-                }
-                onChange={(e) =>
-                  setCurrent({
-                    ...current,
-                    manufacturer: e.target.value.toUpperCase(),
-                  })
-                }
-              />
-            )}
           </div>
 
-          <div className="space-y-2 relative">
-            <div className="flex items-center gap-1 ml-1">
-              <label className="text-[9px] uppercase font-black text-gray-500">
-                N° Lot
-              </label>
-              <button
-                onClick={() => toggleHelp("lot")}
-                className="text-[#8a7f5d]"
-              >
-                <HelpCircle size={10} />
-              </button>
-            </div>
-
-            {activeHelp === "lot" && (
-              <div className="absolute z-50 top-14 left-0 right-0 bg-[#3a3832] border border-[#8a7f5d] p-3 rounded-lg shadow-xl text-[10px] leading-tight animate-in fade-in zoom-in duration-200">
-                <p>
-                  Le numéro est frappé à froid au centre de la <b>nuquière</b>{" "}
-                  (arrière intérieur du casque).
-                </p>
-                <button
-                  onClick={() => setActiveHelp(null)}
-                  className="mt-2 text-[8px] uppercase font-black text-amber-500 underline"
-                >
-                  Compris
-                </button>
-              </div>
-            )}
-
+          <div className="space-y-2">
+            <label className="text-[9px] uppercase font-black text-gray-500 ml-1">
+              {t.labelLot}
+            </label>
             <input
               placeholder="ex: 1234"
               className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm text-amber-500 font-bold h-[56px] outline-none"
@@ -343,17 +322,18 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
           </div>
         </div>
 
-        {/* BANDEAU D'EXPERTISE */}
+        {/* RAPPORT EXPERTISE */}
         <div
           className={`p-4 rounded-2xl bg-[#1a1812] border-2 ${validation.color.replace(
             "text",
             "border"
-          )} bg-opacity-10 flex flex-col gap-2 transition-all shadow-inner`}
+          )} bg-opacity-10 shadow-inner`}
         >
           <div
             className={`flex items-center gap-2 ${validation.color} font-black text-[11px] uppercase tracking-widest`}
           >
-            {validation.icon} Rapport d'Expertise
+            {validation.icon}{" "}
+            {isFr ? "Rapport d'Expertise" : "Expertise Report"}
           </div>
           <p className="text-[10px] text-[#f0ede0] leading-relaxed italic opacity-90">
             "{validation.message}"
@@ -361,153 +341,43 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
         </div>
 
         {/* TECHNIQUES */}
-        <div className="space-y-4 border-t border-[#3a3832] pt-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-[9px] uppercase font-black text-gray-500 ml-1">
-                Coque
-              </label>
-              <select
-                className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm font-bold text-[#f0ede0] outline-none"
-                value={
-                  isStandardShell
-                    ? current.shellSize
-                    : current.shellSize === ""
-                    ? ""
-                    : "AUTRE"
-                }
-                onChange={(e) =>
-                  setCurrent({
-                    ...current,
-                    shellSize:
-                      e.target.value === "AUTRE" ? "SAISIE..." : e.target.value,
-                  })
-                }
-              >
-                <option value="">-- Taille --</option>
-                {SHELL_SIZES.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-                <option value="AUTRE">AUTRE</option>
-              </select>
-              {!isStandardShell && current.shellSize !== "" && (
-                <input
-                  autoFocus
-                  className="w-full mt-2 bg-[#1a1812] border-2 border-amber-600/30 p-4 rounded-xl text-sm text-[#f0ede0] outline-none"
-                  value={
-                    current.shellSize === "SAISIE..." ? "" : current.shellSize
-                  }
-                  onChange={(e) =>
-                    setCurrent({
-                      ...current,
-                      shellSize: e.target.value.toUpperCase(),
-                    })
-                  }
-                />
-              )}
-            </div>
-            <div className="space-y-2">
-              <label className="text-[9px] uppercase font-black text-gray-500 ml-1">
-                Peinture
-              </label>
-              <select
-                className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm font-bold text-amber-500 outline-none"
-                value={current.paintCondition}
-                onChange={(e) =>
-                  setCurrent({ ...current, paintCondition: e.target.value })
-                }
-              >
-                <option value="">-- État --</option>
-                {PAINT_OPTIONS.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-[9px] uppercase font-black text-gray-500 ml-1">
-                Coiffe
-              </label>
-              <select
-                className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm font-bold text-[#f0ede0] outline-none"
-                value={
-                  isStandardLiner
-                    ? current.linerSize
-                    : current.linerSize === ""
-                    ? ""
-                    : "AUTRE"
-                }
-                onChange={(e) =>
-                  setCurrent({
-                    ...current,
-                    linerSize:
-                      e.target.value === "AUTRE" ? "SAISIE..." : e.target.value,
-                  })
-                }
-              >
-                <option value="">-- Taille --</option>
-                {LINER_SIZES.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-                <option value="AUTRE">AUTRE</option>
-              </select>
-              {!isStandardLiner && current.linerSize !== "" && (
-                <input
-                  autoFocus
-                  className="w-full mt-2 bg-[#1a1812] border-2 border-amber-600/30 p-4 rounded-xl text-sm text-[#f0ede0] outline-none"
-                  value={
-                    current.linerSize === "SAISIE..." ? "" : current.linerSize
-                  }
-                  onChange={(e) =>
-                    setCurrent({ ...current, linerSize: e.target.value })
-                  }
-                />
-              )}
-            </div>
-            <div className="space-y-2">
-              <label className="text-[9px] uppercase font-black text-gray-500 ml-1">
-                État Intérieur
-              </label>
-              <select
-                className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm font-bold text-[#f0ede0] outline-none"
-                value={current.linerCondition}
-                onChange={(e) =>
-                  setCurrent({ ...current, linerCondition: e.target.value })
-                }
-              >
-                <option value="">-- État --</option>
-                <option value="Neuve">Neuve</option>
-                <option value="Légèrement portée">Légèrement portée</option>
-                <option value="Usée">Usée</option>
-                <option value="Restaurée">Restaurée</option>
-              </select>
-            </div>
-          </div>
-
+        <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="text-[9px] uppercase font-black text-gray-500 ml-1">
-              Jugulaire
+              {t.labelSize}
             </label>
             <select
               className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm font-bold text-[#f0ede0] outline-none"
-              value={current.chinstrapState}
+              value={current.shellSize}
               onChange={(e) =>
-                setCurrent({ ...current, chinstrapState: e.target.value })
+                setCurrent({ ...current, shellSize: e.target.value })
               }
             >
-              <option value="">-- État Jugulaire --</option>
-              <option value="Présente">Présente</option>
-              <option value="Manquante">Manquante</option>
-              <option value="Détériorée">Détériorée</option>
-              <option value="Remplacée">Remplacée (Repro)</option>
+              <option value="">-- {isFr ? "Coque" : "Shell"} --</option>
+              {SHELL_SIZES.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-2">
+            <label className="text-[9px] uppercase font-black text-gray-500 ml-1">
+              {t.labelPaint}
+            </label>
+            <select
+              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm font-bold text-amber-500 outline-none"
+              value={current.paintCondition}
+              onChange={(e) =>
+                setCurrent({ ...current, paintCondition: e.target.value })
+              }
+            >
+              <option value="">-- {isFr ? "État" : "Condition"} --</option>
+              {PAINT_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -516,21 +386,13 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
         <div className="pt-4 space-y-3">
           <UploadRow
             type="main"
-            label="Vue Principale"
+            label={isFr ? "Vue Principale" : "Main View"}
             current={current}
             onUpload={handleUpload}
             height="h-40"
           />
           <div className="grid grid-cols-4 gap-2">
-            {[
-              "front",
-              "left",
-              "right",
-              "back",
-              "bottom",
-              "interior",
-              "chinstrap",
-            ].map((v) => (
+            {["front", "left", "right", "interior"].map((v) => (
               <UploadRow
                 key={v}
                 type={v}
@@ -544,8 +406,8 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
 
         <textarea
           rows="4"
-          placeholder="Notes & Histoire..."
-          className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm italic text-[#d0c7a8] resize-none outline-none"
+          placeholder={t.labelNote}
+          className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm italic text-[#d0c7a8] outline-none"
           value={current.description}
           onChange={(e) =>
             setCurrent({ ...current, description: e.target.value })
@@ -553,10 +415,10 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
         />
 
         <TexturedButton
-          label={current.id ? "Mettre à jour" : "Sceller l'Archive"}
+          label={current.id ? (isFr ? "Mettre à jour" : "Update") : t.btnSave}
           onClick={() => {
-            const finalExpertise = getExpertise(current);
-            onSave({ ...current, expertiseMessage: finalExpertise });
+            const finalExp = getExpertise(current, lang);
+            onSave({ ...current, expertiseMessage: finalExp });
             setScreen("registry");
           }}
         />
