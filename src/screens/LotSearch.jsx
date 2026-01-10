@@ -9,22 +9,24 @@ import {
   Ruler,
 } from "lucide-react";
 import { lotDatabase } from "../data/lotDatabase";
+import { translations } from "../data/translations"; // Import des traductions
 
-const LotSearch = ({ setScreen }) => {
+const LotSearch = ({ setScreen, lang }) => {
   const [usine, setUsine] = useState("ET");
-  const [taille, setTaille] = useState("64"); // Taille par défaut
+  const [taille, setTaille] = useState("64");
   const [lot, setLot] = useState("");
   const [result, setResult] = useState(null);
+
+  // Accès aux textes traduits
+  const t = translations[lang].lotSearch;
 
   const handleSearch = () => {
     const num = parseInt(lot);
     const size = parseInt(taille);
 
-    // Recherche croisée : Usine + Plage de lot + Taille (si spécifiée dans la base)
     const found = lotDatabase.find((item) => {
       const matchUsine = item.usine === usine;
       const matchLot = num >= item.lotStart && num <= item.lotEnd;
-      // On vérifie la taille si elle est renseignée dans l'entrée de la base de données
       const matchTaille = item.taille ? item.taille === size : true;
 
       return matchUsine && matchLot && matchTaille;
@@ -40,7 +42,7 @@ const LotSearch = ({ setScreen }) => {
         <div className="flex items-center gap-3">
           <Database className="text-amber-500" size={28} />
           <h2 className="text-xl font-black uppercase italic tracking-tighter">
-            Lot Search Expert
+            {t.title}
           </h2>
         </div>
         <button
@@ -54,8 +56,9 @@ const LotSearch = ({ setScreen }) => {
       <div className="space-y-6">
         <div className="flex flex-col gap-2">
           <p className="text-xs italic opacity-70 leading-relaxed">
-            Identifiez la configuration d'usine probable en croisant le code
-            fabricant, la taille et le numéro de lot.
+            {lang === "fr"
+              ? "Identifiez la configuration d'usine probable en croisant le code fabricant, la taille et le numéro de lot."
+              : "Identify the probable factory configuration by crossing the manufacturer code, size, and lot number."}
           </p>
         </div>
 
@@ -64,7 +67,7 @@ const LotSearch = ({ setScreen }) => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-[10px] font-black uppercase text-amber-600 mb-2 block">
-                Fabricant
+                {t.factory}
               </label>
               <select
                 value={usine}
@@ -81,7 +84,7 @@ const LotSearch = ({ setScreen }) => {
 
             <div>
               <label className="text-[10px] font-black uppercase text-amber-600 mb-2 block">
-                Taille Coque
+                {t.size}
               </label>
               <div className="relative">
                 <select
@@ -89,9 +92,9 @@ const LotSearch = ({ setScreen }) => {
                   onChange={(e) => setTaille(e.target.value)}
                   className="w-full p-3 bg-black/40 border border-amber-900/50 rounded-xl text-white font-bold outline-none focus:border-amber-500 transition-colors appearance-none"
                 >
-                  {[60, 62, 64, 66, 68, 70].map((t) => (
-                    <option key={t} value={t}>
-                      {t}
+                  {[60, 62, 64, 66, 68, 70].map((tSize) => (
+                    <option key={tSize} value={tSize}>
+                      {tSize}
                     </option>
                   ))}
                 </select>
@@ -105,12 +108,12 @@ const LotSearch = ({ setScreen }) => {
 
           <div>
             <label className="text-[10px] font-black uppercase text-amber-600 mb-2 block">
-              Numéro de Lot
+              {t.lotNumber}
             </label>
             <div className="relative">
               <input
                 type="number"
-                placeholder="Ex: 4520"
+                placeholder={t.placeholder}
                 value={lot}
                 onChange={(e) => setLot(e.target.value)}
                 className="w-full p-4 bg-black/40 border border-amber-900/50 rounded-2xl placeholder:text-amber-900 text-white font-bold outline-none focus:border-amber-500 transition-colors"
@@ -134,14 +137,14 @@ const LotSearch = ({ setScreen }) => {
               </div>
 
               <h4 className="text-amber-500 font-black uppercase text-xs mb-4 flex items-center gap-2">
-                <Info size={14} /> Fiche de Production Estimée
+                <Info size={14} /> {t.resultTitle}
               </h4>
 
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="border-b border-amber-600/20 pb-2">
                     <span className="text-[10px] uppercase opacity-60 block">
-                      Modèle
+                      {lang === "fr" ? "Modèle" : "Model"}
                     </span>
                     <span className="font-bold text-white text-lg">
                       {result.modele}
@@ -149,23 +152,27 @@ const LotSearch = ({ setScreen }) => {
                   </div>
                   <div className="border-b border-amber-600/20 pb-2">
                     <span className="text-[10px] uppercase opacity-60 block">
-                      Armée
+                      {lang === "fr" ? "Armée" : "Branch"}
                     </span>
                     <span className="font-bold text-white text-lg">
-                      {result.armee}
+                      {/* On récupère la langue spécifique pour l'armée */}
+                      {result.armee[lang]}
                     </span>
                   </div>
                 </div>
 
                 <div className="bg-black/20 p-4 rounded-2xl border border-amber-900/20">
                   <p className="text-xs italic leading-relaxed text-amber-100/90">
-                    {result.note}
+                    {/* On récupère la langue spécifique pour la note */}
+                    {result.note[lang]}
                   </p>
                 </div>
 
                 {result.taille && (
                   <div className="text-[10px] text-amber-500 font-bold uppercase tracking-widest text-center">
-                    Validation spécifique pour taille {result.taille}
+                    {lang === "fr"
+                      ? `Validation spécifique pour taille ${result.taille}`
+                      : `Specific validation for size ${result.taille}`}
                   </div>
                 )}
               </div>
@@ -178,11 +185,12 @@ const LotSearch = ({ setScreen }) => {
             <AlertCircle className="text-red-600" size={40} />
             <div>
               <p className="text-sm font-black text-red-200 uppercase tracking-widest mb-1">
-                Aucune Donnée Répertoriée
+                {lang === "fr"
+                  ? "Aucune Donnée Répertoriée"
+                  : "No Registered Data"}
               </p>
               <p className="text-xs text-red-100/60 italic leading-relaxed">
-                Ce numéro de lot associé à cette taille n'est pas encore présent
-                dans la base. Vérifiez la lecture du marquage sur l'acier.
+                {t.unknown}
               </p>
             </div>
           </div>

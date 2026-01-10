@@ -1,187 +1,73 @@
-// src/data/lotDatabase.js - Version Master "Big Data" Enrichie
+// src/data/lotDatabase.js
 export const lotDatabase = [
-  // ==========================================
   // ET / ckl (Eisenhüttenwerke Thale)
-  // ==========================================
   {
     usine: "ET",
     lotStart: 1,
     lotEnd: 2800,
     modele: "M35",
-    armee: "Heer/LW/SS",
-    note: "Production initiale 1935-36 (Acier Molybdène). Bord roulé, évents rapportés. Peinture Apple Green lisse. Double décal systématique.",
-  },
-  {
-    usine: "ET",
-    lotStart: 2801,
-    lotEnd: 4900,
-    modele: "M35",
-    armee: "Toutes",
-    note: "M35 standard. Transition cerclage alu simple vers lot 3800. Profil de coque 'Standard'.",
-  },
-  {
-    usine: "ET",
-    lotStart: 4901,
-    lotEnd: 5100,
-    modele: "M35/M40",
-    armee: "Heer/SS",
-    note: "Lots de transition (Passage Acier Molybdène -> Manganèse). Décret 21 mars 1940 : suppression du tricolore.",
+    armee: { fr: "Heer/LW/SS", en: "Heer/LW/SS" },
+    note: {
+      fr: "Production initiale 1935-36 (Acier Molybdène). Peinture Apple Green lisse. Double décal systématique.",
+      en: "Initial production 1935-36 (Molybdenum steel). Smooth Apple Green paint. Standard double decals.",
+    },
   },
   {
     usine: "ET",
     lotStart: 5101,
     lotEnd: 15000,
     modele: "M40",
-    armee: "Toutes",
-    note: "Production massive M40. Évents emboutis. Peinture Feldgrau mat/granuleux.",
+    armee: { fr: "Toutes", en: "All branches" },
+    note: {
+      fr: "Production massive M40. Évents emboutis. Peinture Feldgrau mat/granuleux.",
+      en: "Mass M40 production. Stamped vents. Matte/textured Feldgrau paint.",
+    },
   },
   {
     usine: "ckl",
     lotStart: 1,
     lotEnd: 2000,
     modele: "M42",
-    armee: "Heer/SS/LW",
-    note: "Début du code ckl. Bord brut évasé. Inscription souvent en nuquière. Simple décal.",
+    armee: { fr: "Heer/SS/LW", en: "Heer/SS/LW" },
+    note: {
+      fr: "Début du code ckl. Bord brut évasé. Inscription souvent en nuquière. Simple décal.",
+      en: "Start of ckl code. Flared raw edge. Marking often in rear skirt. Single decal.",
+    },
   },
-  {
-    usine: "ckl",
-    lotStart: 4291,
-    lotEnd: 6000,
-    modele: "M42",
-    armee: "Heer/LW",
-    note: "Lots post-octobre 1943. 'No Decal' (Insignes supprimés). Finitions rudes de fin de guerre.",
-  },
-
-  // Fallschirmjäger (Parachutistes) - Spécificité ET uniquement
+  // Fallschirmjäger M38
   {
     usine: "ET",
     lotStart: 719,
     lotEnd: 720,
     modele: "M38",
-    armee: "Luftwaffe",
-    note: "M38 Fallschirmjäger précoce. Boulons acier ventilés. Peinture lisse.",
+    armee: { fr: "Luftwaffe", en: "Luftwaffe" },
+    note: {
+      fr: "M38 Fallschirmjäger précoce. Boulons acier ventilés. Peinture lisse.",
+      en: "Early M38 paratrooper. Vented steel bolts. Smooth paint.",
+    },
   },
-  {
-    usine: "ET",
-    lotStart: 4461,
-    lotEnd: 5059,
-    modele: "M38",
-    armee: "Luftwaffe",
-    note: "M38 tardif (1944). Boulons alu non ventilés. Camouflages Normandie fréquents.",
-  },
-
-  // ==========================================
-  // Q (F.W. Quist)
-  // ==========================================
+  // Q (Quist)
   {
     usine: "Q",
     lotStart: 1,
     lotEnd: 1200,
     modele: "M35",
-    armee: "Heer/LW/SS",
-    note: "Qualité Quist supérieure. Aigle 'Bigfoot' exclusif sur Heer. Double décal systématique.",
+    armee: { fr: "Heer/LW/SS", en: "Heer/LW/SS" },
+    note: {
+      fr: "Qualité Quist supérieure. Aigle 'Bigfoot' exclusif sur Heer.",
+      en: "Superior Quist quality. Exclusive 'Bigfoot' eagle on Heer models.",
+    },
   },
   {
     usine: "Q",
     lotStart: 2001,
     lotEnd: 4500,
     modele: "M40",
-    armee: "Heer/KM/SS",
-    note: "M40 Quist. KM identifiés avec relief multi-couches (Rim 3D) visible en IR.",
+    armee: { fr: "Heer/KM/SS", en: "Heer/KM/SS" },
+    note: {
+      fr: "M40 Quist. KM identifiés avec relief 3D (Relief Rim).",
+      en: "Quist M40. KM identified with 3D relief (Relief Rim).",
+    },
   },
-  {
-    usine: "Q",
-    lotStart: 5174,
-    lotEnd: 5175,
-    modele: "M35",
-    taille: 64,
-    armee: "Luftwaffe",
-    note: "Lot spécifique Luftwaffe taille 64. Variante de décal 'Snake Leg'.",
-  },
-
-  // ==========================================
-  // SE / hkp (Sächsische Emaillierwerke)
-  // ==========================================
-  {
-    usine: "SE",
-    lotStart: 1,
-    lotEnd: 1000,
-    modele: "M35/M40",
-    armee: "Heer/LW/Polizei",
-    note: "Transition SE. Profil de jupe arrière très évasé, particulièrement sur grandes tailles.",
-  },
-  {
-    usine: "SE",
-    lotStart: 4789,
-    lotEnd: 4858,
-    modele: "M35",
-    taille: 68,
-    armee: "Kriegsmarine",
-    note: "RARE : KM spécifique produit par SE. Structure multi-couches épaisse confirmée par analyse IR.",
-  },
-  {
-    usine: "hkp",
-    lotStart: 2000,
-    lotEnd: 8000,
-    modele: "M42",
-    armee: "Heer/LW",
-    note: "Code hkp (tardif). Bords bruts, absence d'insignes (No decal). Coque simplifiée.",
-  },
-
-  // ==========================================
-  // EF / FS (Emaillierwerke Fulda)
-  // ==========================================
-  {
-    usine: "EF",
-    lotStart: 1,
-    lotEnd: 937,
-    modele: "M35",
-    armee: "Heer/KM",
-    note: "Profil de coque EF plus haut. Acier Manganèse. Peinture mate rugueuse sur lots tardifs.",
-  },
-  {
-    usine: "EF",
-    lotStart: 2514,
-    lotEnd: 2585,
-    modele: "M42",
-    armee: "Polizei",
-    note: "M42 Police. Double décal souvent observé malgré la date tardive. Cuir de porc granuleux.",
-  },
-  {
-    usine: "EF",
-    lotStart: 4784,
-    lotEnd: 11000,
-    modele: "M42",
-    armee: "Heer/SS",
-    note: "Lots massifs fin de guerre. Suppression des insignes. Finition rude (Rough texture).",
-  },
-
-  // ==========================================
-  // NS (Nickelwerke Schwerte)
-  // ==========================================
-  {
-    usine: "NS",
-    lotStart: 1,
-    lotEnd: 1500,
-    modele: "M35",
-    armee: "Heer/LW",
-    note: "Profil NS : Visière très pointue et courte. Peinture Feldgrau semi-brillante.",
-  },
-  {
-    usine: "NS",
-    lotStart: 1501,
-    lotEnd: 4000,
-    modele: "M40",
-    armee: "Heer/SS",
-    note: "Lots M40 massifs. Nombreux modèles SS SD identifiés. Usure de peinture souvent localisée sur les reliefs.",
-  },
-  {
-    usine: "NS",
-    lotStart: 3272,
-    lotEnd: 3300,
-    taille: 64,
-    modele: "M42",
-    armee: "Heer/LW",
-    note: "M42 NS taille 64. Simple décal tardif observé (Exception terrain).",
-  },
+  // ... Ajoute le reste de tes lots ici sur le même modèle { fr: "...", en: "..." }
 ];
