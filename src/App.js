@@ -13,27 +13,25 @@ import LotSearch from "./screens/LotSearch";
 export default function App() {
   const [screen, setScreen] = useState("home");
   const [selectedHelmet, setSelectedHelmet] = useState(null);
-
-  // NOUVEAU : État de la langue (français par défaut)
   const [lang, setLang] = useState("fr");
 
-  // Toute la logique est isolée dans ce Hook
   const { collection, addOrUpdate, remove, stats } = useCollection();
 
   const renderScreen = () => {
     switch (screen) {
       case "home":
-        // L'accueil a besoin de setLang pour basculer la langue
         return <Home setScreen={setScreen} lang={lang} setLang={setLang} />;
 
       case "registry":
         return (
           <Registry
             setScreen={setScreen}
-            collection={collection}
-            remove={remove}
             lang={lang}
-            setSelectedHelmet={(h) => {
+            // --- CORRECTION DES NOMS ICI ---
+            helmets={collection} // On envoie collection sous le nom 'helmets'
+            onDelete={remove} // On envoie remove sous le nom 'onDelete'
+            onEdit={(h) => {
+              // On envoie cette fonction sous le nom 'onEdit'
               setSelectedHelmet(h);
               setScreen(h ? "details" : "add");
             }}
