@@ -27,7 +27,6 @@ export const getExpertise = (helmet, lang) => {
   const mkr = helmet.manufacturer?.toUpperCase();
   const mdl = helmet.model;
   const dec = helmet.decals;
-
   const isFr = lang === "fr";
 
   if (!lot || !mkr || !mdl)
@@ -56,16 +55,6 @@ export const getExpertise = (helmet, lang) => {
       return isFr
         ? "ALERTE : Un M42 double insignes est historiquement aberrant. Risque de faux à 99%."
         : "ALERT: A double decal M42 is historically incorrect. 99% risk of being fake.";
-    if (mkr === "ET")
-      return isFr
-        ? "ANOMALIE : Thale utilisait le code 'ckl' pour les M42. Marquage 'ET' suspect ici."
-        : "ANOMALY: Thale used the 'ckl' code for M42s. 'ET' marking is suspicious here.";
-  }
-
-  if (mdl.includes("M38") && mkr !== "ET" && mkr !== "CKL") {
-    return isFr
-      ? "ALERTE : Seule l'usine de Thale a produit des M38 authentiques. Copie majeure probable."
-      : "ALERT: Only the Thale factory produced authentic M38s. High risk of copy.";
   }
 
   return isFr
@@ -77,6 +66,7 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
   const t = translations[lang].add;
   const isFr = lang === "fr";
 
+  // --- OPTIONS DES MENUS ---
   const HELMET_MODELS = isFr
     ? [
         "M35",
@@ -97,13 +87,48 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
         "Other",
       ];
 
+  // Graduation de 100% à 10% + REPEINT/ROUILLÉ
   const PAINT_OPTIONS = isFr
-    ? ["100% (Stock)", "REPEINT", "ROUILLÉ", "70%", "50%", "20%"]
-    : ["100% (Stock)", "REPAINTED", "RUSTY", "70%", "50%", "20%"];
+    ? [
+        "100% (Stock)",
+        "90%",
+        "80%",
+        "70%",
+        "60%",
+        "50%",
+        "40%",
+        "30%",
+        "20%",
+        "10%",
+        "REPEINT",
+        "ROUILLÉ",
+      ]
+    : [
+        "100% (Stock)",
+        "90%",
+        "80%",
+        "70%",
+        "60%",
+        "50%",
+        "40%",
+        "30%",
+        "20%",
+        "10%",
+        "REPAINTED",
+        "RUSTY",
+      ];
 
   const DECAL_OPTIONS = isFr
     ? ["Aucun", "Mono-insigne", "Double insignes"]
     : ["None", "Single Decal", "Double Decals"];
+
+  const LINER_STATES = isFr
+    ? ["Neuve", "Légèrement portée", "Usée", "Restaurée", "Absente"]
+    : ["New", "Lightly worn", "Worn", "Restored", "Missing"];
+
+  const CHINSTRAP_STATES = isFr
+    ? ["Présente (Originale)", "Manquante", "Détériorée", "Remplacée (Repro)"]
+    : ["Present (Original)", "Missing", "Deteriorated", "Replaced (Repro)"];
 
   const SHELL_SIZES = ["60", "62", "64", "66", "68", "70", "72"];
   const LINER_SIZES = [
@@ -137,10 +162,7 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
         front: null,
         left: null,
         right: null,
-        back: null,
-        bottom: null,
         interior: null,
-        chinstrap: null,
       },
     }
   );
@@ -150,27 +172,18 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
     color: "text-gray-500",
     icon: null,
   });
-  const [activeHelp, setActiveHelp] = useState(null);
 
   useEffect(() => {
     const msg = getExpertise(current, lang);
     let color = "text-blue-400";
     let icon = <CheckCircle size={14} />;
-
     if (
       msg.includes("ALERTE") ||
       msg.includes("ALERT") ||
-      msg.includes("ANOMALIE") ||
-      msg.includes("ANOMALY")
+      msg.includes("ANOMALIE")
     ) {
-      color =
-        msg.toLowerCase().includes("faux") || msg.toLowerCase().includes("fake")
-          ? "text-red-500"
-          : "text-orange-500";
+      color = "text-orange-500";
       icon = <AlertTriangle size={14} />;
-    } else if (msg.includes("attente") || msg.includes("pending")) {
-      color = "text-gray-500";
-      icon = <Info size={14} />;
     }
     setValidation({ message: msg, color, icon });
   }, [
@@ -202,10 +215,10 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
           {current.id
             ? isFr
               ? "Modification"
-              : "Edit Record"
+              : "Edit"
             : isFr
             ? "Archivage"
-            : "Archiving"}
+            : "Archive"}
         </h2>
         <button
           onClick={() => setScreen("registry")}
@@ -217,19 +230,19 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
 
       <div className="space-y-6">
         {/* MODÈLE ET INSIGNES */}
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-[9px] uppercase font-black text-gray-500 ml-1">
+            <label className="text-[9px] uppercase font-black text-gray-500">
               {t.labelModel}
             </label>
             <select
-              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm font-black text-[#f0ede0] outline-none"
+              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-xs font-black text-[#f0ede0] outline-none"
               value={current.model}
               onChange={(e) =>
                 setCurrent({ ...current, model: e.target.value })
               }
             >
-              <option value="">-- {isFr ? "Sélectionner" : "Select"} --</option>
+              <option value="">--</option>
               {HELMET_MODELS.map((m) => (
                 <option key={m} value={m}>
                   {m}
@@ -238,19 +251,17 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
             </select>
           </div>
           <div className="space-y-2">
-            <label className="text-[9px] uppercase font-black text-gray-500 ml-1">
+            <label className="text-[9px] uppercase font-black text-gray-500">
               {t.labelDecal}
             </label>
             <select
-              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm font-bold text-[#f0ede0] outline-none"
+              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-xs font-bold text-[#f0ede0] outline-none"
               value={current.decals}
               onChange={(e) =>
                 setCurrent({ ...current, decals: e.target.value })
               }
             >
-              <option value="">
-                -- {isFr ? "État des insignes" : "Decal state"} --
-              </option>
+              <option value="">--</option>
               {DECAL_OPTIONS.map((opt) => (
                 <option key={opt} value={opt}>
                   {opt}
@@ -262,43 +273,18 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
 
         {/* USINE & LOT */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2 relative">
-            <div className="flex items-center gap-1 ml-1">
-              <label className="text-[9px] uppercase font-black text-gray-500">
-                {t.labelFactory}
-              </label>
-              <button
-                onClick={() =>
-                  setActiveHelp(activeHelp === "mkr" ? null : "mkr")
-                }
-                className="text-[#8a7f5d]"
-              >
-                <HelpCircle size={10} />
-              </button>
-            </div>
-            {activeHelp === "mkr" && (
-              <div className="absolute z-50 top-14 left-0 right-0 bg-[#3a3832] border border-[#8a7f5d] p-3 rounded-lg shadow-xl text-[10px] leading-tight animate-in fade-in zoom-in">
-                <p>
-                  {isFr
-                    ? "Le code usine est frappé sur le flanc intérieur gauche ou dans la nuquière."
-                    : "Factory code is stamped on the inner left skirt or rear neck."}
-                </p>
-                <button
-                  onClick={() => setActiveHelp(null)}
-                  className="mt-2 text-[8px] uppercase font-black text-amber-500 underline"
-                >
-                  {isFr ? "Compris" : "Got it"}
-                </button>
-              </div>
-            )}
+          <div className="space-y-2">
+            <label className="text-[9px] uppercase font-black text-gray-500">
+              {t.labelFactory}
+            </label>
             <select
-              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm font-bold text-amber-500 outline-none"
+              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-xs font-bold text-amber-500 outline-none"
               value={current.manufacturer}
               onChange={(e) =>
                 setCurrent({ ...current, manufacturer: e.target.value })
               }
             >
-              <option value="">-- {isFr ? "Usine" : "Factory"} --</option>
+              <option value="">--</option>
               {Object.keys(MANUFACTURERS).map((code) => (
                 <option key={code} value={code}>
                   {code}
@@ -306,14 +292,13 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
               ))}
             </select>
           </div>
-
           <div className="space-y-2">
-            <label className="text-[9px] uppercase font-black text-gray-500 ml-1">
+            <label className="text-[9px] uppercase font-black text-gray-500">
               {t.labelLot}
             </label>
             <input
               placeholder="ex: 1234"
-              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm text-amber-500 font-bold h-[56px] outline-none"
+              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-xs text-amber-500 font-bold h-[52px] outline-none"
               value={current.lotNumber}
               onChange={(e) =>
                 setCurrent({ ...current, lotNumber: e.target.value })
@@ -330,30 +315,29 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
           )} bg-opacity-10 shadow-inner`}
         >
           <div
-            className={`flex items-center gap-2 ${validation.color} font-black text-[11px] uppercase tracking-widest`}
+            className={`flex items-center gap-2 ${validation.color} font-black text-[10px] uppercase tracking-widest`}
           >
-            {validation.icon}{" "}
-            {isFr ? "Rapport d'Expertise" : "Expertise Report"}
+            {validation.icon} {isFr ? "Expertise" : "Expertise"}
           </div>
           <p className="text-[10px] text-[#f0ede0] leading-relaxed italic opacity-90">
             "{validation.message}"
           </p>
         </div>
 
-        {/* TECHNIQUES */}
-        <div className="grid grid-cols-2 gap-4">
+        {/* TAILLES ET PEINTURE */}
+        <div className="grid grid-cols-3 gap-3">
           <div className="space-y-2">
-            <label className="text-[9px] uppercase font-black text-gray-500 ml-1">
+            <label className="text-[9px] uppercase font-black text-gray-500">
               {t.labelSize}
             </label>
             <select
-              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm font-bold text-[#f0ede0] outline-none"
+              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-xs text-white outline-none"
               value={current.shellSize}
               onChange={(e) =>
                 setCurrent({ ...current, shellSize: e.target.value })
               }
             >
-              <option value="">-- {isFr ? "Coque" : "Shell"} --</option>
+              <option value="">--</option>
               {SHELL_SIZES.map((s) => (
                 <option key={s} value={s}>
                   {s}
@@ -362,20 +346,81 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
             </select>
           </div>
           <div className="space-y-2">
-            <label className="text-[9px] uppercase font-black text-gray-500 ml-1">
+            <label className="text-[9px] uppercase font-black text-gray-500">
+              {isFr ? "Taille Coiffe" : "Liner Size"}
+            </label>
+            <select
+              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-xs text-white outline-none"
+              value={current.linerSize}
+              onChange={(e) =>
+                setCurrent({ ...current, linerSize: e.target.value })
+              }
+            >
+              <option value="">--</option>
+              {LINER_SIZES.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-2">
+            <label className="text-[9px] uppercase font-black text-gray-500">
               {t.labelPaint}
             </label>
             <select
-              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm font-bold text-amber-500 outline-none"
+              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-xs font-bold text-amber-500 outline-none"
               value={current.paintCondition}
               onChange={(e) =>
                 setCurrent({ ...current, paintCondition: e.target.value })
               }
             >
-              <option value="">-- {isFr ? "État" : "Condition"} --</option>
+              <option value="">--</option>
               {PAINT_OPTIONS.map((opt) => (
                 <option key={opt} value={opt}>
                   {opt}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* ÉTAT INTÉRIEUR & JUGULAIRE */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label className="text-[9px] uppercase font-black text-gray-500">
+              {isFr ? "État de l'intérieur" : "Interior State"}
+            </label>
+            <select
+              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-xs font-bold text-[#f0ede0] outline-none"
+              value={current.linerCondition}
+              onChange={(e) =>
+                setCurrent({ ...current, linerCondition: e.target.value })
+              }
+            >
+              <option value="">--</option>
+              {LINER_STATES.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-2">
+            <label className="text-[9px] uppercase font-black text-gray-500">
+              {isFr ? "État de la Jugulaire" : "Chinstrap State"}
+            </label>
+            <select
+              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-xs font-bold text-[#f0ede0] outline-none"
+              value={current.chinstrapState}
+              onChange={(e) =>
+                setCurrent({ ...current, chinstrapState: e.target.value })
+              }
+            >
+              <option value="">--</option>
+              {CHINSTRAP_STATES.map((s) => (
+                <option key={s} value={s}>
+                  {s}
                 </option>
               ))}
             </select>
@@ -386,10 +431,10 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
         <div className="pt-4 space-y-3">
           <UploadRow
             type="main"
-            label={isFr ? "Vue Principale" : "Main View"}
+            label={isFr ? "Principale" : "Main"}
             current={current}
             onUpload={handleUpload}
-            height="h-40"
+            height="h-32"
           />
           <div className="grid grid-cols-4 gap-2">
             {["front", "left", "right", "interior"].map((v) => (
@@ -407,7 +452,7 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
         <textarea
           rows="4"
           placeholder={t.labelNote}
-          className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm italic text-[#d0c7a8] outline-none"
+          className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-xs italic text-[#d0c7a8] outline-none"
           value={current.description}
           onChange={(e) =>
             setCurrent({ ...current, description: e.target.value })
@@ -427,7 +472,7 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
   );
 }
 
-const UploadRow = ({ type, label, current, onUpload, height = "h-20" }) => (
+const UploadRow = ({ type, label, current, onUpload, height = "h-16" }) => (
   <label
     className={`relative flex flex-col items-center justify-center bg-[#1a1812] border-2 border-[#3a3832] border-dashed rounded-xl cursor-pointer overflow-hidden ${height}`}
   >
@@ -440,15 +485,13 @@ const UploadRow = ({ type, label, current, onUpload, height = "h-20" }) => (
     {current.images[type] ? (
       <img
         src={current.images[type]}
-        className="w-full h-full object-cover opacity-80"
+        className="w-full h-full object-cover"
         alt={label}
       />
     ) : (
-      <div className="text-center">
-        <ImageIcon size={16} className="mx-auto mb-1 opacity-20" />
-        <span className="text-[7px] uppercase font-black opacity-40">
-          {label}
-        </span>
+      <div className="text-center opacity-20">
+        <ImageIcon size={14} className="mx-auto" />
+        <span className="text-[6px] uppercase font-black">{label}</span>
       </div>
     )}
   </label>
