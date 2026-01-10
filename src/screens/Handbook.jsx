@@ -16,6 +16,8 @@ import {
   Info,
   AlertTriangle,
   Wind,
+  Library,
+  ExternalLink,
 } from "lucide-react";
 
 const Handbook = ({ setScreen }) => {
@@ -164,7 +166,7 @@ const Handbook = ({ setScreen }) => {
     },
     {
       id: "paratroopers",
-      title: "III. Casques Parachutistes (M38)",
+      title: "III. Casques Parachutistes (FJ)",
       icon: <Wind size={20} />,
       content: (
         <div className="space-y-4">
@@ -203,7 +205,7 @@ const Handbook = ({ setScreen }) => {
     },
     {
       id: "liners",
-      title: "IV. Système M31 & Fixations",
+      title: "IV. Système M31 & Intérieurs",
       icon: <Settings size={20} />,
       content: (
         <div className="space-y-4">
@@ -437,7 +439,7 @@ const Handbook = ({ setScreen }) => {
                 d: "Forme ovale 'Abgenommen'. Encre 'bue' par l'acier (poreuse).",
               },
               {
-                t: "Cohérence Lot",
+                t: "Logique Lot",
                 d: "Lot tardif (>1943) = AUCUN décal d'usine. Coque M42 double décal = manipulation.",
               },
             ].map((item, idx) => (
@@ -455,6 +457,74 @@ const Handbook = ({ setScreen }) => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "resources",
+      title: "VIII. Pour aller plus loin (Sources)",
+      icon: <Library size={20} />,
+      content: (
+        <div className="space-y-6">
+          <p className="text-[11px] italic text-amber-200/60 leading-relaxed">
+            L'expertise est un apprentissage continu. Nous vous recommandons
+            vivement ces sources qui ont permis la création de cette base de
+            données.
+          </p>
+
+          <div className="grid gap-4">
+            <div className="bg-black/40 p-4 rounded-xl border border-amber-900/30 shadow-md">
+              <h4 className="text-amber-500 font-black text-xs uppercase mb-1">
+                Jan M. Meland
+              </h4>
+              <p className="text-[11px] text-white/80">
+                Livre : "German Helmets 1916-1945". La référence visuelle et
+                technique la plus récente (2023).
+              </p>
+            </div>
+
+            <div className="bg-black/40 p-4 rounded-xl border border-amber-900/30 shadow-md">
+              <h4 className="text-amber-500 font-black text-xs uppercase mb-1">
+                Brian Ice
+              </h4>
+              <p className="text-[11px] text-white/80">
+                Base de données "German Helmet Lot Numbers". Le travail colossal
+                de recensement des numéros de lots.
+              </p>
+            </div>
+
+            <a
+              href="https://germanhelmetvault.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-amber-600/5 p-4 rounded-xl border border-amber-600/20 flex justify-between items-center hover:bg-amber-600/10 transition-all group"
+            >
+              <div>
+                <h4 className="text-amber-500 font-black text-xs uppercase mb-1">
+                  German Helmet Vault
+                </h4>
+                <p className="text-[11px] text-white/80">
+                  Site d'Andrea : Études statistiques et visuelles de haute
+                  précision.
+                </p>
+              </div>
+              <ExternalLink
+                size={18}
+                className="text-amber-700 group-hover:text-amber-500 transition-colors"
+              />
+            </a>
+
+            <div className="p-4 bg-black/20 rounded-xl border border-amber-900/20">
+              <h4 className="text-amber-600 font-black text-[10px] uppercase mb-2">
+                Forums Recommandés
+              </h4>
+              <ul className="text-[10px] space-y-1 text-white/60">
+                <li>• Wehrmacht-Awards Forum (WA)</li>
+                <li>• German Helmet Walhalla (GHW2)</li>
+                <li>• War Relics Forum</li>
+              </ul>
+            </div>
           </div>
         </div>
       ),
