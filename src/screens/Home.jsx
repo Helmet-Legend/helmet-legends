@@ -1,5 +1,5 @@
 import React from "react";
-// --- ÉTAPE 1 : IMPORT DE L'IMAGE DEPUIS ASSETS ---
+// --- IMPORT DE L'IMAGE DEPUIS ASSETS ---
 import monFondExpert from "../assets/helmet-bg.png";
 
 import monLogo from "../logo.jpg";
@@ -19,20 +19,22 @@ export default function Home({ setScreen, lang, setLang }) {
 
   return (
     <div className="flex flex-col h-screen bg-[#1a1812] items-center justify-center p-6 text-[#d0c7a8] relative overflow-hidden">
-      {/* --- ÉTAPE 2 : LE FOND D'ÉCRAN --- */}
+      {/* --- FOND D'ÉCRAN MODIFIÉ (PLUS CLAIR) --- */}
       <div
         className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 scale-105"
         style={{
           backgroundImage: `url(${monFondExpert})`,
-          // On assombrit légèrement l'image elle-même pour le style
-          filter: "brightness(0.7) contrast(1.1)",
+          // Modification ici : brightness passe de 0.7 à 0.85
+          filter: "brightness(0.85) contrast(1.1)",
         }}
       >
-        {/* Overlay : Vignettage profond pour faire ressortir le menu central */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-[#1a1812]/40 to-[#1a1812] shadow-[inset_0_0_150px_rgba(0,0,0,0.9)]"></div>
+        {/* Overlay modifié : On réduit l'opacité du noir pour éclaircir l'ensemble */}
+        {/* from-black/70 devient from-black/50 */}
+        {/* via-[#1a1812]/40 devient via-[#1a1812]/30 */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-[#1a1812]/30 to-[#1a1812] shadow-[inset_0_0_150px_rgba(0,0,0,0.8)]"></div>
       </div>
 
-      {/* --- ÉTAPE 3 : LE CONTENU (Z-INDEX 10) --- */}
+      {/* --- LE CONTENU (Z-INDEX 10) --- */}
       <div className="relative z-10 flex flex-col items-center w-full max-w-xs">
         {/* SÉLECTEUR MINIATURE */}
         <div className="absolute -top-16 right-0 flex items-center gap-2 z-50 bg-black/60 p-1.5 px-3 rounded-full border border-amber-900/30 backdrop-blur-md shadow-lg">
@@ -78,7 +80,7 @@ export default function Home({ setScreen, lang, setLang }) {
           </div>
         </div>
 
-        {/* LOGO (avec ombre portée plus forte pour décoller du fond) */}
+        {/* LOGO */}
         <div className="h-44 flex items-center justify-center mb-8">
           <img
             src={monLogo}

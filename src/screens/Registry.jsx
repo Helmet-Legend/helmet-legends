@@ -10,7 +10,6 @@ import {
   Info,
 } from "lucide-react";
 
-// On définit des valeurs par défaut pour éviter les erreurs "undefined"
 export default function Registry({
   setScreen = () => {},
   helmets = [],
@@ -22,12 +21,13 @@ export default function Registry({
 
   return (
     <div className="min-h-screen bg-[#1a1812] text-[#d0c7a8] font-serif relative overflow-hidden">
-      {/* IMAGE DE FOND COHÉRENTE */}
+      {/* --- IMAGE DE FOND (MOINS FLOU : 5px) --- */}
       <div
         className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat scale-110"
         style={{
           backgroundImage: `url(${monFondExpert})`,
-          filter: "brightness(0.3) blur(12px)",
+          // On réduit le blur de 12px à 5px
+          filter: "brightness(0.3) blur(5px)",
         }}
       ></div>
 
@@ -51,14 +51,14 @@ export default function Registry({
         {/* BOUTON AJOUTER */}
         <div className="flex gap-2 mb-6">
           <button
-            onClick={() => onEdit(null)} // Appel sécurisé
+            onClick={() => onEdit(null)}
             className="flex-1 bg-amber-600 hover:bg-amber-500 text-black font-black py-3 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-amber-900/20 uppercase text-xs"
           >
             <Plus size={18} /> {isFr ? "Ajouter une pièce" : "Add New Piece"}
           </button>
         </div>
 
-        {/* LISTE SÉCURISÉE */}
+        {/* LISTE */}
         <div className="space-y-4">
           {!helmets || helmets.length === 0 ? (
             <div className="text-center py-20 bg-black/40 backdrop-blur-md rounded-2xl border border-dashed border-amber-900/30">
@@ -74,6 +74,7 @@ export default function Registry({
                 className="group relative bg-black/60 backdrop-blur-lg border-2 border-amber-900/20 rounded-2xl overflow-hidden hover:border-amber-600/50 transition-all duration-300 shadow-2xl"
               >
                 <div className="flex p-4 gap-4">
+                  {/* Miniature Image */}
                   <div className="w-24 h-24 bg-[#1a1812] rounded-lg overflow-hidden border border-amber-900/30 flex-shrink-0 shadow-inner">
                     {h.images?.main ? (
                       <img
@@ -88,6 +89,7 @@ export default function Registry({
                     )}
                   </div>
 
+                  {/* Infos */}
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-start">
                       <h3 className="text-lg font-black text-amber-500 italic leading-tight truncate">

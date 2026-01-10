@@ -6,7 +6,6 @@ export default function LotSearch({ setScreen, lang }) {
   const isFr = lang === "fr";
   const [lotNumber, setLotNumber] = useState("");
 
-  // Dictionnaire de traduction interne
   const t = {
     title: isFr ? "Recherche par Lot" : "Lot Search Expert",
     subtext: isFr
@@ -21,19 +20,19 @@ export default function LotSearch({ setScreen, lang }) {
 
   return (
     <div className="min-h-screen bg-[#1a1812] text-[#d0c7a8] font-serif relative overflow-hidden">
-      {/* IMAGE DE FOND COHÉRENTE */}
+      {/* --- IMAGE DE FOND (MOINS FLOU : 5px) --- */}
       <div
         className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat scale-110"
         style={{
           backgroundImage: `url(${monFondExpert})`,
-          filter: "brightness(0.3) blur(10px)",
+          // On réduit le blur de 10px à 5px
+          filter: "brightness(0.3) blur(5px)",
         }}
       ></div>
 
-      {/* CONTENU */}
       <div className="relative z-10 p-6 max-w-2xl mx-auto">
         {/* HEADER */}
-        <div className="flex items-center justify-between mb-8 border-b-2 border-amber-800 pb-4 backdrop-blur-sm bg-black/20 p-4 rounded-t-xl">
+        <div className="flex items-center justify-between mb-8 border-b-2 border-amber-800 pb-4 backdrop-blur-md bg-black/20 p-4 rounded-t-xl">
           <div className="flex items-center gap-3">
             <Database className="text-amber-500" size={28} />
             <h2 className="text-2xl font-black uppercase italic tracking-tighter">
@@ -52,10 +51,9 @@ export default function LotSearch({ setScreen, lang }) {
           {t.subtext}
         </p>
 
-        {/* FORMULAIRE DE RECHERCHE */}
+        {/* FORMULAIRE */}
         <div className="bg-black/60 backdrop-blur-md p-6 rounded-3xl border-2 border-amber-900/30 shadow-2xl space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* FABRICANT */}
             <div>
               <label className="text-[10px] font-black text-amber-600 uppercase mb-2 flex items-center gap-2">
                 <Factory size={12} /> {t.labelFabricant}
@@ -69,26 +67,18 @@ export default function LotSearch({ setScreen, lang }) {
               </select>
             </div>
 
-            {/* TAILLE */}
             <div>
               <label className="text-[10px] font-black text-amber-600 uppercase mb-2 flex items-center gap-2">
                 <Ruler size={12} /> {t.labelTaille}
               </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  placeholder="64"
-                  className="w-full bg-[#1a1812] border border-amber-900/40 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-500 text-white font-bold"
-                />
-                <Ruler
-                  className="absolute right-3 top-3 opacity-20"
-                  size={16}
-                />
-              </div>
+              <input
+                type="number"
+                placeholder="64"
+                className="w-full bg-[#1a1812] border border-amber-900/40 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-500 text-white font-bold"
+              />
             </div>
           </div>
 
-          {/* NUMÉRO DE LOT */}
           <div>
             <label className="text-[10px] font-black text-amber-600 uppercase mb-2 flex items-center gap-2">
               {t.labelLot}
@@ -108,7 +98,6 @@ export default function LotSearch({ setScreen, lang }) {
           </div>
         </div>
 
-        {/* ZONE DE RÉSULTATS (Vide par défaut) */}
         <div className="mt-8 text-center opacity-20 italic text-sm">
           {isFr
             ? "Entrez un numéro de lot pour lancer l'expertise"
