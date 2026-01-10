@@ -29,7 +29,6 @@ const HELMET_MODELS = [
   "M34 Feuerwehr (Pompiers/Police)",
   "Autre / Prototype",
 ];
-
 const SHELL_SIZES = ["60", "62", "64", "66", "68", "70", "72"];
 const LINER_SIZES = [
   "52",
@@ -69,20 +68,16 @@ export const getExpertise = (helmet) => {
   if (!lot || !mkr || !mdl)
     return "Analyse en attente de données complètes (Usine + Lot)...";
 
-  // Analyse M35
   if (mdl === "M35") {
     if (lot > 5500)
       return `ALERTE : Lot #${lot} très élevé pour un M35. Transition M40 probable. Vérifiez si les évents sont bien rivetés.`;
     return "M35 : Standard double insignes. Si aucun n'est présent, vérifiez s'il s'agit d'un reconditionnement tardif.";
   }
 
-  // Analyse M40
-  if (mdl === "M40") {
-    if (dec === "Double insignes")
-      return "ANOMALIE : Décret de Mars 1940 : arrêt du bouclier tricolore. Un M40 ne devrait être que mono-insigne (sauf Police/SS).";
+  if (mdl === "M40" && dec === "Double insignes") {
+    return "ANOMALIE : Décret de Mars 1940 : arrêt du bouclier tricolore. Un M40 ne devrait être que mono-insigne (sauf Police/SS).";
   }
 
-  // Analyse M42
   if (mdl === "M42") {
     if (dec === "Double insignes")
       return "ALERTE : Un M42 double insignes est historiquement aberrant (Décrets 1940/43). Risque de faux à 99%.";
@@ -90,7 +85,6 @@ export const getExpertise = (helmet) => {
       return "ANOMALIE : Thale utilisait le code 'ckl' pour les M42. Le marquage 'ET' est suspect sur ce modèle.";
   }
 
-  // Analyse M38
   if (mdl === "M38 (Parachutiste)" && mkr !== "ET" && mkr !== "CKL") {
     return "ALERTE : Seule l'usine de Thale a produit des M38 authentiques. Risque de copie majeure.";
   }
@@ -135,6 +129,9 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
     icon: null,
   });
 
+  // État pour gérer l'affichage des bulles d'aide
+  const [activeHelp, setActiveHelp] = useState(null);
+
   const isStandardMkr = Object.keys(MANUFACTURERS).includes(
     current.manufacturer
   );
@@ -172,6 +169,8 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
       console.error(error);
     }
   };
+
+  const toggleHelp = (id) => setActiveHelp(activeHelp === id ? null : id);
 
   return (
     <div className="p-6 h-screen overflow-y-auto pb-32 bg-[#2a2822] font-serif text-[#d0c7a8]">
@@ -232,10 +231,35 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
 
         {/* USINE & LOT */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-[9px] uppercase font-black text-gray-500 ml-1">
-              Usine
-            </label>
+          <div className="space-y-2 relative">
+            <div className="flex items-center gap-1 ml-1">
+              <label className="text-[9px] uppercase font-black text-gray-500">
+                Usine
+              </label>
+              <button
+                onClick={() => toggleHelp("mkr")}
+                className="text-[#8a7f5d]"
+              >
+                <HelpCircle size={10} />
+              </button>
+            </div>
+
+            {activeHelp === "mkr" && (
+              <div className="absolute z-50 top-14 left-0 right-0 bg-[#3a3832] border border-[#8a7f5d] p-3 rounded-lg shadow-xl text-[10px] leading-tight animate-in fade-in zoom-in duration-200">
+                <p>
+                  Le code fabricant (ex: ET, Q) est frappé sur le{" "}
+                  <b>flanc intérieur gauche</b> (M35/M40) ou dans la{" "}
+                  <b>nuquière</b> (M42).
+                </p>
+                <button
+                  onClick={() => setActiveHelp(null)}
+                  className="mt-2 text-[8px] uppercase font-black text-amber-500 underline"
+                >
+                  Compris
+                </button>
+              </div>
+            )}
+
             <select
               className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm font-bold text-amber-500 outline-none"
               value={
@@ -264,7 +288,7 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
             {!isStandardMkr && current.manufacturer !== "" && (
               <input
                 autoFocus
-                className="w-full mt-2 bg-[#1a1812] border-2 border-amber-600/30 p-4 rounded-xl text-sm text-amber-500 uppercase"
+                className="w-full mt-2 bg-[#1a1812] border-2 border-amber-600/30 p-4 rounded-xl text-sm text-amber-500 uppercase outline-none"
                 value={
                   current.manufacturer === "SAISIE..."
                     ? ""
@@ -279,13 +303,38 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
               />
             )}
           </div>
-          <div className="space-y-2">
-            <label className="text-[9px] uppercase font-black text-gray-500 ml-1">
-              N° Lot
-            </label>
+
+          <div className="space-y-2 relative">
+            <div className="flex items-center gap-1 ml-1">
+              <label className="text-[9px] uppercase font-black text-gray-500">
+                N° Lot
+              </label>
+              <button
+                onClick={() => toggleHelp("lot")}
+                className="text-[#8a7f5d]"
+              >
+                <HelpCircle size={10} />
+              </button>
+            </div>
+
+            {activeHelp === "lot" && (
+              <div className="absolute z-50 top-14 left-0 right-0 bg-[#3a3832] border border-[#8a7f5d] p-3 rounded-lg shadow-xl text-[10px] leading-tight animate-in fade-in zoom-in duration-200">
+                <p>
+                  Le numéro est frappé à froid au centre de la <b>nuquière</b>{" "}
+                  (arrière intérieur du casque).
+                </p>
+                <button
+                  onClick={() => setActiveHelp(null)}
+                  className="mt-2 text-[8px] uppercase font-black text-amber-500 underline"
+                >
+                  Compris
+                </button>
+              </div>
+            )}
+
             <input
               placeholder="ex: 1234"
-              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm text-amber-500 font-bold h-[56px]"
+              className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-sm text-amber-500 font-bold h-[56px] outline-none"
               value={current.lotNumber}
               onChange={(e) =>
                 setCurrent({ ...current, lotNumber: e.target.value })
@@ -346,7 +395,7 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
               {!isStandardShell && current.shellSize !== "" && (
                 <input
                   autoFocus
-                  className="w-full mt-2 bg-[#1a1812] border-2 border-amber-600/30 p-4 rounded-xl text-sm text-[#f0ede0]"
+                  className="w-full mt-2 bg-[#1a1812] border-2 border-amber-600/30 p-4 rounded-xl text-sm text-[#f0ede0] outline-none"
                   value={
                     current.shellSize === "SAISIE..." ? "" : current.shellSize
                   }
@@ -413,7 +462,7 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
               {!isStandardLiner && current.linerSize !== "" && (
                 <input
                   autoFocus
-                  className="w-full mt-2 bg-[#1a1812] border-2 border-amber-600/30 p-4 rounded-xl text-sm text-[#f0ede0]"
+                  className="w-full mt-2 bg-[#1a1812] border-2 border-amber-600/30 p-4 rounded-xl text-sm text-[#f0ede0] outline-none"
                   value={
                     current.linerSize === "SAISIE..." ? "" : current.linerSize
                   }
@@ -507,11 +556,7 @@ export default function AddHelmet({ setScreen, onSave, helmet }) {
           label={current.id ? "Mettre à jour" : "Sceller l'Archive"}
           onClick={() => {
             const finalExpertise = getExpertise(current);
-            const helmetToSave = {
-              ...current,
-              expertiseMessage: finalExpertise,
-            };
-            onSave(helmetToSave);
+            onSave({ ...current, expertiseMessage: finalExpertise });
             setScreen("registry");
           }}
         />

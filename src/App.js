@@ -7,12 +7,13 @@ import AddHelmet from "./screens/AddHelmet";
 import Details from "./screens/Details";
 import Expert from "./screens/Expert";
 import Compare from "./screens/Compare";
+import Handbook from "./screens/Handbook"; // Import du nouveau Manuel
 
 export default function App() {
   const [screen, setScreen] = useState("home");
   const [selectedHelmet, setSelectedHelmet] = useState(null);
 
-  // Toute la logique est maintenant isolée dans ce Hook
+  // Toute la logique est isolée dans ce Hook
   const { collection, addOrUpdate, remove, stats } = useCollection();
 
   const renderScreen = () => {
@@ -45,6 +46,8 @@ export default function App() {
         );
       case "compare":
         return <Compare setScreen={setScreen} />;
+      case "handbook": // Nouvel écran pour le Manuel de l'Expert
+        return <Handbook setScreen={setScreen} />;
       case "add":
         return (
           <AddHelmet
