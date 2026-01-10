@@ -1,7 +1,7 @@
 import React from "react";
 import monLogo from "../logo.jpg";
 import { TexturedButton } from "../components/TexturedButton";
-import { Search, Shield, PieChart } from "lucide-react";
+import { Search, Shield, PieChart, BookOpen, Layers } from "lucide-react";
 
 export default function Home({ setScreen }) {
   return (
@@ -15,30 +15,40 @@ export default function Home({ setScreen }) {
         />
       </div>
 
-      {/* NOTE : J'ai supprimé l'image "HELMET_HOME_IMG" qui causait 
-         l'erreur Imgur visible sur votre écran.
-      */}
-
       <div className="space-y-4 w-full max-w-xs">
+        {/* BOUTON PRINCIPAL : AJOUT / EXPERT */}
         <TexturedButton
           icon={<Search size={18} />}
           label="Expert / Ajouter"
           onClick={() => setScreen("expert")}
         />
+
+        {/* NOUVEAU BOUTON : LE MANUEL DE L'EXPERT */}
+        <TexturedButton
+          icon={<BookOpen size={18} />}
+          label="Manuel de l'Expert"
+          onClick={() => setScreen("handbook")}
+          variant="dark"
+        />
+
         <TexturedButton
           icon={<Shield size={18} />}
           label="Registre"
           onClick={() => setScreen("registry")}
           variant="dark"
         />
+
         <TexturedButton
+          icon={<Layers size={18} />}
           label="Comparer Insigne"
           onClick={() => setScreen("compare")}
           variant="dark"
         />
+
+        {/* BOUTON STATISTIQUES EN BAS */}
         <button
           onClick={() => setScreen("stats")}
-          className="w-full text-[10px] uppercase font-bold opacity-40 flex items-center justify-center gap-2 mt-4"
+          className="w-full text-[10px] uppercase font-bold opacity-40 flex items-center justify-center gap-2 mt-4 hover:opacity-100 transition-opacity"
         >
           <PieChart size={14} /> Voir les statistiques
         </button>
