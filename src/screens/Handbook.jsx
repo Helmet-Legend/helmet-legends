@@ -632,17 +632,17 @@ const Handbook = ({ setScreen, lang }) => {
 
   return (
     <div className="min-h-screen bg-[#1a1812] text-[#d0c7a8] font-serif relative overflow-hidden">
-      {/* --- IMAGE DE FOND COHÉRENTE (Floutée) --- */}
+      {/* --- IMAGE DE FOND COHÉRENTE (Floutée à 5px) --- */}
       <div
         className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat scale-110"
         style={{
           backgroundImage: `url(${monFondExpert})`,
-          filter: "brightness(0.3) blur(10px)",
+          filter: "brightness(0.3) blur(5px)",
         }}
       ></div>
 
       {/* --- CONTENU --- */}
-      <div className="relative z-10 p-6 pb-32 max-w-2xl mx-auto">
+      <div className="relative z-10 p-6 pb-32 max-w-2xl mx-auto h-screen overflow-y-auto">
         {/* HEADER */}
         <div className="flex items-center justify-between mb-8 border-b-2 border-amber-800 pb-4 shadow-xl backdrop-blur-sm bg-black/20 p-4 rounded-t-xl">
           <div className="flex items-center gap-3">
