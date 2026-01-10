@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+// --- ÉTAPE 1 : IMPORT DE L'IMAGE POUR LA COHÉRENCE ---
+import monFondExpert from "../assets/helmet-bg.png";
+
 import {
   BookOpen,
   ChevronDown,
@@ -357,7 +360,7 @@ const Handbook = ({ setScreen, lang }) => {
                 </span>{" "}
                 {isFr
                   ? "Queue tombante (Variante précoce sur M35)."
-                  : "Drooping tail (Early M35 variant)."}
+                  : "Dropping tail (Early M35 variant)."}
               </p>
               <p className="text-[11px] mt-1">
                 •{" "}
@@ -628,79 +631,95 @@ const Handbook = ({ setScreen, lang }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#2a2822] text-[#d0c7a8] font-serif p-6 pb-32 shadow-inner">
-      {/* HEADER */}
-      <div className="flex items-center justify-between mb-8 border-b-2 border-amber-800 pb-4 shadow-xl">
-        <div className="flex items-center gap-3">
-          <BookOpen className="text-amber-500" size={28} />
-          <h2 className="text-2xl font-black uppercase italic tracking-tighter">
-            {isFr ? "Manuel Expert" : "Expert Handbook"}
-          </h2>
-        </div>
-        <button
-          onClick={() => setScreen("home")}
-          className="flex items-center gap-1 px-4 py-1.5 bg-amber-900/30 rounded-full border border-amber-700/50 text-[10px] uppercase font-black active:scale-90 transition-transform shadow-lg shadow-black/40"
-        >
-          <ArrowLeft size={14} /> {isFr ? "Retour" : "Back"}
-        </button>
-      </div>
+    <div className="min-h-screen bg-[#1a1812] text-[#d0c7a8] font-serif relative overflow-hidden">
+      {/* --- IMAGE DE FOND COHÉRENTE (Floutée) --- */}
+      <div
+        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat scale-110"
+        style={{
+          backgroundImage: `url(${monFondExpert})`,
+          filter: "brightness(0.3) blur(10px)",
+        }}
+      ></div>
 
-      <div className="space-y-4">
-        {sections.map((section) => (
-          <div
-            key={section.id}
-            className="border-2 border-amber-900/30 rounded-2xl overflow-hidden bg-[#1a1812] shadow-2xl"
-          >
-            <button
-              onClick={() => toggleSection(section.id)}
-              className="w-full flex items-center justify-between p-5 text-left active:bg-amber-900/20 transition-all duration-300"
-            >
-              <div className="flex items-center gap-4">
-                <span className="text-amber-600">{section.icon}</span>
-                <span className="font-black uppercase text-sm tracking-widest">
-                  {section.title}
-                </span>
-              </div>
-              {openSection === section.id ? (
-                <ChevronUp size={20} />
-              ) : (
-                <ChevronDown size={20} />
-              )}
-            </button>
-
-            {openSection === section.id && (
-              <div className="p-6 pt-0 text-sm leading-relaxed border-t border-amber-900/20 animate-in slide-in-from-top-4 duration-500">
-                {section.content}
-              </div>
-            )}
+      {/* --- CONTENU --- */}
+      <div className="relative z-10 p-6 pb-32 max-w-2xl mx-auto">
+        {/* HEADER */}
+        <div className="flex items-center justify-between mb-8 border-b-2 border-amber-800 pb-4 shadow-xl backdrop-blur-sm bg-black/20 p-4 rounded-t-xl">
+          <div className="flex items-center gap-3">
+            <BookOpen className="text-amber-500" size={28} />
+            <h2 className="text-2xl font-black uppercase italic tracking-tighter">
+              {isFr ? "Manuel Expert" : "Expert Handbook"}
+            </h2>
           </div>
-        ))}
-      </div>
+          <button
+            onClick={() => setScreen("home")}
+            className="flex items-center gap-1 px-4 py-1.5 bg-amber-900/40 rounded-full border border-amber-700/50 text-[10px] uppercase font-black active:scale-90 transition-transform shadow-lg"
+          >
+            <ArrowLeft size={14} /> {isFr ? "Retour" : "Back"}
+          </button>
+        </div>
 
-      {/* FOOTER TAILLES */}
-      <div className="mt-10 p-5 bg-amber-600/5 rounded-2xl border border-amber-600/10 shadow-2xl">
-        <h4 className="flex items-center gap-2 text-[10px] font-black uppercase text-amber-500 mb-4 tracking-tighter underline underline-offset-4 decoration-amber-900 italic">
-          <Ruler size={12} />{" "}
-          {isFr
-            ? "Correspondance Tailles Coque / Liner"
-            : "Shell / Liner Size Correspondence"}
-        </h4>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[10px] font-bold text-center">
-          {[
-            isFr ? "Coque 60 ➔ 52-53" : "Shell 60 ➔ 52-53",
-            isFr ? "Coque 62 ➔ 54-55" : "Shell 62 ➔ 54-55",
-            isFr ? "Coque 64 ➔ 56-57" : "Shell 64 ➔ 56-57",
-            isFr ? "Coque 66 ➔ 58-59" : "Shell 66 ➔ 58-59",
-            isFr ? "Coque 68 ➔ 60-61 (9 lang.)" : "Shell 68 ➔ 60-61 (9 lang.)",
-            isFr ? "Coque 70 ➔ 62-63 (9 lang.)" : "Shell 70 ➔ 62-63 (9 lang.)",
-          ].map((t) => (
+        <div className="space-y-4">
+          {sections.map((section) => (
             <div
-              key={t}
-              className="bg-black/40 py-2 rounded-lg border border-amber-900/20 italic text-white/90 shadow-inner"
+              key={section.id}
+              className="border-2 border-amber-900/30 rounded-2xl overflow-hidden bg-black/60 backdrop-blur-md shadow-2xl"
             >
-              {t}
+              <button
+                onClick={() => toggleSection(section.id)}
+                className="w-full flex items-center justify-between p-5 text-left active:bg-amber-900/20 transition-all duration-300"
+              >
+                <div className="flex items-center gap-4">
+                  <span className="text-amber-600">{section.icon}</span>
+                  <span className="font-black uppercase text-sm tracking-widest">
+                    {section.title}
+                  </span>
+                </div>
+                {openSection === section.id ? (
+                  <ChevronUp size={20} />
+                ) : (
+                  <ChevronDown size={20} />
+                )}
+              </button>
+
+              {openSection === section.id && (
+                <div className="p-6 pt-0 text-sm leading-relaxed border-t border-amber-900/20 animate-in slide-in-from-top-4 duration-500">
+                  {section.content}
+                </div>
+              )}
             </div>
           ))}
+        </div>
+
+        {/* FOOTER TAILLES */}
+        <div className="mt-10 p-5 bg-black/60 backdrop-blur-md rounded-2xl border border-amber-600/10 shadow-2xl">
+          <h4 className="flex items-center gap-2 text-[10px] font-black uppercase text-amber-500 mb-4 tracking-tighter underline underline-offset-4 decoration-amber-900 italic">
+            <Ruler size={12} />{" "}
+            {isFr
+              ? "Correspondance Tailles Coque / Liner"
+              : "Shell / Liner Size Correspondence"}
+          </h4>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[10px] font-bold text-center">
+            {[
+              isFr ? "Coque 60 ➔ 52-53" : "Shell 60 ➔ 52-53",
+              isFr ? "Coque 62 ➔ 54-55" : "Shell 62 ➔ 54-55",
+              isFr ? "Coque 64 ➔ 56-57" : "Shell 64 ➔ 56-57",
+              isFr ? "Coque 66 ➔ 58-59" : "Shell 66 ➔ 58-59",
+              isFr
+                ? "Coque 68 ➔ 60-61 (9 lang.)"
+                : "Shell 68 ➔ 60-61 (9 lang.)",
+              isFr
+                ? "Coque 70 ➔ 62-63 (9 lang.)"
+                : "Shell 70 ➔ 62-63 (9 lang.)",
+            ].map((t) => (
+              <div
+                key={t}
+                className="bg-black/40 py-2 rounded-lg border border-amber-900/20 italic text-white/90 shadow-inner"
+              >
+                {t}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

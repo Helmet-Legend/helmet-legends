@@ -1,124 +1,136 @@
 import React from "react";
-import { X, Trash2, ChevronRight, Plus } from "lucide-react";
-import { translations } from "../data/translations"; // Import des traductions
+import monFondExpert from "../assets/helmet-bg.png";
+import {
+  Plus,
+  Trash2,
+  ChevronRight,
+  Shield,
+  ArrowLeft,
+  Database,
+  Info,
+} from "lucide-react";
 
+// On définit des valeurs par défaut pour éviter les erreurs "undefined"
 export default function Registry({
-  setScreen,
-  collection,
-  remove,
-  setSelectedHelmet,
-  lang, // Nouvelle prop pour la langue
+  setScreen = () => {},
+  helmets = [],
+  onDelete = () => {},
+  onEdit = () => {},
+  lang = "fr",
 }) {
-  // Accès au dictionnaire de traduction
-  const t = translations[lang].registry;
+  const isFr = lang === "fr";
 
   return (
-    <div className="relative p-6 h-screen overflow-y-auto pb-32 bg-[#2a2822] font-serif text-[#d0c7a8]">
-      {/* Header avec bouton retour */}
-      <div className="flex justify-between items-center mb-8 border-b-2 border-[#8a7f5d] pb-4">
-        <h2 className="text-xl font-black italic uppercase tracking-wider text-[#f0ede0]">
-          {t.title}
-        </h2>
-        <button
-          onClick={() => setScreen("home")}
-          className="p-2 bg-[#3a3832] rounded-full hover:bg-[#4a4842] transition-colors"
-        >
-          <X size={20} />
-        </button>
-      </div>
+    <div className="min-h-screen bg-[#1a1812] text-[#d0c7a8] font-serif relative overflow-hidden">
+      {/* IMAGE DE FOND COHÉRENTE */}
+      <div
+        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat scale-110"
+        style={{
+          backgroundImage: `url(${monFondExpert})`,
+          filter: "brightness(0.3) blur(12px)",
+        }}
+      ></div>
 
-      {/* Compteur et Recherche rapide */}
-      <div className="flex justify-between items-end mb-6">
-        <div className="text-[10px] uppercase font-black opacity-50 tracking-[0.2em]">
-          {lang === "fr"
-            ? `Total : ${collection.length} PIÈCES ARCHIVÉES`
-            : `Total: ${collection.length} ARCHIVED ITEMS`}
+      <div className="relative z-10 p-6 pb-32 max-w-2xl mx-auto h-screen overflow-y-auto">
+        {/* HEADER */}
+        <div className="flex items-center justify-between mb-8 border-b-2 border-amber-800 pb-4 shadow-xl backdrop-blur-md bg-black/30 p-4 rounded-t-2xl">
+          <div className="flex items-center gap-3">
+            <Shield className="text-amber-500" size={28} />
+            <h2 className="text-2xl font-black uppercase italic tracking-tighter">
+              {isFr ? "Registre d'Archives" : "Archive Registry"}
+            </h2>
+          </div>
+          <button
+            onClick={() => setScreen("home")}
+            className="p-2 bg-amber-900/40 rounded-full border border-amber-700/50 text-amber-500 active:scale-90 transition-transform"
+          >
+            <ArrowLeft size={20} />
+          </button>
         </div>
-      </div>
 
-      {collection.length === 0 ? (
-        <div className="text-center py-20 opacity-30 italic">
-          <p>{t.empty}</p>
+        {/* BOUTON AJOUTER */}
+        <div className="flex gap-2 mb-6">
+          <button
+            onClick={() => onEdit(null)} // Appel sécurisé
+            className="flex-1 bg-amber-600 hover:bg-amber-500 text-black font-black py-3 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-amber-900/20 uppercase text-xs"
+          >
+            <Plus size={18} /> {isFr ? "Ajouter une pièce" : "Add New Piece"}
+          </button>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-6">
-          {collection.map((helmet) => (
-            <div
-              key={helmet.id}
-              className="relative bg-[#1a1812] border-2 border-[#3a3832] rounded-2xl overflow-hidden shadow-2xl flex flex-col"
-            >
-              {/* Image Principale */}
+
+        {/* LISTE SÉCURISÉE */}
+        <div className="space-y-4">
+          {!helmets || helmets.length === 0 ? (
+            <div className="text-center py-20 bg-black/40 backdrop-blur-md rounded-2xl border border-dashed border-amber-900/30">
+              <Database size={48} className="mx-auto mb-4 opacity-20" />
+              <p className="text-sm italic opacity-50">
+                {isFr ? "Aucune archive enregistrée..." : "No records found..."}
+              </p>
+            </div>
+          ) : (
+            helmets.map((h) => (
               <div
-                className="h-48 w-full bg-[#111] cursor-pointer"
-                onClick={() => setSelectedHelmet(helmet)}
+                key={h.id || Math.random()}
+                className="group relative bg-black/60 backdrop-blur-lg border-2 border-amber-900/20 rounded-2xl overflow-hidden hover:border-amber-600/50 transition-all duration-300 shadow-2xl"
               >
-                {helmet.images && helmet.images.main ? (
-                  <img
-                    src={helmet.images.main}
-                    alt={helmet.model}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center opacity-10">
-                    <p className="text-xs italic uppercase">
-                      {lang === "fr" ? "Sans Image" : "No Image"}
+                <div className="flex p-4 gap-4">
+                  <div className="w-24 h-24 bg-[#1a1812] rounded-lg overflow-hidden border border-amber-900/30 flex-shrink-0 shadow-inner">
+                    {h.images?.main ? (
+                      <img
+                        src={h.images.main}
+                        alt="Helmet"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center opacity-20">
+                        <Shield size={24} />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-start">
+                      <h3 className="text-lg font-black text-amber-500 italic leading-tight truncate">
+                        {h.model}{" "}
+                        <span className="text-[10px] text-white/50 not-italic ml-1">
+                          #{h.lotNumber}
+                        </span>
+                      </h3>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDelete(h.id);
+                        }}
+                        className="p-1 text-red-900/50 hover:text-red-500 transition-colors"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+
+                    <p className="text-[10px] uppercase font-bold text-white/70 mt-1 flex items-center gap-1">
+                      <Info size={10} className="text-amber-700" />{" "}
+                      {h.manufacturer} • {h.shellSize}/{h.linerSize}
                     </p>
-                  </div>
-                )}
-              </div>
 
-              {/* Infos Clés */}
-              <div className="p-4 flex justify-between items-start">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-2xl font-black italic text-[#f0ede0] leading-none">
-                      {helmet.model || (lang === "fr" ? "INCONNU" : "UNKNOWN")}
-                    </span>
-                    <span className="text-[10px] bg-amber-900/40 text-amber-500 px-2 py-0.5 rounded border border-amber-900/50 font-bold">
-                      {helmet.manufacturer || "---"}
-                    </span>
+                    <div className="mt-3 flex flex-wrap gap-1">
+                      <span className="px-2 py-0.5 bg-amber-900/30 border border-amber-700/30 rounded text-[9px] font-bold text-amber-200 uppercase">
+                        {h.decals}
+                      </span>
+                    </div>
                   </div>
-                  <p className="text-[9px] uppercase font-black tracking-widest opacity-50">
-                    {lang === "fr" ? "N° LOT" : "LOT N°"} :{" "}
-                    {helmet.lotNumber ||
-                      (lang === "fr" ? "NON RÉPERTORIÉ" : "NOT LISTED")}
-                  </p>
-                </div>
 
-                <div className="flex gap-2">
                   <button
-                    onClick={() => {
-                      if (window.confirm(t.deleteConfirm)) {
-                        remove(helmet.id);
-                      }
-                    }}
-                    className="p-2 text-red-900/50 hover:text-red-500 transition-colors"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                  <button
-                    onClick={() => setSelectedHelmet(helmet)}
-                    className="p-2 bg-[#8a7f5d] text-[#1a1812] rounded-lg shadow-lg active:scale-95 transition-all"
+                    onClick={() => onEdit(h)}
+                    className="self-center p-2 bg-amber-900/20 rounded-full text-amber-600 hover:bg-amber-600 hover:text-black transition-all"
                   >
                     <ChevronRight size={20} />
                   </button>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
-      )}
-
-      {/* BOUTON FLOTTANT D'AJOUT */}
-      <button
-        onClick={() => {
-          setSelectedHelmet(null);
-          setScreen("add");
-        }}
-        className="fixed bottom-10 right-6 w-16 h-16 bg-amber-600 rounded-full flex items-center justify-center text-[#1a1812] shadow-2xl active:scale-95 transition-all z-50 border-2 border-[#8a7f5d]"
-      >
-        <Plus size={32} strokeWidth={3} />
-      </button>
+      </div>
     </div>
   );
 }
