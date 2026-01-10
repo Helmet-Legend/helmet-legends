@@ -1,7 +1,14 @@
 import React from "react";
 import monLogo from "../logo.jpg";
 import { TexturedButton } from "../components/TexturedButton";
-import { Search, Shield, PieChart, BookOpen, Layers } from "lucide-react";
+import {
+  Search,
+  Shield,
+  PieChart,
+  BookOpen,
+  Layers,
+  Database,
+} from "lucide-react";
 
 export default function Home({ setScreen }) {
   return (
@@ -23,7 +30,7 @@ export default function Home({ setScreen }) {
           onClick={() => setScreen("expert")}
         />
 
-        {/* NOUVEAU BOUTON : LE MANUEL DE L'EXPERT */}
+        {/* MANUEL DE L'EXPERT */}
         <TexturedButton
           icon={<BookOpen size={18} />}
           label="Manuel de l'Expert"
@@ -31,6 +38,15 @@ export default function Home({ setScreen }) {
           variant="dark"
         />
 
+        {/* NOUVEAU BOUTON : RECHERCHE DE LOT */}
+        <TexturedButton
+          icon={<Database size={18} />}
+          label="Recherche de Lot"
+          onClick={() => setScreen("lotsearch")}
+          variant="dark"
+        />
+
+        {/* REGISTRE */}
         <TexturedButton
           icon={<Shield size={18} />}
           label="Registre"
@@ -38,6 +54,7 @@ export default function Home({ setScreen }) {
           variant="dark"
         />
 
+        {/* COMPARATEUR */}
         <TexturedButton
           icon={<Layers size={18} />}
           label="Comparer Insigne"

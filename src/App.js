@@ -7,7 +7,8 @@ import AddHelmet from "./screens/AddHelmet";
 import Details from "./screens/Details";
 import Expert from "./screens/Expert";
 import Compare from "./screens/Compare";
-import Handbook from "./screens/Handbook"; // Import du nouveau Manuel
+import Handbook from "./screens/Handbook";
+import LotSearch from "./screens/LotSearch"; // Import du nouvel écran de recherche
 
 export default function App() {
   const [screen, setScreen] = useState("home");
@@ -46,8 +47,10 @@ export default function App() {
         );
       case "compare":
         return <Compare setScreen={setScreen} />;
-      case "handbook": // Nouvel écran pour le Manuel de l'Expert
+      case "handbook":
         return <Handbook setScreen={setScreen} />;
+      case "lotsearch": // Nouvel écran pour la recherche par numéro de lot
+        return <LotSearch setScreen={setScreen} />;
       case "add":
         return (
           <AddHelmet
