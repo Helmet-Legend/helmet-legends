@@ -32,8 +32,8 @@ const Handbook = ({ setScreen, lang }) => {
     {
       id: "shells",
       title: isFr
-        ? "I. Modèles & Métallurgie (1916-1945)"
-        : "I. Models & Metallurgy (1916-1945)",
+        ? "I. Modèles & Métallurgie (1935-1945)"
+        : "I. Models & Metallurgy (1935-1945)",
       icon: <HardHat size={20} />,
       content: (
         <div className="space-y-6">
@@ -44,34 +44,6 @@ const Handbook = ({ setScreen, lang }) => {
           </p>
 
           <div className="grid gap-4">
-            <div className="bg-black/30 p-4 rounded-xl border border-amber-900/20 shadow-lg">
-              <h4 className="font-black text-amber-500 text-sm uppercase flex items-center gap-2">
-                WW1 : M16 / M17 / M18
-              </h4>
-              <p className="text-[10px] mt-1 text-white/70 italic">
-                {isFr
-                  ? "Acier au Chrome-Nickel (1.3 kg)"
-                  : "Chrome-Nickel Steel (1.3 kg)"}
-              </p>
-              <ul className="text-xs space-y-1 mt-2">
-                <li>
-                  •{" "}
-                  <span className="text-white font-bold italic">
-                    {isFr ? "Vents :" : "Vents:"}
-                  </span>{" "}
-                  {isFr
-                    ? "Cornes saillantes pour Stirnpanzer (Plaque de dôme)."
-                    : "Protruding horns for Stirnpanzer (Brow armor)."}
-                </li>
-                <li>
-                  • <span className="text-white font-bold italic">M18 :</span>{" "}
-                  {isFr
-                    ? "Découpe d'oreille (Ear Cut-out) pour améliorer l'audition."
-                    : "Ear Cut-out to improve hearing."}
-                </li>
-              </ul>
-            </div>
-
             <div className="bg-black/30 p-4 rounded-xl border border-amber-900/20 shadow-lg">
               <h4 className="font-black text-amber-500 text-sm uppercase flex items-center gap-2">
                 {isFr ? "M35 (L'Excellence)" : "M35 (The Excellence)"}
@@ -152,9 +124,9 @@ const Handbook = ({ setScreen, lang }) => {
                 code: "ET / ckl",
                 name: "Eisenhüttenwerke Thale",
                 descFr:
-                  "Seule usine produisant TOUS les modèles (M16 à M42). Profil standard.",
+                  "Seule usine produisant TOUS les modèles (M35 à M42). Profil standard.",
                 descEn:
-                  "Only factory producing ALL models (M16 to M42). Standard profile.",
+                  "Only factory producing ALL models (M35 to M42). Standard profile.",
               },
               {
                 code: "Q",
@@ -219,7 +191,7 @@ const Handbook = ({ setScreen, lang }) => {
         <div className="space-y-4">
           <div className="bg-amber-900/10 p-4 rounded-xl border border-amber-600/20">
             <h4 className="text-amber-500 font-black text-xs uppercase mb-2">
-              M36 / M37 / M38 (ET Uniquement)
+              M38 (ET Uniquement)
             </h4>
             <ul className="text-xs space-y-3">
               <li>
