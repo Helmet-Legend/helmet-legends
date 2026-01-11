@@ -60,18 +60,18 @@ export default function Expert({ setScreen, setSelectedHelmet, lang }) {
     <div className="min-h-screen flex flex-col bg-[#1a1812] font-serif text-[#d0c7a8] relative overflow-hidden">
       {/* BACKGROUND OPTIMISÉ */}
       <div
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat scale-110"
         style={{
           backgroundImage: `url(${fondExpertise})`,
-          filter: "brightness(0.4) contrast(1.1)",
+          filter: "brightness(0.3) contrast(1.1) blur(2px)",
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1a1812] via-transparent to-black/80"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1a1812] via-transparent to-black/90"></div>
       </div>
 
-      <div className="relative z-10 p-6 flex flex-col h-screen max-w-2xl mx-auto w-full">
-        {/* HEADER */}
-        <div className="flex justify-between items-center mb-6 border-b-2 border-amber-800 pb-4 shadow-xl backdrop-blur-md bg-black/20 p-4 rounded-t-2xl">
+      <div className="relative z-10 p-4 flex flex-col h-screen max-w-2xl mx-auto w-full">
+        {/* HEADER FIXE */}
+        <div className="flex justify-between items-center mb-6 border-b-2 border-amber-800 pb-4 shadow-xl backdrop-blur-md bg-black/20 p-4 rounded-t-2xl shrink-0">
           <div className="flex items-center gap-3">
             <Microscope className="text-amber-500" size={24} />
             <h2 className="text-xl font-black italic uppercase tracking-tighter text-white">
@@ -86,42 +86,43 @@ export default function Expert({ setScreen, setSelectedHelmet, lang }) {
           </button>
         </div>
 
-        <div className="flex-grow flex flex-col justify-start overflow-y-auto pb-10 custom-scrollbar">
-          {/* ÉTAPE 1 : LE BORD (CARTES LARGES) */}
+        {/* ZONE SCROLLABLE */}
+        <div className="flex-grow overflow-y-auto pb-10 custom-scrollbar pr-1">
+          {/* ÉTAPE 1 : LE BORD */}
           {step === 1 && (
-            <div className="animate-in fade-in slide-in-from-bottom-6 duration-500 space-y-6">
+            <div className="animate-in fade-in slide-in-from-bottom-6 duration-500 space-y-8 py-4">
               <div className="text-center">
-                <p className="text-amber-500 font-black text-[10px] uppercase tracking-[0.3em] mb-1">
+                <p className="text-amber-500 font-black text-xs uppercase tracking-[0.4em] mb-2">
                   Analyse Structurelle
                 </p>
-                <h3 className="text-2xl font-black text-white italic uppercase">
-                  {isFr ? "1. Le bord de la coque" : "1. The Shell Edge"}
+                <h3 className="text-3xl font-black text-white italic uppercase tracking-tighter">
+                  1. Le bord de la coque
                 </h3>
               </div>
 
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 gap-6">
                 <button
                   onClick={() => {
                     setChoices({ ...choices, border: "retournee" });
                     setStep(2);
                   }}
-                  className="group relative flex flex-col bg-black/50 border-2 border-amber-900/30 rounded-3xl overflow-hidden hover:border-amber-500 transition-all duration-300"
+                  className="group relative flex flex-col bg-black/50 border-2 border-amber-900/30 rounded-[2.5rem] overflow-hidden hover:border-amber-500 transition-all duration-300 shadow-2xl"
                 >
                   <img
                     src={rolledEdgeImg}
-                    className="w-full h-44 object-cover opacity-70 group-hover:opacity-100 transition-opacity"
+                    className="w-full h-56 object-cover opacity-60 group-hover:opacity-100 transition-all duration-500"
                     alt=""
                   />
-                  <div className="p-4 bg-black/60 backdrop-blur-md flex justify-between items-center">
+                  <div className="p-6 bg-black/60 backdrop-blur-md flex justify-between items-center border-t border-amber-900/20">
                     <div>
-                      <h4 className="text-amber-500 font-black uppercase italic">
+                      <h4 className="text-amber-500 text-lg font-black uppercase italic tracking-tighter">
                         {isFr ? "Bord Retourné" : "Rolled Edge"}
                       </h4>
-                      <p className="text-[9px] text-white/50 uppercase">
+                      <p className="text-[10px] text-white/50 uppercase font-bold tracking-widest">
                         {isFr ? "M35 & M40 : Replié" : "M35 & M40: Folded"}
                       </p>
                     </div>
-                    <ChevronRight className="text-amber-500" />
+                    <ChevronRight className="text-amber-500" size={28} />
                   </div>
                 </button>
 
@@ -130,69 +131,69 @@ export default function Expert({ setScreen, setSelectedHelmet, lang }) {
                     setChoices({ ...choices, border: "brute" });
                     setStep(2);
                   }}
-                  className="group relative flex flex-col bg-black/50 border-2 border-amber-900/30 rounded-3xl overflow-hidden hover:border-amber-500 transition-all duration-300"
+                  className="group relative flex flex-col bg-black/50 border-2 border-amber-900/30 rounded-[2.5rem] overflow-hidden hover:border-amber-500 transition-all duration-300 shadow-2xl"
                 >
                   <img
                     src={rawEdgeImg}
-                    className="w-full h-44 object-cover opacity-70 group-hover:opacity-100 transition-opacity"
+                    className="w-full h-56 object-cover opacity-60 group-hover:opacity-100 transition-all duration-500"
                     alt=""
                   />
-                  <div className="p-4 bg-black/60 backdrop-blur-md flex justify-between items-center">
+                  <div className="p-6 bg-black/60 backdrop-blur-md flex justify-between items-center border-t border-amber-900/20">
                     <div>
-                      <h4 className="text-amber-500 font-black uppercase italic">
+                      <h4 className="text-amber-500 text-lg font-black uppercase italic tracking-tighter">
                         {isFr ? "Bord Brut" : "Raw Edge"}
                       </h4>
-                      <p className="text-[9px] text-white/50 uppercase">
+                      <p className="text-[10px] text-white/50 uppercase font-bold tracking-widest">
                         {isFr
                           ? "M42 : Évasé / Tranchant"
                           : "M42: Flared / Sharp"}
                       </p>
                     </div>
-                    <ChevronRight className="text-amber-500" />
+                    <ChevronRight className="text-amber-500" size={28} />
                   </div>
                 </button>
               </div>
             </div>
           )}
 
-          {/* ÉTAPE 2 : LES ÉVENTS (CARTES LARGES) */}
+          {/* ÉTAPE 2 : LES ÉVENTS */}
           {step === 2 && (
-            <div className="animate-in fade-in slide-in-from-right-6 duration-500 space-y-6">
+            <div className="animate-in fade-in slide-in-from-right-6 duration-500 space-y-8 py-4">
               <div className="text-center">
-                <p className="text-amber-500 font-black text-[10px] uppercase tracking-[0.3em] mb-1">
+                <p className="text-amber-500 font-black text-xs uppercase tracking-[0.4em] mb-2">
                   Détails de Production
                 </p>
-                <h3 className="text-2xl font-black text-white italic uppercase">
-                  {isFr ? "2. Les Aérations" : "2. The Vents"}
+                <h3 className="text-3xl font-black text-white italic uppercase tracking-tighter">
+                  2. Les Aérations
                 </h3>
               </div>
 
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 gap-6">
                 <button
                   onClick={() =>
                     showResult(
                       choices.border === "retournee" ? "M35" : "M42 (V)"
                     )
                   }
-                  className="group relative flex flex-col bg-black/50 border-2 border-amber-900/30 rounded-3xl overflow-hidden hover:border-amber-500 transition-all duration-300"
+                  className="group relative flex flex-col bg-black/50 border-2 border-amber-900/30 rounded-[2.5rem] overflow-hidden hover:border-amber-500 transition-all duration-300 shadow-2xl"
                 >
                   <img
                     src={bushingVentImg}
-                    className="w-full h-44 object-cover opacity-70 group-hover:opacity-100 transition-opacity"
+                    className="w-full h-56 object-cover opacity-60 group-hover:opacity-100 transition-all duration-500"
                     alt=""
                   />
-                  <div className="p-4 bg-black/60 backdrop-blur-md flex justify-between items-center">
+                  <div className="p-6 bg-black/60 backdrop-blur-md flex justify-between items-center border-t border-amber-900/20">
                     <div>
-                      <h4 className="text-amber-500 font-black uppercase italic">
+                      <h4 className="text-amber-500 text-lg font-black uppercase italic tracking-tighter">
                         {isFr ? "Évent Riveté" : "Bushing Vent"}
                       </h4>
-                      <p className="text-[9px] text-white/50 uppercase">
+                      <p className="text-[10px] text-white/50 uppercase font-bold tracking-widest">
                         {isFr
                           ? "Pièce rapportée (M35)"
                           : "Separate piece (M35)"}
                       </p>
                     </div>
-                    <ChevronRight className="text-amber-500" />
+                    <ChevronRight className="text-amber-500" size={28} />
                   </div>
                 </button>
 
@@ -200,68 +201,69 @@ export default function Expert({ setScreen, setSelectedHelmet, lang }) {
                   onClick={() =>
                     showResult(choices.border === "retournee" ? "M40" : "M42")
                   }
-                  className="group relative flex flex-col bg-black/50 border-2 border-amber-900/30 rounded-3xl overflow-hidden hover:border-amber-500 transition-all duration-300"
+                  className="group relative flex flex-col bg-black/50 border-2 border-amber-900/30 rounded-[2.5rem] overflow-hidden hover:border-amber-500 transition-all duration-300 shadow-2xl"
                 >
                   <img
                     src={stampedVentImg}
-                    className="w-full h-44 object-cover opacity-70 group-hover:opacity-100 transition-opacity"
+                    className="w-full h-56 object-cover opacity-60 group-hover:opacity-100 transition-all duration-500"
                     alt=""
                   />
-                  <div className="p-4 bg-black/60 backdrop-blur-md flex justify-between items-center">
+                  <div className="p-6 bg-black/60 backdrop-blur-md flex justify-between items-center border-t border-amber-900/20">
                     <div>
-                      <h4 className="text-amber-500 font-black uppercase italic">
+                      <h4 className="text-amber-500 text-lg font-black uppercase italic tracking-tighter">
                         {isFr ? "Évent Frappé" : "Stamped Vent"}
                       </h4>
-                      <p className="text-[9px] text-white/50 uppercase">
+                      <p className="text-[10px] text-white/50 uppercase font-bold tracking-widest">
                         {isFr
                           ? "Embouti (M40 / M42)"
                           : "Integrated (M40 / M42)"}
                       </p>
                     </div>
-                    <ChevronRight className="text-amber-500" />
+                    <ChevronRight className="text-amber-500" size={28} />
                   </div>
                 </button>
               </div>
 
               <button
                 onClick={() => setStep(1)}
-                className="flex items-center gap-2 mx-auto mt-4 text-[10px] font-black uppercase opacity-40 hover:opacity-100 transition-opacity text-amber-200"
+                className="flex items-center gap-3 mx-auto mt-6 text-xs font-black uppercase opacity-40 hover:opacity-100 transition-opacity text-amber-200 py-4 px-8 border border-transparent hover:border-amber-900/30 rounded-full"
               >
-                <ArrowLeft size={14} />{" "}
-                {isFr ? "Retour au bord" : "Back to edge"}
+                <ArrowLeft size={16} />{" "}
+                {isFr ? "Retour au choix du bord" : "Back to edge choice"}
               </button>
             </div>
           )}
 
-          {/* ÉTAPE 3 : RÉSULTAT FINAL (DYNAMIQUE) */}
+          {/* ÉTAPE 3 : RÉSULTAT FINAL AGRANDI */}
           {step === 3 && (
-            <div className="flex flex-col items-center animate-in zoom-in duration-700">
-              <div className="mb-8 w-full overflow-hidden rounded-[3rem] border-4 border-amber-600 bg-black/60 shadow-[0_0_50px_rgba(217,119,6,0.3)] backdrop-blur-xl relative group">
-                {/* Image Hero Dynamique */}
-                <div className="relative h-80 w-full bg-gradient-to-b from-black/40 to-black/90 flex items-center justify-center p-4">
+            <div className="flex flex-col items-center animate-in zoom-in duration-700 py-6">
+              <div className="mb-12 w-full overflow-hidden rounded-[4rem] border-4 border-amber-600 bg-black/60 shadow-[0_0_80px_rgba(217,119,6,0.4)] backdrop-blur-xl relative group">
+                {/* Image Hero Massive */}
+                <div className="relative h-[28rem] w-full bg-gradient-to-b from-black/20 to-black/90 flex items-center justify-center p-6">
                   <img
                     src={getHeroImage(identifiedModel)}
                     alt={identifiedModel}
-                    className="h-full w-auto object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.9)] group-hover:scale-110 transition-transform duration-1000"
+                    className="h-full w-auto object-contain drop-shadow-[0_40px_60px_rgba(0,0,0,1)] group-hover:scale-105 transition-transform duration-1000"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
                 </div>
 
-                {/* Texte Verdict */}
-                <div className="relative z-10 bg-black pb-8 pt-2 px-6 text-center">
-                  <p className="text-[10px] uppercase font-black text-amber-500 mb-2 tracking-[0.4em] opacity-80">
+                {/* Texte Verdict Immense */}
+                <div className="relative z-10 bg-black pb-12 pt-4 px-8 text-center border-t border-amber-900/30">
+                  <p className="text-sm uppercase font-black text-amber-500 mb-2 tracking-[0.5em] opacity-90">
                     {isFr ? "Verdict Expertise" : "Expert Verdict"}
                   </p>
-                  <h3 className="text-8xl font-black italic uppercase text-white tracking-tighter leading-none">
+                  <h3 className="text-[9rem] font-black italic uppercase text-white tracking-tighter leading-none drop-shadow-2xl">
                     {identifiedModel}
                   </h3>
                 </div>
               </div>
 
-              <div className="space-y-4 w-full">
+              {/* Actions de fin */}
+              <div className="space-y-6 w-full px-2">
                 <button
                   onClick={startArchiving}
-                  className="w-full bg-amber-600 hover:bg-amber-500 text-black font-black py-5 rounded-2xl uppercase italic tracking-tighter shadow-xl active:scale-95 transition-all text-xl"
+                  className="w-full bg-amber-600 hover:bg-amber-500 text-black font-black py-8 rounded-[2.5rem] uppercase italic tracking-tighter shadow-[0_20px_40px_rgba(217,119,6,0.2)] active:scale-95 transition-all text-2xl border-b-4 border-amber-800"
                 >
                   {isFr ? "Enregistrer ce casque" : "Save this helmet"}
                 </button>
@@ -270,9 +272,9 @@ export default function Expert({ setScreen, setSelectedHelmet, lang }) {
                     setStep(1);
                     setChoices({ border: "", vent: "" });
                   }}
-                  className="w-full py-3 flex items-center justify-center gap-2 text-[10px] font-black uppercase opacity-40 hover:opacity-100 transition-opacity text-amber-200"
+                  className="w-full py-4 flex items-center justify-center gap-3 text-sm font-black uppercase opacity-40 hover:opacity-100 transition-opacity text-amber-200 italic tracking-widest"
                 >
-                  <ArrowLeft size={12} />{" "}
+                  <ArrowLeft size={18} />{" "}
                   {isFr ? "Nouvelle identification" : "New identification"}
                 </button>
               </div>

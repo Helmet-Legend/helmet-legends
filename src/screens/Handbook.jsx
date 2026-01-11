@@ -21,6 +21,8 @@ import {
   Wind,
   Library,
   ExternalLink,
+  Cpu,
+  Target,
 } from "lucide-react";
 
 const Handbook = ({ setScreen, lang }) => {
@@ -624,6 +626,53 @@ const Handbook = ({ setScreen, lang }) => {
                 <li>• War Relics Forum</li>
               </ul>
             </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "ai_tech",
+      title: isFr
+        ? "IX. Assistance IA & Optique Macro"
+        : "IX. AI Assistance & Macro Optics",
+      icon: <Cpu size={20} />,
+      content: (
+        <div className="space-y-4">
+          <p className="text-amber-200/70 italic text-xs border-b border-amber-900/30 pb-2">
+            {isFr
+              ? "Analyse biométrique des insignes par intelligence artificielle."
+              : "Biometric analysis of decals using artificial intelligence."}
+          </p>
+          <div className="bg-amber-900/10 p-4 rounded-xl border border-amber-600/20">
+            <ul className="text-xs space-y-3">
+              <li>
+                •{" "}
+                <span className="text-white font-bold italic">
+                  {isFr ? "Banc d'Optique :" : "Optical Bench:"}
+                </span>{" "}
+                {isFr
+                  ? "Normalisation automatique de la luminance et correction de la perspective pour une comparaison scientifique."
+                  : "Automatic luminance normalization and perspective correction for scientific comparison."}
+              </li>
+              <li>
+                •{" "}
+                <span className="text-white font-bold italic">
+                  {isFr ? "Vecteurs de Tracé :" : "Tracing Vectors:"}
+                </span>{" "}
+                {isFr
+                  ? "Comparaison mathématique de la courbure des ailes et de l'épaisseur des traits (Précision : 0.2mm)."
+                  : "Mathematical comparison of wing curvature and stroke thickness (Precision: 0.2mm)."}
+              </li>
+              <li>
+                •{" "}
+                <span className="text-white font-bold italic">
+                  {isFr ? "Crazing Organique :" : "Organic Crazing:"}
+                </span>{" "}
+                {isFr
+                  ? "Analyse de la structure des micro-craquelures du vernis Zapon pour détecter les vieillissements chimiques artificiels."
+                  : "Analysis of Zapon varnish micro-crack structure to detect artificial chemical aging."}
+              </li>
+            </ul>
           </div>
         </div>
       ),
