@@ -2,9 +2,14 @@ import React, { useState } from "react";
 // --- IMPORT DU FOND ---
 import fondExpertise from "../assets/expert-bg.png";
 
-// --- IMPORT DES MINIATURES ---
+// --- IMPORT DES MINIATURES ÉTAPE 1 (BORDURES) ---
 import rolledEdgeImg from "../assets/rolled-edge-small.png";
 import rawEdgeImg from "../assets/raw-edge-small.png";
+
+// --- NOUVEAU : IMPORT DES MINIATURES ÉTAPE 2 (ÉVENTS) ---
+import bushingVentImg from "../assets/bushing-vent-small.png";
+import stampedVentImg from "../assets/stamped-vent-small.png";
+// -------------------------------------------------------
 
 import { X, Microscope, ArrowLeft, ChevronRight } from "lucide-react";
 
@@ -72,7 +77,7 @@ export default function Expert({ setScreen, setSelectedHelmet, lang }) {
         </div>
 
         <div className="flex-grow flex flex-col justify-start overflow-y-auto pb-10 custom-scrollbar">
-          {/* ÉTAPE 1 : LES GRANDES CARTES DE COMPARAISON */}
+          {/* ÉTAPE 1 : BORDURES */}
           {step === 1 && (
             <div className="animate-in fade-in slide-in-from-bottom-6 duration-500 space-y-6">
               <div className="text-center space-y-1">
@@ -144,10 +149,10 @@ export default function Expert({ setScreen, setSelectedHelmet, lang }) {
             </div>
           )}
 
-          {/* ÉTAPE 2 : LES ÉVENTS (Gardé en format bouton pour la vitesse) */}
+          {/* ÉTAPE 2 : ÉVENTS (MIS À JOUR AVEC IMAGES) */}
           {step === 2 && (
-            <div className="animate-in fade-in slide-in-from-right-6 duration-500 space-y-8 pt-10 text-center">
-              <div className="space-y-1">
+            <div className="animate-in fade-in slide-in-from-right-6 duration-500 space-y-6 pt-4 text-center">
+              <div className="space-y-1 mb-6">
                 <p className="text-amber-500 font-black text-xs uppercase tracking-[0.3em]">
                   {isFr ? "Détails de production" : "Production Details"}
                 </p>
@@ -156,45 +161,71 @@ export default function Expert({ setScreen, setSelectedHelmet, lang }) {
                 </h3>
               </div>
 
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 text-left">
+                {/* CARTE ÉVENT RIVETÉ (BUSHING) */}
                 <button
                   onClick={() =>
                     showResult(
                       choices.border === "retournee" ? "M35" : "M42 (V)"
                     )
                   }
-                  className="w-full p-6 bg-amber-900/20 border-2 border-amber-900/40 rounded-2xl hover:bg-amber-600 hover:text-black transition-all group"
+                  className="group relative flex flex-col bg-black/40 border-2 border-amber-900/30 rounded-3xl overflow-hidden hover:border-amber-500 transition-all duration-300"
                 >
-                  <span className="block text-lg font-black uppercase italic">
-                    {isFr ? "Évents Rapportés" : "Bushing Vents"}
-                  </span>
-                  <span className="text-[10px] opacity-60 uppercase tracking-tighter">
-                    {isFr
-                      ? "Pièce séparée rivetée (M35)"
-                      : "Separate riveted part (M35)"}
-                  </span>
+                  <img
+                    src={bushingVentImg}
+                    className="w-full h-48 object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all"
+                    alt=""
+                  />
+                  <div className="p-4 bg-gradient-to-t from-black to-black/40">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h4 className="text-amber-500 font-black uppercase italic text-lg">
+                          {isFr ? "Évent Riveté" : "Bushing Vent"}
+                        </h4>
+                        <p className="text-[10px] text-white/60 font-sans uppercase tracking-widest">
+                          {isFr
+                            ? "Pièce séparée (M35)"
+                            : "Separate piece (M35)"}
+                        </p>
+                      </div>
+                      <ChevronRight className="text-amber-500 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
                 </button>
 
+                {/* CARTE ÉVENT FRAPPÉ (STAMPED) */}
                 <button
                   onClick={() =>
                     showResult(choices.border === "retournee" ? "M40" : "M42")
                   }
-                  className="w-full p-6 bg-black/40 border-2 border-amber-900/40 rounded-2xl hover:bg-amber-600 hover:text-black transition-all"
+                  className="group relative flex flex-col bg-black/40 border-2 border-amber-900/30 rounded-3xl overflow-hidden hover:border-amber-500 transition-all duration-300"
                 >
-                  <span className="block text-lg font-black uppercase italic">
-                    {isFr ? "Évents Frappés" : "Embossed Vents"}
-                  </span>
-                  <span className="text-[10px] opacity-60 uppercase tracking-tighter">
-                    {isFr
-                      ? "Emboutis directement dans l'acier"
-                      : "Stamped directly into the steel"}
-                  </span>
+                  <img
+                    src={stampedVentImg}
+                    className="w-full h-48 object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all"
+                    alt=""
+                  />
+                  <div className="p-4 bg-gradient-to-t from-black to-black/40">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h4 className="text-amber-500 font-black uppercase italic text-lg">
+                          {isFr ? "Évent Frappé" : "Stamped Vent"}
+                        </h4>
+                        <p className="text-[10px] text-white/60 font-sans uppercase tracking-widest">
+                          {isFr
+                            ? "Embouti dans la masse (M40/42)"
+                            : "Stamped into shell (M40/42)"}
+                        </p>
+                      </div>
+                      <ChevronRight className="text-amber-500 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
                 </button>
               </div>
 
               <button
                 onClick={() => setStep(1)}
-                className="flex items-center gap-2 mx-auto text-[10px] font-black uppercase opacity-40 hover:opacity-100 transition-opacity"
+                className="flex items-center gap-2 mx-auto mt-6 text-[10px] font-black uppercase opacity-40 hover:opacity-100 transition-opacity text-amber-200"
               >
                 <ArrowLeft size={14} />{" "}
                 {isFr ? "Retour au bord" : "Back to edge"}
