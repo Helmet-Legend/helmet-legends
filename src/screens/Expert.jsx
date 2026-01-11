@@ -6,8 +6,7 @@ import fondExpertise from "../assets/expert-bg.png";
 import rolledEdgeImg from "../assets/rolled-edge-small.png";
 import rawEdgeImg from "../assets/raw-edge-small.png";
 
-import { X, Microscope, ArrowLeft } from "lucide-react";
-import { TexturedButton } from "../components/TexturedButton";
+import { X, Microscope, ArrowLeft, ChevronRight } from "lucide-react";
 
 export default function Expert({ setScreen, setSelectedHelmet, lang }) {
   const [step, setStep] = useState(1);
@@ -55,13 +54,13 @@ export default function Expert({ setScreen, setSelectedHelmet, lang }) {
         <div className="absolute inset-0 bg-gradient-to-t from-[#1a1812] via-transparent to-black/60"></div>
       </div>
 
-      <div className="relative z-10 p-6 flex flex-col h-screen">
+      <div className="relative z-10 p-6 flex flex-col h-screen max-w-2xl mx-auto w-full">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8 border-b-2 border-amber-800 pb-4 shadow-xl backdrop-blur-md bg-black/20 p-4 rounded-t-2xl">
+        <div className="flex justify-between items-center mb-6 border-b-2 border-amber-800 pb-4 shadow-xl backdrop-blur-md bg-black/20 p-4 rounded-t-2xl">
           <div className="flex items-center gap-3">
             <Microscope className="text-amber-500" size={24} />
             <h2 className="text-xl font-black italic uppercase tracking-tighter">
-              {isFr ? "Identification" : "Identification"}
+              {isFr ? "Laboratoire d'Expertise" : "Expertise Lab"}
             </h2>
           </div>
           <button
@@ -72,125 +71,171 @@ export default function Expert({ setScreen, setSelectedHelmet, lang }) {
           </button>
         </div>
 
-        <div className="flex-grow flex flex-col justify-center max-w-sm mx-auto w-full space-y-6">
+        <div className="flex-grow flex flex-col justify-start overflow-y-auto pb-10 custom-scrollbar">
+          {/* ÉTAPE 1 : LES GRANDES CARTES DE COMPARAISON */}
           {step === 1 && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-4">
-              <p className="text-center text-amber-500 font-black text-xs uppercase tracking-[0.2em] mb-4">
-                {isFr ? "Étape 1 : La Bordure" : "Step 1: The Edge"}
-              </p>
+            <div className="animate-in fade-in slide-in-from-bottom-6 duration-500 space-y-6">
+              <div className="text-center space-y-1">
+                <p className="text-amber-500 font-black text-xs uppercase tracking-[0.3em]">
+                  {isFr ? "Analyse de la structure" : "Structural Analysis"}
+                </p>
+                <h3 className="text-2xl font-black text-white italic uppercase">
+                  {isFr ? "1. Le bord de la coque" : "1. The Shell Edge"}
+                </h3>
+              </div>
 
-              {/* Utilisation de la prop 'icon' pour l'image */}
-              <TexturedButton
-                icon={
+              <div className="grid grid-cols-1 gap-4">
+                {/* CARTE BORDURE RETOURNÉE */}
+                <button
+                  onClick={() => {
+                    setChoices({ ...choices, border: "retournee" });
+                    setStep(2);
+                  }}
+                  className="group relative flex flex-col bg-black/40 border-2 border-amber-900/30 rounded-3xl overflow-hidden hover:border-amber-500 transition-all duration-300 text-left"
+                >
                   <img
                     src={rolledEdgeImg}
-                    className="w-10 h-10 rounded border border-amber-900/50 object-cover"
+                    className="w-full h-48 object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all"
                     alt=""
                   />
-                }
-                label={isFr ? "Bordure Retournée" : "Rolled Edge"}
-                onClick={() => {
-                  setChoices({ ...choices, border: "retournee" });
-                  setStep(2);
-                }}
-              />
+                  <div className="p-4 bg-gradient-to-t from-black to-black/40">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h4 className="text-amber-500 font-black uppercase italic text-lg">
+                          {isFr ? "Bord Retourné" : "Rolled Edge"}
+                        </h4>
+                        <p className="text-[10px] text-white/60 font-sans uppercase tracking-widest">
+                          {isFr ? "Modèles M35 & M40" : "M35 & M40 Models"}
+                        </p>
+                      </div>
+                      <ChevronRight className="text-amber-500 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                </button>
 
-              <TexturedButton
-                icon={
+                {/* CARTE BORDURE BRUTE */}
+                <button
+                  onClick={() => {
+                    setChoices({ ...choices, border: "brute" });
+                    setStep(2);
+                  }}
+                  className="group relative flex flex-col bg-black/40 border-2 border-amber-900/30 rounded-3xl overflow-hidden hover:border-amber-500 transition-all duration-300 text-left"
+                >
                   <img
                     src={rawEdgeImg}
-                    className="w-10 h-10 rounded border border-amber-900/50 object-cover"
+                    className="w-full h-48 object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all"
                     alt=""
                   />
-                }
-                label={isFr ? "Bordure Brute (M42)" : "Raw Edge (M42)"}
-                variant="dark"
-                onClick={() => {
-                  setChoices({ ...choices, border: "brute" });
-                  setStep(2);
-                }}
-              />
+                  <div className="p-4 bg-gradient-to-t from-black to-black/40">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h4 className="text-amber-500 font-black uppercase italic text-lg">
+                          {isFr ? "Bord Brut" : "Raw Edge"}
+                        </h4>
+                        <p className="text-[10px] text-white/60 font-sans uppercase tracking-widest">
+                          {isFr ? "Modèle M42" : "M42 Model"}
+                        </p>
+                      </div>
+                      <ChevronRight className="text-amber-500 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                </button>
+              </div>
             </div>
           )}
 
+          {/* ÉTAPE 2 : LES ÉVENTS (Gardé en format bouton pour la vitesse) */}
           {step === 2 && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-4">
-              <p className="text-center text-amber-500 font-black text-xs uppercase tracking-[0.2em] mb-4">
-                {isFr ? "Étape 2 : Les Évents" : "Step 2: The Vents"}
-              </p>
-              <TexturedButton
-                label={
-                  isFr ? "Évents Rivetés (M35)" : "Inward-Pressed Vents (M35)"
-                }
-                onClick={() =>
-                  showResult(
-                    choices.border === "retournee" ? "M35" : "M42 (Variante)"
-                  )
-                }
-              />
-              <TexturedButton
-                label={
-                  isFr ? "Évents Frappés (M40/M42)" : "Embossed Vents (M40/M42)"
-                }
-                variant="dark"
-                onClick={() =>
-                  showResult(choices.border === "retournee" ? "M40" : "M42")
-                }
-              />
+            <div className="animate-in fade-in slide-in-from-right-6 duration-500 space-y-8 pt-10 text-center">
+              <div className="space-y-1">
+                <p className="text-amber-500 font-black text-xs uppercase tracking-[0.3em]">
+                  {isFr ? "Détails de production" : "Production Details"}
+                </p>
+                <h3 className="text-2xl font-black text-white italic uppercase">
+                  {isFr ? "2. Les Aérations" : "2. The Vents"}
+                </h3>
+              </div>
+
+              <div className="space-y-4">
+                <button
+                  onClick={() =>
+                    showResult(
+                      choices.border === "retournee" ? "M35" : "M42 (V)"
+                    )
+                  }
+                  className="w-full p-6 bg-amber-900/20 border-2 border-amber-900/40 rounded-2xl hover:bg-amber-600 hover:text-black transition-all group"
+                >
+                  <span className="block text-lg font-black uppercase italic">
+                    {isFr ? "Évents Rapportés" : "Bushing Vents"}
+                  </span>
+                  <span className="text-[10px] opacity-60 uppercase tracking-tighter">
+                    {isFr
+                      ? "Pièce séparée rivetée (M35)"
+                      : "Separate riveted part (M35)"}
+                  </span>
+                </button>
+
+                <button
+                  onClick={() =>
+                    showResult(choices.border === "retournee" ? "M40" : "M42")
+                  }
+                  className="w-full p-6 bg-black/40 border-2 border-amber-900/40 rounded-2xl hover:bg-amber-600 hover:text-black transition-all"
+                >
+                  <span className="block text-lg font-black uppercase italic">
+                    {isFr ? "Évents Frappés" : "Embossed Vents"}
+                  </span>
+                  <span className="text-[10px] opacity-60 uppercase tracking-tighter">
+                    {isFr
+                      ? "Emboutis directement dans l'acier"
+                      : "Stamped directly into the steel"}
+                  </span>
+                </button>
+              </div>
+
+              <button
+                onClick={() => setStep(1)}
+                className="flex items-center gap-2 mx-auto text-[10px] font-black uppercase opacity-40 hover:opacity-100 transition-opacity"
+              >
+                <ArrowLeft size={14} />{" "}
+                {isFr ? "Retour au bord" : "Back to edge"}
+              </button>
             </div>
           )}
 
+          {/* ÉTAPE 3 : RÉSULTAT FINAL */}
           {step === 3 && (
-            <div className="flex flex-col items-center animate-in fade-in zoom-in duration-500">
-              <div className="mb-6 p-8 bg-black/60 backdrop-blur-xl border-4 border-amber-600 rounded-3xl shadow-[0_0_30px_rgba(217,119,6,0.3)] relative w-full text-center">
-                <p className="text-[10px] uppercase font-black text-amber-500 mb-2 tracking-widest">
-                  {isFr ? "Modèle Identifié" : "Identified Model"}
+            <div className="flex flex-col items-center animate-in zoom-in duration-500 pt-10">
+              <div className="mb-6 p-10 bg-black/60 backdrop-blur-xl border-4 border-amber-600 rounded-[40px] shadow-[0_0_50px_rgba(217,119,6,0.3)] relative w-full text-center">
+                <p className="text-xs uppercase font-black text-amber-500 mb-4 tracking-[0.4em]">
+                  {isFr ? "Verdict Expertise" : "Expert Verdict"}
                 </p>
-                <h3 className="text-7xl font-black italic uppercase text-white tracking-tighter">
+                <h3 className="text-8xl font-black italic uppercase text-white tracking-tighter drop-shadow-2xl">
                   {identifiedModel}
                 </h3>
               </div>
 
-              <div className="space-y-3 w-full">
-                <TexturedButton
-                  label={isFr ? "Enregistrer un casque" : "Save Helmet"}
-                  onClick={startArchiving}
-                />
+              <div className="space-y-4 w-full px-4">
                 <button
-                  onClick={() => setStep(1)}
+                  onClick={startArchiving}
+                  className="w-full bg-amber-600 hover:bg-amber-500 text-black font-black py-5 rounded-2xl uppercase italic tracking-tighter shadow-xl active:scale-95 transition-all"
+                >
+                  {isFr ? "Enregistrer ce casque" : "Save this helmet"}
+                </button>
+                <button
+                  onClick={() => {
+                    setStep(1);
+                    setChoices({ border: "", vent: "" });
+                  }}
                   className="w-full py-3 text-[10px] font-black uppercase opacity-40 hover:opacity-100 transition-opacity text-amber-200"
                 >
-                  {isFr ? "Recommencer" : "Restart"}
+                  {isFr
+                    ? "Recommencer l'identification"
+                    : "Restart identification"}
                 </button>
               </div>
             </div>
           )}
         </div>
-
-        {step < 3 && (
-          <div className="mt-auto p-4 border border-amber-900/30 rounded-xl bg-black/40 backdrop-blur-sm shadow-inner">
-            <p className="text-[10px] uppercase font-black mb-2 text-amber-600">
-              {isFr ? "Rappel rapide" : "Quick Reminder"}
-            </p>
-            <div className="text-[8px] grid grid-cols-3 gap-2 text-center uppercase font-bold text-white/60 italic">
-              <div>
-                M35
-                <br />
-                {isFr ? "Ret. + Riveté" : "Rol. + Pressed"}
-              </div>
-              <div>
-                M40
-                <br />
-                {isFr ? "Ret. + Frappé" : "Rol. + Emboss."}
-              </div>
-              <div>
-                M42
-                <br />
-                {isFr ? "Brut + Frappé" : "Raw + Emboss."}
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
