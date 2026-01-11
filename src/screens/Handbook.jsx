@@ -23,6 +23,7 @@ import {
   ExternalLink,
   Cpu,
   Target,
+  ShieldCheck,
 } from "lucide-react";
 
 const Handbook = ({ setScreen, lang }) => {
@@ -76,6 +77,38 @@ const Handbook = ({ setScreen, lang }) => {
                     : "Separate bushings mechanically pressed in."}
                 </li>
               </ul>
+              {/* AJOUT : DÉTAILS ALLIAGES ET QUIST */}
+              <div className="mt-3 pt-3 border-t border-amber-900/20 text-[10px] space-y-1 text-amber-100/60">
+                <p>
+                  •{" "}
+                  <span className="text-white font-bold">
+                    {isFr ? "Alliage :" : "Alloy:"}
+                  </span>{" "}
+                  {isFr
+                    ? "Acier Chrome-Nickel-Manganèse. Emboutissage en plusieurs étapes avec recuit."
+                    : "Chrome-Nickel-Manganese steel. Multi-stage stamping with annealing."}
+                </p>
+                <p>
+                  •{" "}
+                  <span className="text-white font-bold">
+                    {isFr
+                      ? "Spécificité Quist (Q) :"
+                      : "Quist Specificity (Q):"}
+                  </span>{" "}
+                  {isFr
+                    ? "Coque plus épaisse de 0.1mm à 0.2mm, augmentant la robustesse et le poids."
+                    : "Shell 0.1mm to 0.2mm thicker, increasing robustness and weight."}
+                </p>
+                <p>
+                  •{" "}
+                  <span className="text-white font-bold">
+                    {isFr ? "Tailles Géantes :" : "Giant Sizes:"}
+                  </span>{" "}
+                  {isFr
+                    ? "Seule l'usine ET (Thale) a produit des tailles 70, 72 et 74 (Rarissimes)."
+                    : "Only the ET (Thale) factory produced sizes 70, 72, and 74 (Extremely rare)."}
+                </p>
+              </div>
             </div>
 
             <div className="bg-black/30 p-4 rounded-xl border border-amber-900/20 shadow-lg">
@@ -401,6 +434,12 @@ const Handbook = ({ setScreen, lang }) => {
                   ? "visible à la loupe x10."
                   : "visible under x10 magnification."}
               </p>
+              {/* AJOUT : ADHÉSION ET ZAPON */}
+              <p className="text-[10px] mt-2 italic text-amber-100/40">
+                {isFr
+                  ? "Note : Les décals originaux sont protégés par un vernis Zapon qui fusionne avec la peinture sur 80 ans, rendant le transfert indissociable du métal."
+                  : "Note: Original decals are protected by Zapon varnish which fuses with the paint over 80 years, making the transfer inseparable from the metal."}
+              </p>
             </div>
 
             {/* WAFFEN-SS */}
@@ -671,6 +710,62 @@ const Handbook = ({ setScreen, lang }) => {
                 {isFr
                   ? "Analyse de la structure des micro-craquelures du vernis Zapon pour détecter les vieillissements chimiques artificiels."
                   : "Analysis of Zapon varnish micro-crack structure to detect artificial chemical aging."}
+              </li>
+            </ul>
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "m34_civil",
+      title: isFr
+        ? "X. Modèles Légers & Civiques (M34)"
+        : "X. Lightweight & Civil Models (M34)",
+      icon: <ShieldCheck size={20} />,
+      content: (
+        <div className="space-y-4">
+          <p className="text-amber-200/70 italic text-xs border-b border-amber-900/30 pb-2">
+            {isFr
+              ? "Casques destinés à la Police, aux Pompiers et à la Défense Passive."
+              : "Helmets intended for Police, Firefighters, and Civil Defense."}
+          </p>
+          <div className="bg-black/30 p-4 rounded-xl border border-amber-900/20 shadow-lg">
+            <ul className="text-xs space-y-3">
+              <li>
+                •{" "}
+                <span className="text-amber-500 font-bold uppercase">
+                  {isFr ? "Évents 'Salière' :" : "Salt Shaker Vents:"}
+                </span>{" "}
+                {isFr
+                  ? "2 groupes de 7 trous poinçonnés de chaque côté (caractéristique unique)."
+                  : "2 groups of 7 punched holes on each side (unique characteristic)."}
+              </li>
+              <li>
+                •{" "}
+                <span className="text-amber-500 font-bold uppercase">
+                  {isFr ? "Poids & Matières :" : "Weight & Materials:"}
+                </span>{" "}
+                {isFr
+                  ? "Moyenne de 900g. Acier léger ou aluminium pour les modèles de parade."
+                  : "Average of 900g. Lightweight steel or aluminum for parade models."}
+              </li>
+              <li>
+                •{" "}
+                <span className="text-amber-500 font-bold uppercase">
+                  {isFr ? "Fixation :" : "Fixation:"}
+                </span>{" "}
+                {isFr
+                  ? "Souvent montés avec 4 rivets au lieu de 3. Jugulaire simple ou à 2 points."
+                  : "Often mounted with 4 rivets instead of 3. Simple or 2-point chinstrap."}
+              </li>
+              <li>
+                •{" "}
+                <span className="text-amber-500 font-bold uppercase">
+                  {isFr ? "Usage :" : "Usage:"}
+                </span>{" "}
+                {isFr
+                  ? "Feuerschutzpolizei (noir), Luftschutz (bleu), Croix-Rouge (blanc/gris)."
+                  : "Feuerschutzpolizei (black), Luftschutz (blue), Red Cross (white/grey)."}
               </li>
             </ul>
           </div>
