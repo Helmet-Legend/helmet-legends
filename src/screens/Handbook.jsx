@@ -10,7 +10,6 @@ import {
   Settings,
   Droplets,
   Ruler,
-  AlertCircle,
   HardHat,
   Search,
   ArrowLeft,
@@ -24,126 +23,123 @@ import {
   Cpu,
   Target,
   ShieldCheck,
+  Zap,
+  FlaskConical,
+  Binary,
+  Scale,
+  Anchor,
+  Flame,
+  Fingerprint,
+  Crosshair,
+  Cloud,
+  Microscope,
+  PenTool,
+  Layers,
 } from "lucide-react";
 
 const Handbook = ({ setScreen, lang }) => {
   const [openSection, setOpenSection] = useState(null);
   const isFr = lang === "fr";
-
-  const toggleSection = (id) => {
-    setOpenSection(openSection === id ? null : id);
-  };
+  const toggleSection = (id) => setOpenSection(openSection === id ? null : id);
 
   const sections = [
     {
-      id: "shells",
+      id: "genesis",
       title: isFr
-        ? "I. Modèles & Métallurgie (1935-1945)"
-        : "I. Models & Metallurgy (1935-1945)",
+        ? "0. Genèse & Héraldique (1916-1934)"
+        : "0. Genesis & Heraldry (1916-1934)",
+      icon: <History size={20} />,
+      content: (
+        <div className="space-y-4">
+          <div className="bg-black/30 p-4 rounded-xl border border-amber-900/20 text-xs leading-relaxed">
+            <p>
+              •{" "}
+              <span className="text-amber-500 font-bold underline">
+                Héritage (1917) :
+              </span>{" "}
+              Apparition d'insignes régimentaires peints à la main (ex: écusson
+              des Hohenzollern) sur les flancs gauches des modèles M16 et M18.
+            </p>
+            <p>
+              •{" "}
+              <span className="text-amber-500 font-bold underline">
+                L'Ordre du 5 Avril 1934 :
+              </span>{" "}
+              Standardisation prescrivant l'écusson national tricolore
+              (noir-blanc-rouge) à droite et l'emblème de l'armée à gauche.
+            </p>
+            <p>
+              •{" "}
+              <span className="text-amber-500 font-bold underline">
+                Configuration SS :
+              </span>{" "}
+              Inversion réglementaire avec les runes Siegrunen à droite et l'écu
+              du parti (croix gammée sur disque blanc) à gauche.
+            </p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "shells",
+      title: isFr ? "I. Modèles & Métallurgie" : "I. Models & Metallurgy",
       icon: <HardHat size={20} />,
       content: (
         <div className="space-y-6">
-          <p className="text-amber-200/70 italic text-xs border-b border-amber-900/30 pb-2">
-            {isFr
-              ? "Évolution de l'artisanat vers l'automatisation. Dureté Rockwell C 49-54."
-              : "Evolution from craftsmanship to automation. Rockwell C hardness 49-54."}
-          </p>
-
-          <div className="grid gap-4">
-            <div className="bg-black/30 p-4 rounded-xl border border-amber-900/20 shadow-lg">
-              <h4 className="font-black text-amber-500 text-sm uppercase flex items-center gap-2">
-                {isFr ? "M35 (L'Excellence)" : "M35 (The Excellence)"}
-              </h4>
-              <p className="text-[10px] mt-1 text-white/70 italic">
-                {isFr ? "Acier au Molybdène" : "Molybdenum Steel"}
-              </p>
-              <ul className="text-xs space-y-1 mt-2">
-                <li>
-                  •{" "}
-                  <span className="text-white font-bold">
-                    {isFr ? "Bord :" : "Edge:"}
-                  </span>{" "}
-                  {isFr
-                    ? "Roulé à la machine (replié vers l'intérieur)."
-                    : "Machine-rolled (folded inwards)."}
-                </li>
-                <li>
-                  •{" "}
-                  <span className="text-white font-bold">
-                    {isFr ? "Aérations :" : "Vents:"}
-                  </span>{" "}
-                  {isFr
-                    ? "Œillets rapportés (bushings) pressés mécaniquement."
-                    : "Separate bushings mechanically pressed in."}
-                </li>
-              </ul>
-              {/* AJOUT : DÉTAILS ALLIAGES ET QUIST */}
-              <div className="mt-3 pt-3 border-t border-amber-900/20 text-[10px] space-y-1 text-amber-100/60">
-                <p>
-                  •{" "}
-                  <span className="text-white font-bold">
-                    {isFr ? "Alliage :" : "Alloy:"}
-                  </span>{" "}
-                  {isFr
-                    ? "Acier Chrome-Nickel-Manganèse. Emboutissage en plusieurs étapes avec recuit."
-                    : "Chrome-Nickel-Manganese steel. Multi-stage stamping with annealing."}
-                </p>
-                <p>
-                  •{" "}
-                  <span className="text-white font-bold">
-                    {isFr
-                      ? "Spécificité Quist (Q) :"
-                      : "Quist Specificity (Q):"}
-                  </span>{" "}
-                  {isFr
-                    ? "Coque plus épaisse de 0.1mm à 0.2mm, augmentant la robustesse et le poids."
-                    : "Shell 0.1mm to 0.2mm thicker, increasing robustness and weight."}
-                </p>
-                <p>
-                  •{" "}
-                  <span className="text-white font-bold">
-                    {isFr ? "Tailles Géantes :" : "Giant Sizes:"}
-                  </span>{" "}
-                  {isFr
-                    ? "Seule l'usine ET (Thale) a produit des tailles 70, 72 et 74 (Rarissimes)."
-                    : "Only the ET (Thale) factory produced sizes 70, 72, and 74 (Extremely rare)."}
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-black/30 p-4 rounded-xl border border-amber-900/20 shadow-lg">
-              <h4 className="font-black text-amber-500 text-sm uppercase flex items-center gap-2">
-                {isFr
-                  ? "M40 & M42 (Simplification)"
-                  : "M40 & M42 (Simplification)"}
-              </h4>
-              <p className="text-[10px] mt-1 text-white/70 italic">
-                {isFr
-                  ? "Acier au Manganèse-Silicium"
-                  : "Manganese-Silicon Steel"}
-              </p>
-              <ul className="text-xs space-y-1 mt-2">
-                <li>
-                  • <span className="text-white font-bold">M40 :</span>{" "}
-                  {isFr
-                    ? "Bord roulé, mais aérations"
-                    : "Rolled edge, but vents"}{" "}
-                  <span className="text-amber-500 font-bold underline">
-                    {isFr ? "embouties" : "stamped"}
-                  </span>{" "}
-                  {isFr ? "directement." : "directly."}
-                </li>
-                <li>
-                  •{" "}
-                  <span className="text-white font-bold">M42 (Août 42) :</span>{" "}
-                  {isFr ? "Bord" : "Edge"}{" "}
-                  <span className="text-amber-500 font-bold uppercase underline">
-                    {isFr ? "brut / tranchant" : "raw / flared"}
-                  </span>{" "}
-                  {isFr ? "(évasé)." : "(flared)."}
-                </li>
-              </ul>
-            </div>
+          <div className="bg-black/30 p-4 rounded-xl border border-amber-900/20 shadow-lg">
+            <h4 className="font-black text-amber-500 text-sm uppercase flex items-center gap-2">
+              {isFr ? "M35 (L'Apogée)" : "M35 (The Peak)"}
+            </h4>
+            <ul className="text-xs space-y-2 mt-2">
+              <li>
+                •{" "}
+                <span className="text-white font-bold">
+                  Acier au Molybdène :
+                </span>{" "}
+                Alliage Chrome-Nickel-Molybdène offrant une résistance
+                supérieure pour un poids réduit (1.1mm à 1.2mm).
+              </li>
+              <li>
+                •{" "}
+                <span className="text-white font-bold">
+                  Aérateurs Rapportés :
+                </span>{" "}
+                Orifices percés puis équipés d'œillets (rivets creux) insérés et
+                sertis séparément ("Donut").
+              </li>
+              <li>
+                • <span className="text-white font-bold">Finition :</span> Bord
+                roulé vers l'intérieur (Rolled Edge) et peinture lisse
+                (Apfelgrün).
+              </li>
+            </ul>
+          </div>
+          <div className="bg-black/30 p-4 rounded-xl border border-amber-900/20 shadow-lg">
+            <h4 className="font-black text-amber-500 text-sm uppercase flex items-center gap-2">
+              M40 & M42 (Rationalisation)
+            </h4>
+            <ul className="text-xs space-y-2 mt-2">
+              <li>
+                •{" "}
+                <span className="text-white font-bold">M40 (Mars 1940) :</span>{" "}
+                Bascule vers l'acier Manganèse-Silicium (pénurie de molybdène).
+                Évents embossés directement ("volcaniques").
+              </li>
+              <li>
+                •{" "}
+                <span className="text-white font-bold">M42 (Avril 1942) :</span>{" "}
+                Suppression du roulage pour gagner du temps. Bord brut évasé
+                (Flared Rim) tranchant.
+              </li>
+              <li>
+                •{" "}
+                <span className="text-amber-500 font-bold italic">
+                  Note de Production :
+                </span>{" "}
+                L'usine Quist a produit des M40 jusqu'en 1944. Les M42 marqués
+                "Q" sont rarissimes.
+              </li>
+            </ul>
           </div>
         </div>
       ),
@@ -151,8 +147,8 @@ const Handbook = ({ setScreen, lang }) => {
     {
       id: "manufacturers",
       title: isFr
-        ? "II. Usines & Profils Spécifiques"
-        : "II. Factories & Specific Profiles",
+        ? "II. Les Cinq Géants & Codes"
+        : "II. The Five Giants & Codes",
       icon: <Search size={20} />,
       content: (
         <div className="space-y-4">
@@ -161,60 +157,301 @@ const Handbook = ({ setScreen, lang }) => {
               {
                 code: "ET / ckl",
                 name: "Eisenhüttenwerke Thale",
-                descFr:
-                  "Seule usine produisant TOUS les modèles (M35 à M42). Profil standard.",
-                descEn:
-                  "Only factory producing ALL models (M35 to M42). Standard profile.",
+                desc: "Plus gros producteur. Monopole M38. Seul fabricant des tailles 70 à 74.",
               },
               {
                 code: "Q",
-                name: "F.W. Quist",
-                descFr:
-                  "Qualité supérieure. Refus de produire le M42 (Q continue le M40 jusqu'en 1945). Aigle 'Bigfoot'.",
-                descEn:
-                  "Superior quality. Refused to produce the M42 (Q continued M40 until 1945). 'Bigfoot' eagle.",
-              },
-              {
-                code: "NS",
-                name: "Nickelwerke Schwerte",
-                descFr:
-                  "Visière pointue ('Sharp profile'). Vents souvent plus petits.",
-                descEn: "Pointed visor ('Sharp profile'). Vents often smaller.",
+                name: "F.W. Quist (Esslingen)",
+                desc: "Aciers réputés robustes. Refus tardif du M42. Aigle 'Bigfoot' exclusif.",
               },
               {
                 code: "SE / hkp",
                 name: "Sächsische Emaillierwerke",
-                descFr:
-                  "Jupe arrière très évasée (Flare) sur tailles 66+. KM rares identifiées.",
-                descEn:
-                  "Deep rear flare on sizes 66+. Rare KM examples identified.",
+                desc: "Signature : évents coniques sur M40. Jupe arrière très évasée.",
               },
               {
-                code: "EF / FS",
+                code: "NS",
+                name: "Nickelwerke Schwerte",
+                desc: "Visière pointue ('Sharp profile'). Préfixe 'D' sur les lots M35.",
+              },
+              {
+                code: "EF",
                 name: "Emaillierwerke Fulda",
-                descFr:
-                  "Profil de dôme plus haut. Fournisseur n°1 de la Polizei après 1942.",
-                descEn:
-                  "Higher dome profile. #1 provider for the Polizei after 1942.",
+                desc: "Fournisseur privilégié Waffen-SS. M35 parfois mal finis.",
+              },
+              {
+                code: "qvl / bvL",
+                name: "Codes de Dissimulation",
+                desc: "Production satellite de Thale (1944-45) liée au cryptage du R.B.Nr.",
               },
             ].map((m) => (
               <div
                 key={m.code}
                 className="bg-black/40 p-3 rounded-lg border border-amber-900/30"
               >
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-amber-500 font-black text-sm italic">
-                    {m.code}
-                  </span>
-                  <span className="text-[10px] text-white opacity-70 italic font-serif">
-                    {m.name}
-                  </span>
-                </div>
-                <p className="text-[11px] text-amber-100/80 leading-snug">
-                  {isFr ? m.descFr : m.descEn}
-                </p>
+                <span className="text-amber-500 font-black text-sm italic">
+                  {m.code}
+                </span>
+                <p className="text-[11px] text-amber-100/80 mt-1">{m.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "heer_expert",
+      title: isFr
+        ? "III. Expertise : HEER (Armée de Terre)"
+        : "III. Expertise: HEER (Army)",
+      icon: <Crosshair size={20} />,
+      content: (
+        <div className="space-y-4">
+          <div className="bg-black/30 p-4 rounded-xl border border-amber-900/20 text-[10px] leading-relaxed">
+            <h4 className="text-amber-500 font-black uppercase mb-2">
+              Morphologie de l'Aigle (Hoheitsadler)
+            </h4>
+            <p className="mb-2">
+              • <span className="text-white font-bold">Style ET :</span> Lignes
+              nettes, bordure noire précise. Courbure "hump" sur l'aile gauche
+              (droite pour l'observateur).{" "}
+              <span className="text-amber-500 italic">Défaut récurrent :</span>{" "}
+              point sur la griffe droite de la patte droite.
+            </p>
+            <p className="mb-2">
+              •{" "}
+              <span className="text-white font-bold">
+                Type Big Foot (Quist) :
+              </span>{" "}
+              Griffes larges, structure massive. Plumage de poitrine fin.
+              Exclusif aux coques Q.
+            </p>
+            <p className="mb-2">
+              •{" "}
+              <span className="text-white font-bold">
+                Style HJ&K (Thin Wing) :
+              </span>{" "}
+              Ailes fines, texture granuleuse. Typique des coques EF, NS et
+              reconditionnements.
+            </p>
+            <p>
+              • <span className="text-white font-bold">Variantes Rares :</span>{" "}
+              <span className="text-amber-500">Gustav Peiniger</span> ("Mad
+              Faced" - visage distordu) et{" "}
+              <span className="text-amber-500">Methner & Burger</span> (lignes
+              internes grises).
+            </p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "luft_expert",
+      title: isFr ? "IV. Expertise : LUFTWAFFE" : "IV. Expertise: LUFTWAFFE",
+      icon: <Cloud size={20} />,
+      content: (
+        <div className="space-y-4">
+          <div className="bg-black/30 p-4 rounded-xl border border-amber-900/20 text-[10px] leading-relaxed">
+            <h4 className="text-amber-500 font-black uppercase mb-2">
+              L'Aigle en Vol
+            </h4>
+            <p className="mb-2">
+              •{" "}
+              <span className="text-white font-bold">
+                Droop Tail (1er Modèle - 1935/37) :
+              </span>{" "}
+              Plumes de la queue pointant vers le bas. Variantes{" "}
+              <span className="text-amber-500 italic">Snake Leg</span>{" "}
+              (onduleuse) et{" "}
+              <span className="text-amber-500 italic">Straight Leg</span>{" "}
+              (perpendiculaire).
+            </p>
+            <p className="mb-2">
+              •{" "}
+              <span className="text-white font-bold">
+                Modèle Standard (1937+) :
+              </span>{" "}
+              Design anguleux. Présence d'un{" "}
+              <span className="text-amber-500 italic">petit point noir</span>{" "}
+              repère à la base de l'aile gauche sur ET, Quist et SE.
+            </p>
+            <p>
+              • <span className="text-white font-bold">Variante NS :</span> La
+              griffe semble "flotter" au-dessus de la croix gammée.
+            </p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "km_expert",
+      title: isFr
+        ? "V. Expertise : KRIEGSMARINE (Marine)"
+        : "V. Expertise: KRIEGSMARINE",
+      icon: <Anchor size={20} />,
+      content: (
+        <div className="space-y-4">
+          <div className="p-4 bg-amber-900/10 rounded-xl border border-amber-900/30 text-[10px]">
+            <h4 className="text-amber-500 font-black uppercase mb-2">
+              Le Défi de l'Or et du Vernis "Toné"
+            </h4>
+            <p className="mb-3 italic opacity-80">
+              Le vernis Zapon des insignes Heer (argent) jaunit avec l'âge. Un
+              vrai KM utilise une poudre de Bronze/Laiton (or dans la masse).
+            </p>
+            <p className="mb-3">
+              •{" "}
+              <span className="text-white font-bold underline">
+                La Crête (The Ridge) :
+              </span>{" "}
+              Signature absolue des insignes KM produits pour{" "}
+              <span className="text-amber-500 font-bold">ET et SE</span>. Ligne
+              noire en relief palpable visible à la loupe.
+            </p>
+            <p>
+              •{" "}
+              <span className="text-white font-bold underline">
+                Avertissement NS :
+              </span>{" "}
+              L'usine NS n'a jamais produit d'insignes Kriegsmarine. Toute coque
+              NS "KM" est un faux ou un Heer jauni.
+            </p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "ss_expert",
+      title: isFr
+        ? "VI. Expertise : WAFFEN-SS (Runes)"
+        : "VI. Expertise: WAFFEN-SS",
+      icon: <Zap size={20} />,
+      content: (
+        <div className="space-y-4">
+          <div className="p-4 bg-red-900/10 rounded-xl border border-red-900/30 text-[10px] leading-relaxed">
+            <h4 className="text-red-500 font-black uppercase mb-2 flex items-center gap-2">
+              <AlertTriangle size={14} /> Géométrie et Mythes
+            </h4>
+            <p className="mb-2">
+              •{" "}
+              <span className="text-white font-bold underline">
+                Style C.A. Pocher (1er Modèle) :
+              </span>{" "}
+              Angles très vifs. Alignement exact de la base des runes avec le
+              point de rupture de l'écusson.
+            </p>
+            <p className="mb-2">
+              •{" "}
+              <span className="text-white font-bold underline">
+                Style Quist :
+              </span>{" "}
+              La rune de gauche descend légèrement plus bas que celle de droite.
+            </p>
+            <p className="mb-2">
+              •{" "}
+              <span className="text-white font-bold underline">
+                Le Mythe Champagne :
+              </span>{" "}
+              Runes rosées/dorées trouvées sur coques NS. Longtemps débattues,
+              elles sont désormais reconnues comme authentiques variantes
+              chimiques.{" "}
+              <span className="text-white font-bold italic">
+                (Note : D'autres sources les classent comme toxiques sur coques
+                ND - vérifier lot)
+              </span>
+              .
+            </p>
+            <p>
+              •{" "}
+              <span className="text-white font-bold underline">
+                Border Break :
+              </span>{" "}
+              Micro-cassures irrégulières dans le trait noir périphérique
+              (impression lithographique).
+            </p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "polizei",
+      title: isFr
+        ? "VII. Expertise : POLIZEI (Police)"
+        : "VII. Expertise: POLIZEI",
+      icon: <ShieldCheck size={20} />,
+      content: (
+        <div className="space-y-4">
+          <div className="bg-black/30 p-4 rounded-xl border border-amber-900/20 text-[10px]">
+            <p className="mb-2">
+              •{" "}
+              <span className="text-white font-bold underline">
+                Configurations :
+              </span>{" "}
+              Deux insignes maintenus sur M35/40/42 (Aigle de police à gauche /
+              Écu du parti à droite).
+            </p>
+            <p className="mb-2">
+              • <span className="text-white font-bold underline">Styles :</span>{" "}
+              Style <span className="text-amber-500 font-bold">SE</span>{" "}
+              (bordure noire nette - très commun) et Style{" "}
+              <span className="text-amber-500 font-bold">EF</span> (exclusif
+              Fulda).
+            </p>
+            <p>
+              •{" "}
+              <span className="text-white font-bold underline">
+                Réattributions :
+              </span>{" "}
+              Des casques Heer ont été réattribués à la police en appliquant les
+              nouveaux insignes par-dessus les anciens.
+            </p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "forensics",
+      title: isFr
+        ? "VIII. Laboratoire Forensique"
+        : "VIII. Forensic Laboratory",
+      icon: <FlaskConical size={20} />,
+      content: (
+        <div className="space-y-5">
+          <div className="bg-black/30 p-4 rounded-xl border border-amber-900/20 text-[10px] leading-relaxed">
+            <h4 className="text-amber-500 font-black uppercase mb-2">
+              Technologie de Production d'époque
+            </h4>
+            <p className="mb-2">
+              <span className="text-white font-bold underline">
+                Stratification "Sandwich" :
+              </span>{" "}
+              Couche de base transparente + Couche métallique (Pulver d'Alu ou
+              Bronze) + Couche de détail noire + Vernis Zapon (Copal ou
+              Nitrocellulose).
+            </p>
+            <p className="mb-2">
+              <span className="text-white font-bold underline">
+                Adhésion Moléculaire :
+              </span>{" "}
+              Le transfert à sec/vernis utilisé en usine fusionne avec la
+              peinture. Absence de "marche" au toucher contrairement aux
+              autocollants modernes.
+            </p>
+            <p>
+              <span className="text-white font-bold underline">
+                Crazing (Craquelures) :
+              </span>{" "}
+              Réseau de micro-fissures aléatoires dû au vieillissement de 80
+              ans. Les faux présentent des rayures au scalpel trop droites.
+            </p>
+          </div>
+          <div className="p-3 bg-amber-900/10 rounded-xl border border-amber-900/30 flex items-center gap-3 italic text-[10px]">
+            <Microscope size={16} className="text-amber-500 shrink-0" />
+            <p>
+              Signature d'Impression (x200) : Les originaux montrent une
+              distribution aléatoire des pigments. Les faux numériques révèlent
+              une trame de points régulière ou des bords en "dents de scie".
+            </p>
           </div>
         </div>
       ),
@@ -222,49 +459,32 @@ const Handbook = ({ setScreen, lang }) => {
     {
       id: "paratroopers",
       title: isFr
-        ? "III. Casques Parachutistes (FJ)"
-        : "III. Paratrooper Helmets (FJ)",
+        ? "IX. Casques Parachutistes (M38)"
+        : "IX. Paratrooper Helmets (M38)",
       icon: <Wind size={20} />,
       content: (
         <div className="space-y-4">
-          <div className="bg-amber-900/10 p-4 rounded-xl border border-amber-600/20">
-            <h4 className="text-amber-500 font-black text-xs uppercase mb-2">
-              M38 (ET Uniquement)
+          <div className="bg-amber-900/10 p-4 rounded-xl border border-amber-600/20 text-xs">
+            <h4 className="text-amber-500 font-black uppercase mb-2">
+              Architecture Aérodynamique (ET/ckl)
             </h4>
-            <ul className="text-xs space-y-3">
+            <ul className="space-y-2">
               <li>
-                •{" "}
-                <span className="text-white font-bold italic">
-                  {isFr ? "Fixation :" : "Fixation:"}
-                </span>{" "}
-                {isFr
-                  ? "4 boulons creux (ventilation) ou fendus (production tardive)."
-                  : "4 hollow bolts (ventilation) or split bolts (late production)."}
+                • <span className="text-white font-bold">Acier renforcé :</span>{" "}
+                Épaisseur de 1.5mm pour les contraintes de saut. Coque sphérique
+                sans bords saillants.
               </li>
               <li>
                 •{" "}
-                <span className="text-white font-bold italic">
-                  {isFr ? "Amortisseurs :" : "Pads:"}
+                <span className="text-white font-bold">
+                  Système de Rétention :
                 </span>{" "}
-                {isFr
-                  ? "Mousse jaune naturelle (précoce) ➔ Caoutchouc noir (synthétique dès 1939)."
-                  : "Natural yellow foam (early) ➔ Black rubber (synthetic from 1939)."}
+                Quatre boulons de fixation et jugulaire en "Y" complexe.
               </li>
               <li>
-                •{" "}
-                <span className="text-white font-bold italic">
-                  {isFr ? "Harnais :" : "Harness:"}
-                </span>{" "}
-                {isFr
-                  ? "Jugulaire 4 points en cuir de chèvre. Boutons pression"
-                  : "4-point goatskin chinstrap. Snaps"}{" "}
-                <span className="text-amber-500 underline italic">prym 4</span>.
-              </li>
-              <li>
-                • <span className="text-white font-bold italic">Note :</span>{" "}
-                {isFr
-                  ? "Absence totale de visière pour éviter les torsions cervicales aux sauts."
-                  : "Total absence of visor to prevent neck torsion during jumps."}
+                • <span className="text-white font-bold">Boulons :</span>{" "}
+                Modèles 'Spanner' (deux trous) ➔ modèles 'Slotted' (fente
+                simple).
               </li>
             </ul>
           </div>
@@ -272,503 +492,146 @@ const Handbook = ({ setScreen, lang }) => {
       ),
     },
     {
-      id: "liners",
-      title: isFr
-        ? "IV. Système M31 & Intérieurs"
-        : "IV. M31 Liner System & Interiors",
-      icon: <Settings size={20} />,
+      id: "civic",
+      title: isFr ? "X. Modèles Civiques & M34" : "X. Civic Models & M34",
+      icon: <Flame size={20} />,
       content: (
         <div className="space-y-4">
-          <div className="bg-black/30 p-3 rounded-lg border border-amber-900/20 shadow-md">
-            <h4 className="text-amber-500 text-[11px] font-black uppercase mb-2 underline italic underline-offset-4">
-              {isFr ? "Le Cerclage (Band)" : "The Band"}
-            </h4>
-            <p className="text-xs leading-loose">
+          <div className="bg-black/30 p-4 rounded-xl border border-amber-900/20 text-xs leading-relaxed">
+            <p className="mb-2">
               •{" "}
-              <span className="text-white font-bold">
-                {isFr ? "Pré-1940 :" : "Pre-1940:"}
+              <span className="text-amber-500 font-bold underline">
+                M34 Square Dip :
               </span>{" "}
-              {isFr
-                ? "Aluminium (anneaux de jugulaire carrés)."
-                : "Aluminum (square chinstrap rings)."}
-              <br />•{" "}
-              <span className="text-white font-bold">
-                {isFr ? "Post-1940 :" : "Post-1940:"}
+              Transition angulaire abrupte visière-jupe pour étanchéité accrue
+              du masque à gaz.
+            </p>
+            <p className="mb-2">
+              •{" "}
+              <span className="text-amber-500 font-bold underline">
+                Salt Shaker (Salière) :
               </span>{" "}
-              {isFr ? "Acier galvanisé (anneaux" : "Galvanized steel ("}{" "}
-              <span className="text-amber-500 font-black italic">
-                {isFr ? "RONDS" : "ROUND"}
-              </span>
-              ).
+              Aérateurs formés de deux groupes de sept perforations circulaires.
+            </p>
+            <p className="mb-2">
+              •{" "}
+              <span className="text-amber-500 font-bold underline">
+                Casque Gladiator :
+              </span>{" "}
+              Construction en 3 pièces ou monobloc pour la Luftschutz (Défense
+              passive).
+            </p>
+            <p>
+              •{" "}
+              <span className="text-amber-500 font-bold underline">
+                Beaded (Bourrelet) :
+              </span>{" "}
+              Coques de combat (M35/40/42) présentant des défauts
+              métallurgiques, marquées d'un bourrelet horizontal pour interdire
+              l'usage au front.
             </p>
           </div>
-          <div className="grid grid-cols-2 gap-2 text-[10px]">
-            <div className="bg-black/40 p-2 rounded border border-amber-900/20 shadow-md">
-              <span className="text-amber-500 font-bold uppercase italic block mb-1">
-                {isFr ? "Cuirs & Sizing" : "Leather & Sizing"}
-              </span>
-              {isFr
-                ? "Mouton (M35) / Porc (M42 -"
-                : "Sheepskin (M35) / Pigskin (M42 -"}{" "}
-              <span className="text-white font-bold underline">
-                {isFr ? "pores par 3" : "3-pore pattern"}
-              </span>
-              ).
-              <br />
-              <span className="text-white">Note :</span>{" "}
-              {isFr ? "8 languettes standard /" : "8 standard tongues /"}{" "}
-              <span className="text-amber-500 font-bold underline">
-                {isFr ? "9 languettes" : "9 tongues"}
-              </span>{" "}
-              {isFr ? "sur tailles 68/70." : "on sizes 68/70."}
-            </div>
-            <div className="bg-black/40 p-2 rounded border border-amber-900/20 shadow-md">
-              <span className="text-amber-500 font-bold uppercase italic block mb-1">
-                {isFr ? "Rivets (Pins)" : "Split Pins"}
-              </span>
-              {isFr
-                ? "Laiton nickelé (pré-guerre) ➔ Acier galvanisé (1940+). Pattes pliées dans la longueur à l'arrière."
-                : "Nickeled brass (pre-war) ➔ Galvanized steel (1940+). Legs folded lengthwise at the back."}
-            </div>
-          </div>
         </div>
       ),
     },
     {
-      id: "decals",
-      title: isFr
-        ? "V. Expertise Approfondie des Insignes"
-        : "V. In-Depth Decal Expertise",
-      icon: <Shield size={20} />,
+      id: "lot_logic",
+      title: isFr ? "XI. Archivistique des Lots" : "XI. Lot Number Archiving",
+      icon: <Binary size={20} />,
       content: (
-        <div className="space-y-5">
-          <div className="flex gap-2 justify-center">
-            <div className="bg-amber-600/10 p-1.5 rounded border border-amber-600/30 text-[9px] text-white font-black italic uppercase">
-              {isFr
-                ? "Décret 1940 : Fin Tricolore"
-                : "1940 Decree: End of Tricolor"}
-            </div>
-            <div className="bg-amber-600/10 p-1.5 rounded border border-amber-600/30 text-[9px] text-white font-black italic uppercase">
-              {isFr ? "Décret 1943 : Fin Décals" : "1943 Decree: End of Decals"}
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            {/* HEER */}
-            <div className="p-3 bg-black/40 rounded-xl border border-amber-900/30 shadow-inner">
-              <h4 className="text-amber-500 font-black text-[11px] uppercase mb-1 underline italic underline-offset-4">
-                Heer : {isFr ? "Détails Macro" : "Macro Details"}
-              </h4>
-              <p className="text-[11px]">
-                •{" "}
-                <span className="text-white font-bold italic underline">
-                  Style ET :
-                </span>{" "}
-                {isFr ? "Point spécifique sur la" : "Specific dot on the"}{" "}
-                <span className="text-amber-500 underline font-black">
-                  {isFr
-                    ? "griffe droite du pied droit"
-                    : "right claw of the right foot"}
-                </span>
-                .
-              </p>
-              <p className="text-[11px] mt-1">
-                •{" "}
-                <span className="text-white font-bold italic underline">
-                  Style Bigfoot (Quist) :
-                </span>{" "}
-                {isFr
-                  ? "Serres massives et carrées. Tête de l'aigle plate."
-                  : "Massive square claws. Flat eagle head."}
-              </p>
-            </div>
-
-            {/* LUFTWAFFE */}
-            <div className="p-3 bg-black/40 rounded-xl border border-amber-900/30 shadow-inner">
-              <h4 className="text-amber-500 font-black text-[11px] uppercase mb-1 underline italic underline-offset-4">
-                Luftwaffe : {isFr ? "L'Aigle Volant" : "The Flying Eagle"}
-              </h4>
-              <p className="text-[11px]">
-                •{" "}
-                <span className="text-white font-bold italic underline">
-                  Droop Tail :
-                </span>{" "}
-                {isFr
-                  ? "Queue tombante (Variante précoce sur M35)."
-                  : "Dropping tail (Early M35 variant)."}
-              </p>
-              <p className="text-[11px] mt-1">
-                •{" "}
-                <span className="text-white font-bold italic underline">
-                  Snake Leg :
-                </span>{" "}
-                {isFr
-                  ? "Patte en zigzag/serpent (Standard sur M35/M40)."
-                  : "Snake/zigzag leg (Standard on M35/M40)."}
-              </p>
-              <p className="text-[11px] mt-1 italic text-white/60">
-                •{" "}
-                {isFr
-                  ? "Aigle toujours détouré, sans bouclier sur les modèles M40/M42."
-                  : "Eagle always cutout, no shield on M40/M42 models."}
-              </p>
-            </div>
-
-            {/* KRIEGSMARINE */}
-            <div className="p-3 bg-black/40 rounded-xl border border-amber-900/30 shadow-inner">
-              <h4 className="text-amber-500 font-black text-[11px] uppercase mb-1 underline italic underline-offset-4">
-                Kriegsmarine : Relief Rim
-              </h4>
-              <p className="text-[11px]">
-                •{" "}
-                <span className="text-white font-bold italic underline">
-                  Structure :
-                </span>{" "}
-                {isFr
-                  ? "Deux couches d'encre (poudre d'or)."
-                  : "Two layers of ink (gold powder)."}{" "}
-                <span className="text-amber-500 font-black underline italic">
-                  {isFr ? "Bord noir en relief" : "Raised black border"}
-                </span>{" "}
-                {isFr
-                  ? "visible à la loupe x10."
-                  : "visible under x10 magnification."}
-              </p>
-              {/* AJOUT : ADHÉSION ET ZAPON */}
-              <p className="text-[10px] mt-2 italic text-amber-100/40">
-                {isFr
-                  ? "Note : Les décals originaux sont protégés par un vernis Zapon qui fusionne avec la peinture sur 80 ans, rendant le transfert indissociable du métal."
-                  : "Note: Original decals are protected by Zapon varnish which fuses with the paint over 80 years, making the transfer inseparable from the metal."}
-              </p>
-            </div>
-
-            {/* WAFFEN-SS */}
-            <div className="p-3 bg-black/40 rounded-xl border border-amber-900/30 shadow-inner">
-              <h4 className="text-amber-500 font-black text-[11px] uppercase mb-1 underline italic underline-offset-4">
-                Waffen-SS : {isFr ? "Paillettes d'Alu" : "Aluminum Flakes"}
-              </h4>
-              <p className="text-[11px]">
-                •{" "}
-                <span className="text-white font-bold italic underline">
-                  Composition :
-                </span>{" "}
-                {isFr
-                  ? "Scintillement sous lampe LED. Runes alignées en bas (Type ET)."
-                  : "Sparkling under LED light. Runes aligned at the bottom (ET Type)."}
-              </p>
-              <p className="text-[11px] mt-1">
-                •{" "}
-                <span className="text-white font-bold italic underline">
-                  Type EF :
-                </span>{" "}
-                {isFr
-                  ? "La rune de gauche frôle presque le bord noir de l'insigne."
-                  : "The left rune nearly touches the black border of the decal."}
-              </p>
-            </div>
-
-            <div className="p-3 bg-red-900/10 rounded-xl border border-red-900/30">
-              <h4 className="text-red-500 font-black text-[10px] uppercase mb-1 flex items-center gap-1">
-                <AlertTriangle size={14} />{" "}
-                {isFr
-                  ? "Unités Spéciales & Volontaires"
-                  : "Special Units & Volunteers"}
-              </h4>
-              <ul className="text-[10px] space-y-1 italic text-amber-100/70">
-                <li>
-                  •{" "}
-                  <span className="text-red-400 font-bold uppercase">
-                    RAD :
-                  </span>{" "}
-                  {isFr
-                    ? "Aigle debout sur une pelle. Insigne large et haut."
-                    : "Eagle standing on a shovel. Wide and tall decal."}
-                </li>
-                <li>
-                  •{" "}
-                  <span className="text-red-400 font-bold uppercase">
-                    Volontaires :
-                  </span>{" "}
-                  {isFr
-                    ? "Ecussons nationaux (Azul/LVF) rarissimes. 99% de faux."
-                    : "National shields (Azul/LVF) extremely rare. 99% fake."}
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      ),
-    },
-    {
-      id: "paint",
-      title: isFr ? "VI. Peintures & Camouflages" : "VI. Paints & Camouflages",
-      icon: <Droplets size={20} />,
-      content: (
-        <div className="space-y-3 text-xs leading-relaxed">
-          <p>
-            •{" "}
-            <span className="text-amber-500 font-bold underline">
-              Heer/SS :
-            </span>{" "}
-            {isFr
-              ? "Apple Green lisse (M35) ➔ Feldgrau mat/granuleux (M40/42)."
-              : "Smooth Apple Green (M35) ➔ Matte/textured Feldgrau (M40/42)."}
-          </p>
-          <p>
-            •{" "}
-            <span className="text-amber-500 font-bold underline">
-              Luftwaffe :
-            </span>{" "}
-            {isFr
-              ? "Blaugrau spécifique (Bleu-gris)."
-              : "Specific Blaugrau (Blue-grey)."}
-          </p>
-          <p>
-            •{" "}
-            <span className="text-amber-500 font-bold underline">
-              Kriegsmarine :
-            </span>{" "}
-            {isFr
-              ? "Shipboard grey (Naval - Gris d'acier)."
-              : "Shipboard grey (Steel grey)."}
-          </p>
-          <div className="bg-amber-900/20 p-3 rounded border border-amber-900/40 mt-2 italic shadow-lg">
-            <h4 className="text-amber-500 font-black text-[10px] uppercase mb-1 underline">
-              {isFr ? "Techniques Terrain :" : "Field Techniques:"}
+        <div className="space-y-4">
+          <div className="bg-black/30 p-4 rounded-xl border border-amber-900/20 text-[10px] leading-relaxed">
+            <h4 className="text-amber-500 font-black uppercase mb-2">
+              Méthode de Triangulation
             </h4>
-            {isFr
-              ? "Ajout de sable, sciure ou copeaux de bois (Texture). Grillage (Chicken Wire) laissant des marques d'oxydation définitives sur l'acier."
-              : "Addition of sand, sawdust or wood chips (Texture). Wire mesh (Chicken Wire) leaving permanent oxidation marks on the steel."}
+            <p className="mb-2">
+              •{" "}
+              <span className="text-white font-bold underline">
+                Définition :
+              </span>{" "}
+              Le Lotnummer désigne une coulée (heat) d'acier spécifique
+              transformée en tôles.
+            </p>
+            <p className="mb-2">
+              •{" "}
+              <span className="text-white font-bold underline">
+                Lot Twins (Jumeaux) :
+              </span>{" "}
+              Des coques d'un même lot peuvent porter des insignes de branches
+              différentes car elles étaient stockées "nues".
+            </p>
+            <p>
+              •{" "}
+              <span className="text-white font-bold underline">
+                Chronologie :
+              </span>{" "}
+              La transition M35/M40 chez ET se situe autour du lot{" "}
+              <span className="text-amber-500 font-bold">4800</span>. Chez
+              Quist, le M35 perdure jusqu'aux lots 4000-5000.
+            </p>
           </div>
         </div>
       ),
     },
     {
-      id: "checklist",
+      id: "dome_stamp",
       title: isFr
-        ? "VII. Checklist Finale d'Expertise"
-        : "VII. Final Expertise Checklist",
-      icon: <Camera size={20} />,
-      content: (
-        <div className="space-y-4 bg-amber-900/10 p-4 rounded-xl border border-amber-600/20">
-          <div className="space-y-3">
-            {[
-              {
-                tFr: "Alliage & Bords",
-                tEn: "Alloy & Edges",
-                dFr: "M42 = bords bruts tranchants. M35/40 = bords roulés parfaits.",
-                dEn: "M42 = raw sharp edges. M35/40 = perfect rolled edges.",
-              },
-              {
-                tFr: "Vernis Zapon",
-                tEn: "Zapon Varnish",
-                dFr: "Craquelé 'Crazing' organique obligatoire sur transferts à l'eau.",
-                dEn: "Organic 'Crazing' mandatory on water-slide decals.",
-              },
-              {
-                tFr: "Tampon de Dôme",
-                tEn: "Dome Stamp",
-                dFr: "Forme ovale 'Abgenommen'. Encre 'bue' par l'acier (poreuse).",
-                dEn: "Oval 'Abgenommen' shape. Ink 'soaked' into the steel (porous).",
-              },
-              {
-                tFr: "Logique Lot",
-                tEn: "Lot Logic",
-                dFr: "Lot tardif (>1943) = AUCUN décal d'usine. Coque M42 double décal = manipulation.",
-                dEn: "Late lot (>1943) = NO factory decal. Double decal M42 shell = manipulation.",
-              },
-            ].map((item, idx) => (
-              <div key={idx} className="flex gap-3">
-                <div className="bg-amber-600 text-black font-black px-1.5 rounded h-fit text-xs italic">
-                  {idx + 1}
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-white uppercase italic underline underline-offset-2">
-                    {isFr ? item.tFr : item.tEn}
-                  </p>
-                  <p className="text-[10px] text-amber-100/70 italic mt-0.5 leading-snug">
-                    {isFr ? item.dFr : item.dEn}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ),
-    },
-    {
-      id: "resources",
-      title: isFr
-        ? "VIII. Pour aller plus loin (Sources)"
-        : "VIII. Further Reading (Sources)",
-      icon: <Library size={20} />,
-      content: (
-        <div className="space-y-6">
-          <p className="text-[11px] italic text-amber-200/60 leading-relaxed">
-            {isFr
-              ? "L'expertise est un apprentissage continu. Nous vous recommandons vivement ces sources qui ont permis la création de cette base de données."
-              : "Expertise is continuous learning. We highly recommend these sources that enabled the creation of this database."}
-          </p>
-
-          <div className="grid gap-4">
-            <div className="bg-black/40 p-4 rounded-xl border border-amber-900/30 shadow-md">
-              <h4 className="text-amber-500 font-black text-xs uppercase mb-1">
-                Jan M. Meland
-              </h4>
-              <p className="text-[11px] text-white/80">
-                {isFr
-                  ? "Livre : 'German Helmets 1916-1945'. La référence visuelle et technique la plus récente (2023)."
-                  : "Book: 'German Helmets 1916-1945'. The most recent visual and technical reference (2023)."}
-              </p>
-            </div>
-
-            <div className="bg-black/40 p-4 rounded-xl border border-amber-900/30 shadow-md">
-              <h4 className="text-amber-500 font-black text-xs uppercase mb-1">
-                Brian Ice
-              </h4>
-              <p className="text-[11px] text-white/80">
-                {isFr
-                  ? "Base de données 'German Helmet Lot Numbers'. Le travail colossal de recensement des numéros de lots."
-                  : "Database 'German Helmet Lot Numbers'. The colossal work of indexing lot numbers."}
-              </p>
-            </div>
-
-            <a
-              href="https://germanhelmetvault.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-amber-600/5 p-4 rounded-xl border border-amber-600/20 flex justify-between items-center hover:bg-amber-600/10 transition-all group"
-            >
-              <div>
-                <h4 className="text-amber-500 font-black text-xs uppercase mb-1">
-                  German Helmet Vault
-                </h4>
-                <p className="text-[11px] text-white/80">
-                  {isFr
-                    ? "Site d'Andrea : Études statistiques et visuelles de haute précision."
-                    : "Andrea's Site: High-precision statistical and visual studies."}
-                </p>
-              </div>
-              <ExternalLink
-                size={18}
-                className="text-amber-700 group-hover:text-amber-500 transition-colors"
-              />
-            </a>
-
-            <div className="p-4 bg-black/20 rounded-xl border border-amber-900/20">
-              <h4 className="text-amber-600 font-black text-[10px] uppercase mb-2">
-                {isFr ? "Forums Recommandés" : "Recommended Forums"}
-              </h4>
-              <ul className="text-[10px] space-y-1 text-white/60">
-                <li>• Wehrmacht-Awards Forum (WA)</li>
-                <li>• German Helmet Walhalla (GHW2)</li>
-                <li>• War Relics Forum</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      ),
-    },
-    {
-      id: "ai_tech",
-      title: isFr
-        ? "IX. Assistance IA & Optique Macro"
-        : "IX. AI Assistance & Macro Optics",
-      icon: <Cpu size={20} />,
+        ? "XII. Tampon de Dôme (Abgenommen)"
+        : "XII. Dome Stamp (Abgenommen)",
+      icon: <Fingerprint size={20} />,
       content: (
         <div className="space-y-4">
-          <p className="text-amber-200/70 italic text-xs border-b border-amber-900/30 pb-2">
-            {isFr
-              ? "Analyse biométrique des insignes par intelligence artificielle."
-              : "Biometric analysis of decals using artificial intelligence."}
-          </p>
-          <div className="bg-amber-900/10 p-4 rounded-xl border border-amber-600/20">
-            <ul className="text-xs space-y-3">
-              <li>
-                •{" "}
-                <span className="text-white font-bold italic">
-                  {isFr ? "Banc d'Optique :" : "Optical Bench:"}
-                </span>{" "}
-                {isFr
-                  ? "Normalisation automatique de la luminance et correction de la perspective pour une comparaison scientifique."
-                  : "Automatic luminance normalization and perspective correction for scientific comparison."}
-              </li>
-              <li>
-                •{" "}
-                <span className="text-white font-bold italic">
-                  {isFr ? "Vecteurs de Tracé :" : "Tracing Vectors:"}
-                </span>{" "}
-                {isFr
-                  ? "Comparaison mathématique de la courbure des ailes et de l'épaisseur des traits (Précision : 0.2mm)."
-                  : "Mathematical comparison of wing curvature and stroke thickness (Precision: 0.2mm)."}
-              </li>
-              <li>
-                •{" "}
-                <span className="text-white font-bold italic">
-                  {isFr ? "Crazing Organique :" : "Organic Crazing:"}
-                </span>{" "}
-                {isFr
-                  ? "Analyse de la structure des micro-craquelures du vernis Zapon pour détecter les vieillissements chimiques artificiels."
-                  : "Analysis of Zapon varnish micro-crack structure to detect artificial chemical aging."}
-              </li>
-            </ul>
+          <div className="bg-amber-900/10 p-4 rounded-xl border border-amber-900/30 text-[10px]">
+            <h4 className="text-amber-500 font-black uppercase mb-2 italic">
+              Certification d'Inspection
+            </h4>
+            <p className="italic leading-relaxed">
+              Marquage à l'encre certifiant l'acceptation par le bureau de
+              l'armement. L'encre doit être{" "}
+              <span className="text-white font-bold">poreuse</span> (absorbée
+              par la peinture mate). Un tampon brillant ou posé en surface est
+              un indicateur de manipulation post-guerre.
+            </p>
           </div>
         </div>
       ),
     },
     {
-      id: "m34_civil",
-      title: isFr
-        ? "X. Modèles Légers & Civiques (M34)"
-        : "X. Lightweight & Civil Models (M34)",
-      icon: <ShieldCheck size={20} />,
+      id: "metrology",
+      title: isFr ? "XIII. Table de Métrologie" : "XIII. Metrology Table",
+      icon: <Scale size={20} />,
       content: (
-        <div className="space-y-4">
-          <p className="text-amber-200/70 italic text-xs border-b border-amber-900/30 pb-2">
-            {isFr
-              ? "Casques destinés à la Police, aux Pompiers et à la Défense Passive."
-              : "Helmets intended for Police, Firefighters, and Civil Defense."}
-          </p>
-          <div className="bg-black/30 p-4 rounded-xl border border-amber-900/20 shadow-lg">
-            <ul className="text-xs space-y-3">
-              <li>
-                •{" "}
-                <span className="text-amber-500 font-bold uppercase">
-                  {isFr ? "Évents 'Salière' :" : "Salt Shaker Vents:"}
-                </span>{" "}
-                {isFr
-                  ? "2 groupes de 7 trous poinçonnés de chaque côté (caractéristique unique)."
-                  : "2 groups of 7 punched holes on each side (unique characteristic)."}
-              </li>
-              <li>
-                •{" "}
-                <span className="text-amber-500 font-bold uppercase">
-                  {isFr ? "Poids & Matières :" : "Weight & Materials:"}
-                </span>{" "}
-                {isFr
-                  ? "Moyenne de 900g. Acier léger ou aluminium pour les modèles de parade."
-                  : "Average of 900g. Lightweight steel or aluminum for parade models."}
-              </li>
-              <li>
-                •{" "}
-                <span className="text-amber-500 font-bold uppercase">
-                  {isFr ? "Fixation :" : "Fixation:"}
-                </span>{" "}
-                {isFr
-                  ? "Souvent montés avec 4 rivets au lieu de 3. Jugulaire simple ou à 2 points."
-                  : "Often mounted with 4 rivets instead of 3. Simple or 2-point chinstrap."}
-              </li>
-              <li>
-                •{" "}
-                <span className="text-amber-500 font-bold uppercase">
-                  {isFr ? "Usage :" : "Usage:"}
-                </span>{" "}
-                {isFr
-                  ? "Feuerschutzpolizei (noir), Luftschutz (bleu), Croix-Rouge (blanc/gris)."
-                  : "Feuerschutzpolizei (black), Luftschutz (blue), Red Cross (white/grey)."}
-              </li>
-            </ul>
-          </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-[10px] border-collapse">
+            <thead>
+              <tr className="text-amber-500 uppercase border-b border-amber-900/30 text-left">
+                <th className="p-2">Coque</th>
+                <th className="p-2">Tête (cm)</th>
+                <th className="p-2">Poids (g)</th>
+                <th className="p-2">Note</th>
+              </tr>
+            </thead>
+            <tbody className="text-amber-100/60 italic">
+              {[
+                "60:52/53:810-930:Peu courant",
+                "62:54/55:880-1000:Standard Petit",
+                "64:56/57:920-1070:Plus répandu",
+                "66:58/59:1000-1125:Gabarit Large",
+                "68:60/61:1025-1170:Moins courant",
+                "70:62/63:Rare:Exclusivité Thale/Quist",
+              ].map((row) => {
+                const [t, c, p, n] = row.split(":");
+                return (
+                  <tr key={t} className="border-b border-amber-900/10">
+                    <td className="p-2 font-black text-white">{t}</td>
+                    <td className="p-2">{c}</td>
+                    <td className="p-2">{p}</td>
+                    <td className="p-2 text-[8px]">{n}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       ),
     },
@@ -776,7 +639,6 @@ const Handbook = ({ setScreen, lang }) => {
 
   return (
     <div className="min-h-screen bg-[#1a1812] text-[#d0c7a8] font-serif relative overflow-hidden">
-      {/* --- IMAGE DE FOND COHÉRENTE (Floutée à 5px) --- */}
       <div
         className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat scale-110"
         style={{
@@ -785,13 +647,11 @@ const Handbook = ({ setScreen, lang }) => {
         }}
       ></div>
 
-      {/* --- CONTENU --- */}
-      <div className="relative z-10 p-6 pb-32 max-w-2xl mx-auto h-screen overflow-y-auto">
-        {/* HEADER */}
+      <div className="relative z-10 p-6 pb-32 max-w-2xl mx-auto h-screen overflow-y-auto custom-scrollbar">
         <div className="flex items-center justify-between mb-8 border-b-2 border-amber-800 pb-4 shadow-xl backdrop-blur-sm bg-black/20 p-4 rounded-t-xl">
           <div className="flex items-center gap-3">
             <BookOpen className="text-amber-500" size={28} />
-            <h2 className="text-2xl font-black uppercase italic tracking-tighter">
+            <h2 className="text-2xl font-black uppercase italic tracking-tighter text-white">
               {isFr ? "Manuel Expert" : "Expert Handbook"}
             </h2>
           </div>
@@ -815,7 +675,7 @@ const Handbook = ({ setScreen, lang }) => {
               >
                 <div className="flex items-center gap-4">
                   <span className="text-amber-600">{section.icon}</span>
-                  <span className="font-black uppercase text-sm tracking-widest">
+                  <span className="font-black uppercase text-sm tracking-widest text-white">
                     {section.title}
                   </span>
                 </div>
@@ -825,7 +685,6 @@ const Handbook = ({ setScreen, lang }) => {
                   <ChevronDown size={20} />
                 )}
               </button>
-
               {openSection === section.id && (
                 <div className="p-6 pt-0 text-sm leading-relaxed border-t border-amber-900/20 animate-in slide-in-from-top-4 duration-500">
                   {section.content}
@@ -835,37 +694,13 @@ const Handbook = ({ setScreen, lang }) => {
           ))}
         </div>
 
-        {/* FOOTER TAILLES */}
-        <div className="mt-10 p-5 bg-black/60 backdrop-blur-md rounded-2xl border border-amber-600/10 shadow-2xl">
-          <h4 className="flex items-center gap-2 text-[10px] font-black uppercase text-amber-500 mb-4 tracking-tighter underline underline-offset-4 decoration-amber-900 italic">
-            <Ruler size={12} />{" "}
-            {isFr
-              ? "Correspondance Tailles Coque / Liner"
-              : "Shell / Liner Size Correspondence"}
-          </h4>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[10px] font-bold text-center">
-            {[
-              isFr ? "Coque 60 ➔ 52-53" : "Shell 60 ➔ 52-53",
-              isFr ? "Coque 62 ➔ 54-55" : "Shell 62 ➔ 54-55",
-              isFr ? "Coque 64 ➔ 56-57" : "Shell 64 ➔ 56-57",
-              isFr ? "Coque 66 ➔ 58-59" : "Shell 66 ➔ 58-59",
-              isFr
-                ? "Coque 68 ➔ 60-61 (9 lang.)"
-                : "Shell 68 ➔ 60-61 (9 lang.)",
-              isFr
-                ? "Coque 70 ➔ 62-63 (9 lang.)"
-                : "Shell 70 ➔ 62-63 (9 lang.)",
-            ].map((t) => (
-              <div
-                key={t}
-                className="bg-black/40 py-2 rounded-lg border border-amber-900/20 italic text-white/90 shadow-inner"
-              >
-                {t}
-              </div>
-            ))}
-          </div>
+        <div className="mt-10 p-5 bg-black/60 backdrop-blur-md rounded-2xl border border-amber-600/10 shadow-2xl text-center">
+          <p className="text-[10px] italic opacity-40 uppercase tracking-widest">
+            Helmet Legends Forensic Database v4.0
+          </p>
         </div>
       </div>
+      <style>{`.custom-scrollbar::-webkit-scrollbar { width: 4px; } .custom-scrollbar::-webkit-scrollbar-track { background: transparent; } .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(217, 119, 6, 0.2); border-radius: 10px; }`}</style>
     </div>
   );
 };

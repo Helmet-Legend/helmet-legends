@@ -1,0 +1,38 @@
+export const LOT_RANGES = [
+  {
+    start: 1,
+    end: 4800,
+    mfr: "ET",
+    model: "M35",
+    decal: "Double Decal",
+    paint: "Apfelgrün",
+    notes: "Règle Brian Ice : Production Thale M35 standard.",
+  },
+  {
+    start: 4801,
+    end: 9999,
+    mfr: "ET",
+    model: "M40",
+    decal: "Simple Decal",
+    paint: "Rauhtarn",
+    notes: "Règle Brian Ice : Transition M40. Évents embossés.",
+  },
+  {
+    start: 1,
+    end: 7000,
+    mfr: "ckl",
+    model: "M42",
+    decal: "ND",
+    paint: "Feldgrau",
+    notes: "Règle German Vault : Série M42 tardive.",
+  },
+  {
+    start: 1,
+    end: 4500,
+    mfr: "SE",
+    model: "M35",
+    decal: "Double Decal",
+    paint: "Apfelgrün",
+    notes: "Règle Brian Ice : Production SE M35 standard.",
+  },
+];
