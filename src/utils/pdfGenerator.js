@@ -89,15 +89,12 @@ export const generateHelmetPDF = (helmet, lang = "fr") => {
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(muted[0], muted[1], muted[2]);
-  doc.text(
-    isFr
-      ? "ARCHIVE OFFICIELLE - DOSSIER D'EXPERTISE TECHNIQUE"
-      : "OFFICIAL ARCHIVE - TECHNICAL EXPERTISE FILE",
-    105,
-    36,
-    { align: "center" }
-  );
+  // La ligne ci-dessous est maintenant correctement fermée avec });
+  doc.text(isFr ? "FICHE DESCRIPTIVE" : "DESCRIPTIVE SHEET", 105, 36, {
+    align: "center",
+  });
 
+  // Suite du code (Référence et Date)
   doc.setFontSize(8);
   doc.setTextColor(gold[0], gold[1], gold[2]);
   doc.text(`RÉFÉRENCE : ${serialNumber}`, 20, 48);
