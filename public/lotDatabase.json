@@ -109208,5 +109208,15 @@
     "phase": "Inconnue",
     "years": "N/A",
     "notes": "ND"
+  },
+  {
+    "model": "M42",
+    "mfr": "EF",
+    "lot": "DN385",
+    "size": "66",
+    "decal": "ND",
+    "phase": "tardif",
+    "years": "1944–1945",
+    "notes": "EF M42 DN, peinture granuleuse, production de fin de guerre"
   }
 ]

@@ -447,6 +447,22 @@ const LotSearch = () => {
                 "{result.notes || result.info}"
               </p>
             </div>
+            <div
+              style={{
+                marginTop: "25px",
+                paddingTop: "15px",
+                borderTop: "1px solid rgba(193, 180, 154, 0.2)",
+                fontSize: "0.7rem",
+                color: "rgba(255, 255, 255, 0.4)",
+                textAlign: "center",
+                lineHeight: "1.4",
+              }}
+            >
+              ⚠️ <strong>Note de l'expert :</strong> Cet outil fournit une aide
+              à l’analyse historique et ne constitue en aucun cas une
+              certification d’authenticité ou d’attribution. Toute conclusion
+              finale relève de l’expertise humaine.
+            </div>
           </div>
         )}
 

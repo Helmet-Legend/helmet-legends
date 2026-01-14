@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react"; // Ajout de useState
 import monFondExpert from "../assets/helmet-bg.png";
 import {
   Plus,
@@ -8,6 +8,9 @@ import {
   ArrowLeft,
   Database,
   Info,
+  Download, // Nouvel import
+  Check, // Nouvel import
+  Loader2, // Pour l'animation de chargement
 } from "lucide-react";
 
 export default function Registry({
@@ -19,14 +22,37 @@ export default function Registry({
 }) {
   const isFr = lang === "fr";
 
+  // États pour le feedback de téléchargement
+  const [downloadingId, setDownloadingId] = useState(null);
+  const [successId, setSuccessId] = useState(null);
+
+  // Fonction de simulation du téléchargement PDF
+  const handleDownloadPDF = async (helmet) => {
+    setDownloadingId(helmet.id);
+
+    try {
+      // Simule le délai de génération du PDF (2 secondes)
+      // Remplacez ce délai par votre véritable logique jsPDF/html2canvas si nécessaire
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      setDownloadingId(null);
+      setSuccessId(helmet.id);
+
+      // Faire disparaître le message de succès après 3 secondes
+      setTimeout(() => setSuccessId(null), 3000);
+    } catch (error) {
+      console.error("Erreur lors du téléchargement", error);
+      setDownloadingId(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#1a1812] text-[#d0c7a8] font-serif relative overflow-hidden">
-      {/* --- IMAGE DE FOND (MOINS FLOU : 5px) --- */}
+      {/* --- IMAGE DE FOND --- */}
       <div
         className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat scale-110"
         style={{
           backgroundImage: `url(${monFondExpert})`,
-          // On réduit le blur de 12px à 5px
           filter: "brightness(0.3) blur(5px)",
         }}
       ></div>
@@ -98,15 +124,41 @@ export default function Registry({
                           #{h.lotNumber}
                         </span>
                       </h3>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDelete(h.id);
-                        }}
-                        className="p-1 text-red-900/50 hover:text-red-500 transition-colors"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+
+                      {/* BOUTONS D'ACTION (Delete & Download) */}
+                      <div className="flex gap-3">
+                        {/* Bouton Téléchargement avec Feedback */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDownloadPDF(h);
+                          }}
+                          disabled={downloadingId === h.id}
+                          className={`p-1 transition-colors ${
+                            successId === h.id
+                              ? "text-green-500"
+                              : "text-amber-700 hover:text-amber-400"
+                          }`}
+                        >
+                          {downloadingId === h.id ? (
+                            <Loader2 size={16} className="animate-spin" />
+                          ) : successId === h.id ? (
+                            <Check size={16} />
+                          ) : (
+                            <Download size={16} />
+                          )}
+                        </button>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete(h.id);
+                          }}
+                          className="p-1 text-red-900/50 hover:text-red-500 transition-colors"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </div>
 
                     <p className="text-[10px] uppercase font-bold text-white/70 mt-1 flex items-center gap-1">
@@ -114,10 +166,19 @@ export default function Registry({
                       {h.manufacturer} • {h.shellSize}/{h.linerSize}
                     </p>
 
-                    <div className="mt-3 flex flex-wrap gap-1">
-                      <span className="px-2 py-0.5 bg-amber-900/30 border border-amber-700/30 rounded text-[9px] font-bold text-amber-200 uppercase">
-                        {h.decals}
-                      </span>
+                    <div className="mt-3 flex justify-between items-end">
+                      <div className="flex flex-wrap gap-1">
+                        <span className="px-2 py-0.5 bg-amber-900/30 border border-amber-700/30 rounded text-[9px] font-bold text-amber-200 uppercase">
+                          {h.decals}
+                        </span>
+                      </div>
+
+                      {/* Indicateur textuel de succès éphémère */}
+                      {successId === h.id && (
+                        <span className="text-[9px] text-green-500 font-bold animate-pulse">
+                          {isFr ? "PDF PRÊT" : "PDF READY"}
+                        </span>
+                      )}
                     </div>
                   </div>
 
