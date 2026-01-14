@@ -1,6 +1,6 @@
 import { jsPDF } from "jspdf";
 
-// IMPORTANT : Remplacez par votre véritable chaîne Base64 pour le filigrane
+// Remplacez par votre véritable chaîne Base64 pour le filigrane
 const logoBase64 = "data:image/png;base64,...";
 
 const generateSerialNumber = () => {
@@ -27,13 +27,13 @@ export const generateHelmetPDF = (helmet, lang = "fr") => {
   doc.setFillColor(bg[0], bg[1], bg[2]);
   doc.rect(0, 0, 210, 297, "F");
 
-  // 2. FILIGRANE LOGO (Correction de la transparence)
+  // 2. FILIGRANE LOGO (OPACITÉ 6% CENTRÉE)
   try {
     if (typeof doc.saveGraphicsState === "function" && logoBase64.length > 50) {
       doc.saveGraphicsState();
-      const gState = new doc.GState({ opacity: 0.06 }); // Augmenté à 6% pour plus de visibilité
+      const gState = new doc.GState({ opacity: 0.06 });
       doc.setGState(gState);
-      const size = 150;
+      const size = 155;
       doc.addImage(
         logoBase64,
         "PNG",
@@ -58,7 +58,7 @@ export const generateHelmetPDF = (helmet, lang = "fr") => {
   doc.rect(8, 8, 194, 281);
   doc.rect(9.5, 9.5, 191, 278);
 
-  // 4. EN-TÊTE CORRIGÉ
+  // 4. EN-TÊTE
   doc.setTextColor(gold[0], gold[1], gold[2]);
   doc.setFont("times", "bold");
   doc.setFontSize(32);
@@ -97,7 +97,7 @@ export const generateHelmetPDF = (helmet, lang = "fr") => {
     );
   }
 
-  // 6. TOUTES LES SPÉCIFICATIONS TECHNIQUES (MENU DÉROULANT COMPLET)
+  // 6. SPÉCIFICATIONS TECHNIQUES (COLONNES)
   const specsY = 155;
   doc.setTextColor(gold[0], gold[1], gold[2]);
   doc.setFont("times", "bold");
@@ -148,28 +148,24 @@ export const generateHelmetPDF = (helmet, lang = "fr") => {
   doc.setTextColor(200, 200, 200);
   doc.text(doc.splitTextToSize(notes, 75), 115, specsY + 12);
 
-  // 7. GALERIE DE TOUTES LES PHOTOS (VUES TECHNIQUES)
-  const galleryY = 245;
-  doc.setTextColor(gold[0], gold[1], gold[2]);
-  doc.setFontSize(10);
-  doc.text(isFr ? "VUES COMPLÉMENTAIRES" : "ADDITIONAL VIEWS", 105, galleryY, {
-    align: "center",
-  });
+  // 7. GALERIE PHOTOS (TITRE EFFACÉ POUR ÉVITER LES EMPRIÈTEMENTS)
+  const galleryY = 248; // Position ajustée pour laisser respirer les détails techniques
 
   const otherViews = Object.entries(helmet.images || {})
     .filter(([k, v]) => k !== "main" && v !== null)
     .slice(0, 4);
+
   let xPos = 20;
   otherViews.forEach(([key, url]) => {
     try {
       doc.setDrawColor(gold[0], gold[1], gold[2]);
       doc.setLineWidth(0.2);
-      doc.rect(xPos, galleryY + 5, 40, 30);
+      doc.rect(xPos, galleryY, 40, 30); // Cadres photos directs
       doc.addImage(
         url,
         "JPEG",
         xPos + 0.5,
-        galleryY + 5.5,
+        galleryY + 0.5,
         39,
         29,
         undefined,
@@ -181,8 +177,8 @@ export const generateHelmetPDF = (helmet, lang = "fr") => {
 
   // 8. PIED DE PAGE
   doc.setFontSize(7);
-  doc.setTextColor(100, 100, 100);
+  doc.setTextColor(muted[0], muted[1], muted[2]);
   doc.text("app.helmetlegends.com", 105, 290, { align: "center" });
 
-  doc.save(`Archive_HL_${helmet.model}_${helmet.lotNumber}.pdf`);
+  doc.save(`Expertise_HL_${helmet.model}_${helmet.lotNumber}.pdf`);
 };
