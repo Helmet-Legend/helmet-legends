@@ -7,6 +7,7 @@ export const LOT_RANGES = [
     model: "M35",
     phase: "Précoce (1935-1940)",
     years: "1935–1940",
+    decal: "Double Decal (DD)",
     notes: "Configuration Double Decal majoritaire. Peinture lisse Apfelgrün.",
   },
   {
@@ -16,6 +17,7 @@ export const LOT_RANGES = [
     model: "M40",
     phase: "Intermédiaire (Guerre)",
     years: "1940–1942",
+    decal: "Single Decal (SD)",
     notes: "Évents embossés. Passage au Single Decal et peinture mate.",
   },
   {
@@ -25,6 +27,7 @@ export const LOT_RANGES = [
     model: "M42",
     phase: "Tardive (Économie)",
     years: "1942–1945",
+    decal: "SD ou No Decal",
     notes: "Bords évasés non repliés. Fin des insignes en 1943.",
   },
 
@@ -36,6 +39,7 @@ export const LOT_RANGES = [
     model: "M35",
     phase: "Standard 1935-1940",
     years: "1935–1940",
+    decal: "Double Decal (DD)",
     notes: "Production SE précoce de haute qualité.",
   },
   {
@@ -45,6 +49,7 @@ export const LOT_RANGES = [
     model: "M42",
     phase: "Tardive SE (hkp)",
     years: "1942–1945",
+    decal: "No Decal",
     notes: "Production simplifiée. Évents plus petits (hkp).",
   },
 
@@ -56,6 +61,7 @@ export const LOT_RANGES = [
     model: "M40",
     phase: "Production Continue",
     years: "1940–1944",
+    decal: "Single Decal (SD)",
     notes: "Quist a produit le M40 très tardivement avant de passer au M42.",
   },
 
@@ -67,6 +73,7 @@ export const LOT_RANGES = [
     model: "M35",
     phase: "Précoce",
     years: "1935–1940",
+    decal: "Double Decal (DD)",
     notes: "Production limitée en M35 pour NS.",
   },
   {
@@ -76,6 +83,7 @@ export const LOT_RANGES = [
     model: "M40",
     phase: "Standard",
     years: "1940–1942",
+    decal: "Single Decal (SD)",
     notes: "Production massive de M40. Excellente qualité de peinture.",
   },
   {
@@ -85,6 +93,7 @@ export const LOT_RANGES = [
     model: "M42",
     phase: "Tardive",
     years: "1942–1945",
+    decal: "No Decal",
     notes: "Marquages souvent situés à l'arrière pour les modèles tardifs.",
   },
 
@@ -96,6 +105,7 @@ export const LOT_RANGES = [
     model: "M35",
     phase: "Précoce",
     years: "1935–1940",
+    decal: "Double Decal (DD)",
     notes: "Double Decal fréquent. Forme de coque spécifique à EF.",
   },
   {
@@ -105,6 +115,7 @@ export const LOT_RANGES = [
     model: "M40",
     phase: "Standard",
     years: "1940–1942",
+    decal: "Single Decal (SD)",
     notes: "L'usine de Fulda a produit des M40 très robustes.",
   },
   {
@@ -114,6 +125,7 @@ export const LOT_RANGES = [
     model: "M42",
     phase: "Tardive",
     years: "1942–1945",
+    decal: "No Decal",
     notes: "Série 'DN' fréquente dans les lots tardifs de chez EF.",
   },
 ];

@@ -31,7 +31,6 @@ const LotSearch = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    // On récupère les 11 000 entrées dans le dossier public
     fetch("/lotDatabase.json")
       .then((res) => res.json())
       .then((data) => {
@@ -63,7 +62,7 @@ const LotSearch = () => {
         ...master,
         type: "master",
         statusMessage: "CONCORDANCE TROUVÉE DANS L'ARCHIVE",
-        statusColor: "#27ae60", // Vert
+        statusColor: "#27ae60",
       });
       return;
     }
@@ -81,21 +80,23 @@ const LotSearch = () => {
         type: "range",
         lot: searchTerm,
         size: selectedSize,
+        decal: "À vérifier",
         statusMessage: "ESTIMATION D'APRÈS LES REGISTRES D'USINE",
-        statusColor: "#d3791d", // Orange
+        statusColor: "#d3791d",
       });
       return;
     }
 
-    // 3. RÉPONSE SYSTÉMATIQUE (ORANGE - ESTIMATION GÉNÉRALE)
+    // 3. RÉPONSE SYSTÉMATIQUE
     setResult({
       ...MODEL_DEFAULTS["M40"],
       mfr: mfrKey,
       lot: searchTerm,
       size: selectedSize,
+      decal: "Inconnu",
       type: "general",
       statusMessage: "ESTIMATION GÉNÉRALE (HORS REGISTRES PRÉCIS)",
-      statusColor: "#d3791d", // Orange
+      statusColor: "#d3791d",
     });
   };
 
@@ -112,7 +113,6 @@ const LotSearch = () => {
         boxSizing: "border-box",
       }}
     >
-      {/* Fond d'écran flou */}
       <div
         style={{
           position: "fixed",
@@ -137,7 +137,6 @@ const LotSearch = () => {
           margin: "0 auto",
         }}
       >
-        {/* Header */}
         <header
           style={{
             display: "flex",
@@ -179,20 +178,6 @@ const LotSearch = () => {
           </button>
         </header>
 
-        <p
-          style={{
-            fontStyle: "italic",
-            color: "rgba(255,255,255,0.45)",
-            fontSize: "0.9rem",
-            marginBottom: "30px",
-            lineHeight: "1.4",
-          }}
-        >
-          Identifiez la configuration d'usine probable en croisant le code
-          fabricant, la taille et le numéro de lot.
-        </p>
-
-        {/* Formulaire */}
         <div
           style={{
             background: "rgba(25, 25, 25, 0.85)",
@@ -320,8 +305,8 @@ const LotSearch = () => {
           </div>
         </div>
 
-        {/* Résultat */}
-        {result ? (
+        {/* --- SECTION RÉSULTAT MISE À JOUR --- */}
+        {result && (
           <div
             style={{
               marginTop: "10px",
@@ -390,36 +375,64 @@ const LotSearch = () => {
                 paddingTop: "20px",
               }}
             >
+              {/* Grille à 3 colonnes pour une meilleure lisibilité */}
               <div
-                style={{ display: "flex", gap: "20px", marginBottom: "15px" }}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr 1fr",
+                  gap: "10px",
+                  marginBottom: "15px",
+                }}
               >
                 <div>
                   <span
                     style={{
                       color: "rgba(255,255,255,0.4)",
-                      fontSize: "0.7rem",
+                      fontSize: "0.65rem",
                       display: "block",
                       textTransform: "uppercase",
                     }}
                   >
                     Phase
                   </span>
-                  <span style={{ fontSize: "0.95rem" }}>{result.phase}</span>
+                  <span style={{ fontSize: "0.85rem" }}>{result.phase}</span>
                 </div>
                 <div>
                   <span
                     style={{
                       color: "rgba(255,255,255,0.4)",
-                      fontSize: "0.7rem",
+                      fontSize: "0.65rem",
                       display: "block",
                       textTransform: "uppercase",
                     }}
                   >
                     Période
                   </span>
-                  <span style={{ fontSize: "0.95rem" }}>{result.years}</span>
+                  <span style={{ fontSize: "0.85rem" }}>{result.years}</span>
+                </div>
+                <div>
+                  <span
+                    style={{
+                      color: "rgba(255,255,255,0.4)",
+                      fontSize: "0.65rem",
+                      display: "block",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Insigne
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "0.85rem",
+                      color: "#d3791d",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {result.decal}
+                  </span>
                 </div>
               </div>
+
               <p
                 style={{
                   fontSize: "0.9rem",
@@ -435,7 +448,9 @@ const LotSearch = () => {
               </p>
             </div>
           </div>
-        ) : (
+        )}
+
+        {!result && !isLoading && (
           <p
             style={{
               textAlign: "center",
@@ -445,9 +460,7 @@ const LotSearch = () => {
               fontStyle: "italic",
             }}
           >
-            {isLoading
-              ? "Synchronisation de l'archive..."
-              : "Entrez un numéro de lot pour lancer l'expertise"}
+            Entrez un numéro de lot pour lancer l'expertise
           </p>
         )}
       </div>
