@@ -1,7 +1,9 @@
 import { jsPDF } from "jspdf";
 
-// Remplacez par votre véritable chaîne Base64 pour le filigrane
-const logoBase64 = "data:image/png;base64,...";
+/**
+ * CHEMIN DU LOGO DANS LE DOSSIER PUBLIC
+ */
+const logoPath = "/icon-512.png";
 
 const generateSerialNumber = () => {
   const date = new Date();
@@ -17,40 +19,33 @@ export const generateHelmetPDF = (helmet, lang = "fr") => {
   const isFr = lang === "fr";
   const serialNumber = generateSerialNumber();
 
-  // COULEURS EXPERT
+  // 🎨 PALETTE EXPERT
   const gold = [173, 138, 86];
   const bg = [26, 24, 18];
   const textCrème = [229, 229, 229];
   const muted = [140, 140, 140];
 
-  // 1. FOND SOMBRE
+  // 1. FOND DE PAGE SOMBRE
   doc.setFillColor(bg[0], bg[1], bg[2]);
   doc.rect(0, 0, 210, 297, "F");
 
-  // 2. FILIGRANE LOGO (OPACITÉ 6% CENTRÉE)
+  // 2. FILIGRANE (WATERMARK) PLEIN ÉCRAN
   try {
-    if (typeof doc.saveGraphicsState === "function" && logoBase64.length > 50) {
-      doc.saveGraphicsState();
-      const gState = new doc.GState({ opacity: 0.06 });
-      doc.setGState(gState);
-      const size = 155;
-      doc.addImage(
-        logoBase64,
-        "PNG",
-        (210 - size) / 2,
-        (297 - size) / 2,
-        size,
-        size,
-        undefined,
-        "FAST"
-      );
-      doc.restoreGraphicsState();
-    }
+    doc.saveGraphicsState();
+    const gState = new doc.GState({ opacity: 0.06 });
+    doc.setGState(gState);
+
+    const size = 155;
+    const xPos = (210 - size) / 2;
+    const yPos = (297 - size) / 2;
+
+    doc.addImage(logoPath, "PNG", xPos, yPos, size, size, undefined, "FAST");
+    doc.restoreGraphicsState();
   } catch (e) {
-    console.warn("Filigrane erreur:", e);
+    console.warn("Filigrane ignoré : vérifiez le fichier dans public.", e);
   }
 
-  // 3. CADRES DORÉS
+  // 3. TRIPLE CADRE DORÉ
   doc.setDrawColor(gold[0], gold[1], gold[2]);
   doc.setLineWidth(1.2);
   doc.rect(6, 6, 198, 285);
@@ -97,7 +92,7 @@ export const generateHelmetPDF = (helmet, lang = "fr") => {
     );
   }
 
-  // 6. SPÉCIFICATIONS TECHNIQUES (COLONNES)
+  // 6. SPÉCIFICATIONS ET NOTES (2 COLONNES)
   const specsY = 155;
   doc.setTextColor(gold[0], gold[1], gold[2]);
   doc.setFont("times", "bold");
@@ -107,7 +102,11 @@ export const generateHelmetPDF = (helmet, lang = "fr") => {
     20,
     specsY
   );
-  doc.text(isFr ? "NOTES D'ANALYSE" : "FIELD ANALYSIS", 110, specsY);
+  doc.text(
+    isFr ? "NOTES ET ANALYSE DE TERRAIN" : "FIELD ANALYSIS",
+    110,
+    specsY
+  );
   doc.setLineWidth(0.4);
   doc.line(20, specsY + 2, 95, specsY + 2);
   doc.line(110, specsY + 2, 190, specsY + 2);
@@ -140,27 +139,26 @@ export const generateHelmetPDF = (helmet, lang = "fr") => {
     curY += 8.5;
   });
 
-  // NOTES D'ANALYSE
-  const notes =
-    helmet.description || (isFr ? "Aucune note saisie." : "No notes.");
+  const notesText =
+    helmet.description ||
+    (isFr ? "Aucun historique documenté." : "No documented history.");
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
   doc.setTextColor(200, 200, 200);
-  doc.text(doc.splitTextToSize(notes, 75), 115, specsY + 12);
+  doc.text(doc.splitTextToSize(notesText, 75), 115, specsY + 12);
 
-  // 7. GALERIE PHOTOS (TITRE EFFACÉ POUR ÉVITER LES EMPRIÈTEMENTS)
-  const galleryY = 248; // Position ajustée pour laisser respirer les détails techniques
-
-  const otherViews = Object.entries(helmet.images || {})
+  // 7. GALERIE PHOTOS (SANS TITRE POUR ÉVITER LE CHEVAUCHEMENT)
+  const galleryY = 248;
+  const otherPhotos = Object.entries(helmet.images || {})
     .filter(([k, v]) => k !== "main" && v !== null)
     .slice(0, 4);
 
   let xPos = 20;
-  otherViews.forEach(([key, url]) => {
+  otherPhotos.forEach(([key, url]) => {
     try {
       doc.setDrawColor(gold[0], gold[1], gold[2]);
       doc.setLineWidth(0.2);
-      doc.rect(xPos, galleryY, 40, 30); // Cadres photos directs
+      doc.rect(xPos, galleryY, 40, 30);
       doc.addImage(
         url,
         "JPEG",
@@ -172,7 +170,9 @@ export const generateHelmetPDF = (helmet, lang = "fr") => {
         "FAST"
       );
       xPos += 45;
-    } catch (e) {}
+    } catch (e) {
+      console.error("Erreur galerie", e);
+    }
   });
 
   // 8. PIED DE PAGE
@@ -180,5 +180,5 @@ export const generateHelmetPDF = (helmet, lang = "fr") => {
   doc.setTextColor(muted[0], muted[1], muted[2]);
   doc.text("app.helmetlegends.com", 105, 290, { align: "center" });
 
-  doc.save(`Expertise_HL_${helmet.model}_${helmet.lotNumber}.pdf`);
+  doc.save(`Archive_HL_${helmet.model}_${helmet.lotNumber}.pdf`);
 };
