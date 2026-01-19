@@ -1,38 +1,31 @@
 import React, { useState, useEffect } from "react";
-// Importation corrigée selon votre arborescence
-import { LOT_RANGES } from "../data/lotRanges";
-import expertBg from "../assets/expert-bg.png";
+import expertBg from "../assets/expert-bg.png"; // Assurez-vous que le chemin est correct
 
-const MODEL_DEFAULTS = {
-  M35: {
-    phase: "Production Initiale",
-    years: "1935–1940",
-    info: "Bords repliés, évents rapportés.",
-  },
-  M40: {
-    phase: "Production Standard",
-    years: "1940–1942",
-    info: "Évents embossés.",
-  },
-  M42: {
-    phase: "Production Tardive",
-    years: "1942–1945",
-    info: "Bords évasés.",
-  },
+// Configuration des couleurs historiques pour les badges
+const BRANCH_STYLES = {
+  Heer: { bg: "#4a5d4e", label: "HEER (ARMY)" },
+  Luftwaffe: { bg: "#3c4e5e", label: "LUFTWAFFE" },
+  "Waffen-SS": { bg: "#1a1a1a", label: "WAFFEN-SS" },
+  Kriegsmarine: { bg: "#b08d57", label: "KRIEGSMARINE" },
+  Polizei: { bg: "#2c3e50", label: "POLIZEI" },
+  default: { bg: "#333", label: "BRANCHE INCONNUE" },
 };
 
 const LotSearch = () => {
   const [db, setDb] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedMfr, setSelectedMfr] = useState("ET / ckl (Thale)");
-  const [selectedSize, setSelectedSize] = useState("64");
-  const [result, setResult] = useState(null);
+  const [selectedMfr, setSelectedMfr] = useState("ET");
+  const [results, setResults] = useState([]);
 
+  // Chargement de la base de données au montage du composant
   useEffect(() => {
     setIsLoading(true);
-    fetch("/lotDatabase.json")
-      .then((res) => res.json())
+    fetch("/DATABASE_ULTIME_NORMALISEE.json")
+      .then((res) => {
+        if (!res.ok) throw new Error("Erreur de chargement du fichier JSON");
+        return res.json();
+      })
       .then((data) => {
         setDb(data);
         setIsLoading(false);
@@ -46,442 +39,340 @@ const LotSearch = () => {
   const handleSearch = () => {
     if (!searchTerm) return;
 
-    const mfrKey = selectedMfr.split(" ")[0];
+    // 1. On prépare la recherche (numérique pur et texte brut)
+    const numericInput = searchTerm.replace(/\D/g, "");
+    const rawInput = searchTerm.trim().toUpperCase();
 
-    // 1. RECHERCHE DE CONCORDANCE (VERT)
-    const master = db.find(
-      (i) =>
-        i.mfr === mfrKey &&
-        String(i.lot) === searchTerm &&
-        String(i.size) === selectedSize
-    );
+    // 2. Filtrage multicritères
+    const matches = db.filter((item) => {
+      // Correspondance Fabricant (On gère les majuscules)
+      const mfrMatch =
+        item.manufacturer?.toUpperCase() === selectedMfr.toUpperCase();
 
-    if (master) {
-      setResult({
-        ...MODEL_DEFAULTS[master.model || "M40"],
-        ...master,
-        type: "master",
-        statusMessage: "CONCORDANCE TROUVÉE DANS L'ARCHIVE",
-        statusColor: "#27ae60",
-      });
-      return;
-    }
+      // Correspondance Lot (Soit le numéro pur, soit présent dans le texte brut)
+      const lotMatch =
+        item.lot_number === numericInput ||
+        item.lot_raw?.toUpperCase().includes(rawInput);
 
-    // 2. RECHERCHE DANS LES REGISTRES D'USINE (ORANGE)
-    const lotNum = parseInt(searchTerm);
-    const range = LOT_RANGES.find(
-      (r) => r.mfr === mfrKey && lotNum >= r.start && lotNum <= r.end
-    );
-
-    if (range) {
-      setResult({
-        ...MODEL_DEFAULTS[range.model || "M40"],
-        ...range,
-        type: "range",
-        lot: searchTerm,
-        size: selectedSize,
-        decal: "À vérifier",
-        statusMessage: "ESTIMATION D'APRÈS LES REGISTRES D'USINE",
-        statusColor: "#d3791d",
-      });
-      return;
-    }
-
-    // 3. RÉPONSE SYSTÉMATIQUE
-    setResult({
-      ...MODEL_DEFAULTS["M40"],
-      mfr: mfrKey,
-      lot: searchTerm,
-      size: selectedSize,
-      decal: "Inconnu",
-      type: "general",
-      statusMessage: "ESTIMATION GÉNÉRALE (HORS REGISTRES PRÉCIS)",
-      statusColor: "#d3791d",
+      return mfrMatch && lotMatch;
     });
+
+    setResults(matches);
   };
 
   return (
-    <div
-      style={{
-        position: "relative",
-        minHeight: "100vh",
-        width: "100%",
-        backgroundColor: "#000",
-        color: "#f5f5f5",
-        fontFamily: "serif",
-        padding: "20px",
-        boxSizing: "border-box",
-      }}
-    >
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: `url(${expertBg})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          opacity: 0.35,
-          filter: "blur(5px)",
-          zIndex: 0,
-        }}
-      />
+    <div style={styles.container}>
+      {/* Background avec overlay pour lisibilité */}
+      <div style={{ ...styles.overlay, backgroundImage: `url(${expertBg})` }} />
 
-      <div
-        style={{
-          position: "relative",
-          zIndex: 1,
-          maxWidth: "450px",
-          margin: "0 auto",
-        }}
-      >
-        <header
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            borderBottom: "1px solid rgba(193, 180, 154, 0.4)",
-            paddingBottom: "15px",
-            marginBottom: "25px",
-          }}
-        >
+      <div style={styles.content}>
+        <header style={styles.header}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span style={{ color: "#d3791d", fontSize: "22px" }}>🗃️</span>
-            <h1
-              style={{
-                color: "#c1b49a",
-                fontSize: "1.3rem",
-                textTransform: "uppercase",
-                margin: 0,
-                fontWeight: "bold",
-              }}
-            >
-              Recherche par lot
-            </h1>
+            <span style={{ fontSize: "24px" }}>🔍</span>
+            <h1 style={styles.title}>Moteur d'Expertise de Lot</h1>
           </div>
           <button
             onClick={() => (window.location.href = "/")}
-            style={{
-              background: "rgba(193, 180, 154, 0.1)",
-              border: "1px solid #c1b49a",
-              color: "#c1b49a",
-              padding: "5px 15px",
-              borderRadius: "20px",
-              fontSize: "0.75rem",
-              cursor: "pointer",
-              fontWeight: "bold",
-            }}
+            style={styles.backBtn}
           >
             ← RETOUR
           </button>
         </header>
 
-        <div
-          style={{
-            background: "rgba(25, 25, 25, 0.85)",
-            padding: "25px",
-            borderRadius: "25px",
-            border: "1px solid rgba(193, 180, 154, 0.15)",
-            backdropFilter: "blur(12px)",
-            marginBottom: "30px",
-            boxShadow: "0 15px 35px rgba(0,0,0,0.5)",
-          }}
-        >
-          <label
-            style={{
-              color: "#d3791d",
-              fontSize: "0.75rem",
-              fontWeight: "bold",
-              display: "block",
-              marginBottom: "10px",
-              letterSpacing: "1px",
-            }}
-          >
-            🏭 FABRICANT
-          </label>
-          <select
-            value={selectedMfr}
-            onChange={(e) => setSelectedMfr(e.target.value)}
-            style={{
-              width: "100%",
-              background: "rgba(0,0,0,0.4)",
-              border: "1px solid #444",
-              color: "white",
-              padding: "14px",
-              borderRadius: "12px",
-              marginBottom: "25px",
-              outline: "none",
-              fontSize: "1rem",
-            }}
-          >
-            <option>ET / ckl (Thale)</option>
-            <option>Q (Quist)</option>
-            <option>SE / hkp (Sachsische E.)</option>
-            <option>NS (Vereinigte D.)</option>
-            <option>EF (Emaillerwerke AG)</option>
-          </select>
-
-          <label
-            style={{
-              color: "#d3791d",
-              fontSize: "0.75rem",
-              fontWeight: "bold",
-              display: "block",
-              marginBottom: "10px",
-              letterSpacing: "1px",
-            }}
-          >
-            📐 TAILLE COQUE
-          </label>
-          <select
-            value={selectedSize}
-            onChange={(e) => setSelectedSize(e.target.value)}
-            style={{
-              width: "100%",
-              background: "rgba(0,0,0,0.4)",
-              border: "1px solid #444",
-              color: "white",
-              padding: "14px",
-              borderRadius: "12px",
-              marginBottom: "25px",
-              outline: "none",
-              fontSize: "1rem",
-            }}
-          >
-            {["60", "62", "64", "66", "68", "70"].map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
-
-          <label
-            style={{
-              color: "#d3791d",
-              fontSize: "0.75rem",
-              fontWeight: "bold",
-              display: "block",
-              marginBottom: "10px",
-              letterSpacing: "1px",
-            }}
-          >
-            NUMÉRO DE LOT
-          </label>
-          <div style={{ display: "flex", gap: "12px" }}>
-            <input
-              type="text"
-              placeholder="Ex: 4520"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{
-                flex: 1,
-                background: "rgba(0,0,0,0.4)",
-                border: "1px solid #444",
-                color: "white",
-                padding: "14px",
-                borderRadius: "12px",
-                outline: "none",
-                fontSize: "1rem",
-              }}
-            />
-            <button
-              onClick={handleSearch}
-              style={{
-                background: "#d3791d",
-                border: "none",
-                width: "60px",
-                borderRadius: "12px",
-                cursor: "pointer",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                boxShadow: "0 5px 15px rgba(211, 121, 29, 0.3)",
-              }}
-            >
-              <span style={{ fontSize: "1.5rem" }}>🔍</span>
-            </button>
+        {/* --- FORMULAIRE DE RECHERCHE --- */}
+        <div style={styles.searchCard}>
+          <div style={styles.inputRow}>
+            <div style={{ flex: 1 }}>
+              <label style={styles.label}>FABRICANT / CODE</label>
+              <select
+                value={selectedMfr}
+                onChange={(e) => setSelectedMfr(e.target.value)}
+                style={styles.select}
+              >
+                <option value="ET">ET (Thale)</option>
+                <option value="CKL">CKL (Thale - Tardif)</option>
+                <option value="Q">Q (Quist)</option>
+                <option value="SE">SE (Sachsische E.)</option>
+                <option value="HKP">HKP (Sachsische E. - Tardif)</option>
+                <option value="NS">NS (Vereinigte D.)</option>
+                <option value="EF">EF (Emaillerwerke AG)</option>
+              </select>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={styles.label}>NUMÉRO DE LOT</label>
+              <div style={{ display: "flex", gap: "10px" }}>
+                <input
+                  type="text"
+                  placeholder="Ex: 4520"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                  style={styles.input}
+                />
+                <button onClick={handleSearch} style={styles.searchBtn}>
+                  ANALYSER
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* --- SECTION RÉSULTAT MISE À JOUR --- */}
-        {result && (
-          <div
-            style={{
-              marginTop: "10px",
-              padding: "25px",
-              borderRadius: "20px",
-              background: "rgba(30, 30, 30, 0.7)",
-              borderLeft: `6px solid ${result.statusColor}`,
-              boxShadow: "0 12px 30px rgba(0,0,0,0.6)",
-              backdropFilter: "blur(10px)",
-            }}
-          >
-            <div
-              style={{
-                color: result.statusColor,
-                fontSize: "0.75rem",
-                fontWeight: "bold",
-                marginBottom: "12px",
-                letterSpacing: "1.5px",
-              }}
-            >
-              {result.statusMessage}
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "baseline",
-                marginBottom: "15px",
-              }}
-            >
-              <h2
-                style={{
-                  color: "#c1b49a",
-                  margin: 0,
-                  fontSize: "1.5rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {result.model || "M40"} {result.mfr}
-              </h2>
-              <span
-                style={{
-                  color: "#d3791d",
-                  fontWeight: "bold",
-                  fontSize: "1.2rem",
-                }}
-              >
-                #{result.lot}
-              </span>
-            </div>
-
-            <p
-              style={{
-                fontSize: "0.95rem",
-                color: "#ccc",
-                margin: "0 0 20px 0",
-              }}
-            >
-              Taille enregistrée : <strong>{result.size}</strong>
+        {/* --- AFFICHAGE DES RÉSULTATS --- */}
+        <div style={styles.resultsArea}>
+          {isLoading ? (
+            <p style={styles.statusText}>
+              Initialisation de la base (32k entrées)...
             </p>
+          ) : results.length > 0 ? (
+            results.map((item, idx) => {
+              const branchInfo =
+                BRANCH_STYLES[item.branch] || BRANCH_STYLES.default;
 
-            <div
-              style={{
-                borderTop: "1px solid rgba(255,255,255,0.1)",
-                paddingTop: "20px",
-              }}
-            >
-              {/* Grille à 3 colonnes pour une meilleure lisibilité */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr 1fr",
-                  gap: "10px",
-                  marginBottom: "15px",
-                }}
-              >
-                <div>
-                  <span
-                    style={{
-                      color: "rgba(255,255,255,0.4)",
-                      fontSize: "0.65rem",
-                      display: "block",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    Phase
-                  </span>
-                  <span style={{ fontSize: "0.85rem" }}>{result.phase}</span>
-                </div>
-                <div>
-                  <span
-                    style={{
-                      color: "rgba(255,255,255,0.4)",
-                      fontSize: "0.65rem",
-                      display: "block",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    Période
-                  </span>
-                  <span style={{ fontSize: "0.85rem" }}>{result.years}</span>
-                </div>
-                <div>
-                  <span
-                    style={{
-                      color: "rgba(255,255,255,0.4)",
-                      fontSize: "0.65rem",
-                      display: "block",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    Insigne
-                  </span>
-                  <span
-                    style={{
-                      fontSize: "0.85rem",
-                      color: "#d3791d",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {result.decal}
-                  </span>
-                </div>
-              </div>
+              return (
+                <div key={idx} style={styles.resultCard}>
+                  <div style={styles.cardHeader}>
+                    <div>
+                      <small style={styles.sourceLabel}>
+                        {item.sources?.join(" / ")}
+                      </small>
+                      <h2 style={styles.modelTitle}>
+                        {item.model} {item.manufacturer} {item.size || ""}
+                      </h2>
+                    </div>
+                    <div style={styles.lotBadge}>LOT {item.lot_raw}</div>
+                  </div>
 
-              <p
-                style={{
-                  fontSize: "0.9rem",
-                  fontStyle: "italic",
-                  color: "#eee",
-                  lineHeight: "1.5",
-                  background: "rgba(0,0,0,0.2)",
-                  padding: "12px",
-                  borderRadius: "8px",
-                }}
-              >
-                "{result.notes || result.info}"
+                  <div style={styles.badgeRow}>
+                    <span
+                      style={{
+                        ...styles.badge,
+                        backgroundColor: branchInfo.bg,
+                      }}
+                    >
+                      {branchInfo.label}
+                    </span>
+                    {item.insignia_type && (
+                      <span style={styles.insigniaBadge}>
+                        {item.insignia_type}
+                      </span>
+                    )}
+                  </div>
+
+                  <div style={styles.details}>
+                    <div style={styles.detailBlock}>
+                      <label style={styles.detailLabel}>
+                        DESCRIPTION DE L'INSIGNE
+                      </label>
+                      <p style={styles.detailText}>
+                        {item.decals?.description_brute || "Non spécifié"}
+                      </p>
+                    </div>
+
+                    {(item.liner?.year || item.liner?.material) && (
+                      <div style={styles.detailBlock}>
+                        <label style={styles.detailLabel}>
+                          CONFIG. COIFFE (LINER)
+                        </label>
+                        <p style={styles.detailText}>
+                          {item.liner.year ? `Année : ${item.liner.year}` : ""}
+                          {item.liner.material
+                            ? ` | Matériau : ${item.liner.material}`
+                            : ""}
+                        </p>
+                      </div>
+                    )}
+
+                    {item.decals?.notes && (
+                      <div style={styles.notesBox}>
+                        <strong>Observations :</strong> {item.decals.notes}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            searchTerm &&
+            !isLoading && (
+              <p style={styles.statusText}>
+                Aucun lot correspondant répertorié pour ce fabricant.
               </p>
-            </div>
-            <div
-              style={{
-                marginTop: "25px",
-                paddingTop: "15px",
-                borderTop: "1px solid rgba(193, 180, 154, 0.2)",
-                fontSize: "0.7rem",
-                color: "rgba(255, 255, 255, 0.4)",
-                textAlign: "center",
-                lineHeight: "1.4",
-              }}
-            >
-              ⚠️ <strong>Note de l'expert :</strong> Cet outil fournit une aide
-              à l’analyse historique et ne constitue en aucun cas une
-              certification d’authenticité ou d’attribution. Toute conclusion
-              finale relève de l’expertise humaine.
-            </div>
-          </div>
-        )}
-
-        {!result && !isLoading && (
-          <p
-            style={{
-              textAlign: "center",
-              color: "rgba(255,255,255,0.25)",
-              marginTop: "40px",
-              fontSize: "0.9rem",
-              fontStyle: "italic",
-            }}
-          >
-            Entrez un numéro de lot pour lancer l'expertise
-          </p>
-        )}
+            )
+          )}
+        </div>
       </div>
     </div>
   );
+};
+
+// --- STYLES ---
+const styles = {
+  container: {
+    position: "relative",
+    minHeight: "100vh",
+    backgroundColor: "#050505",
+    color: "#e0e0e0",
+    padding: "20px",
+    fontFamily: "'Segoe UI', Roboto, sans-serif",
+  },
+  overlay: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    opacity: 0.15,
+    zIndex: 0,
+  },
+  content: {
+    position: "relative",
+    zIndex: 1,
+    maxWidth: "700px",
+    margin: "0 auto",
+  },
+  header: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "30px",
+    borderBottom: "1px solid #333",
+    paddingBottom: "15px",
+  },
+  title: {
+    fontSize: "1.3rem",
+    color: "#c1b49a",
+    textTransform: "uppercase",
+    letterSpacing: "2px",
+    margin: 0,
+  },
+  backBtn: {
+    background: "rgba(193, 180, 154, 0.1)",
+    border: "1px solid #c1b49a",
+    color: "#c1b49a",
+    padding: "6px 15px",
+    borderRadius: "4px",
+    cursor: "pointer",
+    fontSize: "0.8rem",
+  },
+  searchCard: {
+    background: "#111",
+    padding: "25px",
+    borderRadius: "12px",
+    border: "1px solid #222",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+    marginBottom: "30px",
+  },
+  inputRow: { display: "flex", gap: "20px", flexWrap: "wrap" },
+  label: {
+    display: "block",
+    fontSize: "0.7rem",
+    color: "#d3791d",
+    fontWeight: "bold",
+    marginBottom: "8px",
+    letterSpacing: "1px",
+  },
+  select: {
+    width: "100%",
+    background: "#000",
+    color: "#fff",
+    border: "1px solid #333",
+    padding: "12px",
+    borderRadius: "6px",
+    outline: "none",
+  },
+  input: {
+    flex: 1,
+    background: "#000",
+    color: "#fff",
+    border: "1px solid #333",
+    padding: "12px",
+    borderRadius: "6px",
+    outline: "none",
+  },
+  searchBtn: {
+    background: "#d3791d",
+    border: "none",
+    color: "#fff",
+    padding: "0 25px",
+    borderRadius: "6px",
+    fontWeight: "bold",
+    cursor: "pointer",
+  },
+  resultCard: {
+    background: "rgba(20, 20, 20, 0.95)",
+    padding: "25px",
+    borderRadius: "12px",
+    border: "1px solid #333",
+    marginBottom: "20px",
+    borderLeft: "4px solid #d3791d",
+  },
+  cardHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: "15px",
+  },
+  sourceLabel: {
+    fontSize: "0.6rem",
+    color: "#888",
+    textTransform: "uppercase",
+  },
+  modelTitle: { fontSize: "1.4rem", margin: "5px 0 0 0", color: "#fff" },
+  lotBadge: {
+    background: "#d3791d",
+    color: "#000",
+    padding: "5px 12px",
+    borderRadius: "4px",
+    fontWeight: "bold",
+    fontSize: "0.9rem",
+  },
+  badgeRow: { display: "flex", gap: "10px", marginBottom: "20px" },
+  badge: {
+    padding: "5px 12px",
+    borderRadius: "3px",
+    fontSize: "0.7rem",
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  insigniaBadge: {
+    border: "1px solid #d3791d",
+    color: "#d3791d",
+    padding: "4px 12px",
+    borderRadius: "3px",
+    fontSize: "0.7rem",
+    fontWeight: "bold",
+  },
+  detailBlock: { marginBottom: "15px" },
+  detailLabel: {
+    fontSize: "0.65rem",
+    color: "#555",
+    fontWeight: "bold",
+    display: "block",
+    marginBottom: "4px",
+  },
+  detailText: {
+    fontSize: "0.95rem",
+    color: "#ddd",
+    margin: 0,
+    lineHeight: "1.4",
+  },
+  notesBox: {
+    background: "rgba(0,0,0,0.3)",
+    padding: "15px",
+    borderRadius: "6px",
+    borderLeft: "3px solid #d3791d",
+    fontSize: "0.9rem",
+    color: "#bbb",
+    marginTop: "15px",
+  },
+  statusText: {
+    textAlign: "center",
+    color: "#555",
+    marginTop: "50px",
+    fontStyle: "italic",
+  },
 };
 
 export default LotSearch;
