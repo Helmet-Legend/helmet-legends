@@ -8,7 +8,6 @@ import ssImg from "../assets/SS_decal.png";
 import poliImg from "../assets/polize_decali.png";
 import lwImg from "../assets/lw_decal.png";
 
-// CONFIGURATION DES BRANCHES (Stats réelles extraites de votre base)
 const BRANCH_CONFIG = {
   Heer: { bg: "#4a5d43", label: "HEER", img: heerImg, count: 14560 },
   Luftwaffe: { bg: "#3c4e5e", label: "LUFTWAFFE", img: lwImg, count: 7764 },
@@ -23,7 +22,6 @@ const BRANCH_CONFIG = {
   default: { bg: "#333", label: "À CONFIRMER", img: null, count: 5791 },
 };
 
-// STATS FABRICANTS (Les 7 principaux de votre base)
 const MFR_STATS = [
   { name: "ET (Thale)", count: 10797 },
   { name: "EF (Fulda)", count: 6334 },
@@ -69,7 +67,12 @@ const LotSearch = () => {
 
       <div style={styles.content}>
         <header style={styles.header}>
-          <h1 style={styles.mainTitle}>Registre d'Expertise</h1>
+          <div>
+            <h1 style={styles.mainTitle}>Registre d'Expertise</h1>
+            <p style={styles.subTitle}>
+              {db.length.toLocaleString()} ENTRÉES CERTIFIÉES
+            </p>
+          </div>
           <button
             onClick={() => (window.location.href = "/")}
             style={styles.backBtn}
@@ -78,20 +81,19 @@ const LotSearch = () => {
           </button>
         </header>
 
-        {/* --- ACCORDÉON DES STATISTIQUES COMPLET --- */}
+        {/* --- ACCORDÉON DES STATISTIQUES --- */}
         <div style={styles.accordionWrapper}>
           <button
             onClick={() => setIsStatsOpen(!isStatsOpen)}
             style={styles.accordionHeader}
           >
-            📊 STATISTIQUES DÉTAILLÉES DE LA PRODUCTION (32 668 ENTRÉES)
+            <span>📊 STATISTIQUES DE PRODUCTION</span>
             <span>{isStatsOpen ? "▲" : "▼"}</span>
           </button>
 
           {isStatsOpen && (
             <div style={styles.accordionBody}>
               <div style={styles.statsGrid}>
-                {/* Colonne 1: Branches */}
                 <div style={styles.statsCol}>
                   <h4 style={styles.statsTitle}>RÉPARTITION PAR ARME</h4>
                   {Object.entries(BRANCH_CONFIG)
@@ -117,7 +119,7 @@ const LotSearch = () => {
                     style={{
                       ...styles.statRow,
                       marginTop: "15px",
-                      borderTop: "1px solid #222",
+                      borderTop: "1px solid #333",
                       paddingTop: "10px",
                     }}
                   >
@@ -125,19 +127,18 @@ const LotSearch = () => {
                   </div>
                   <div style={styles.statRow}>
                     <span style={styles.statLabel}>M35</span>
-                    <span style={styles.statValue}>12 166</span>
+                    <span style={styles.statValue}>37.2%</span>
                   </div>
                   <div style={styles.statRow}>
                     <span style={styles.statLabel}>M40</span>
-                    <span style={styles.statValue}>9 342</span>
+                    <span style={styles.statValue}>28.6%</span>
                   </div>
                   <div style={styles.statRow}>
                     <span style={styles.statLabel}>M42</span>
-                    <span style={styles.statValue}>11 136</span>
+                    <span style={styles.statValue}>34.1%</span>
                   </div>
                 </div>
 
-                {/* Colonne 2: Toutes les usines principales */}
                 <div style={styles.statsCol}>
                   <h4 style={styles.statsTitle}>PRINCIPALES USINES</h4>
                   {MFR_STATS.map((mfr, i) => (
@@ -157,15 +158,8 @@ const LotSearch = () => {
                       <span style={styles.statValue}>{mfr.count}</span>
                     </div>
                   ))}
-                  <p
-                    style={{
-                      fontSize: "0.6rem",
-                      color: "#444",
-                      marginTop: "20px",
-                    }}
-                  >
-                    Données issues des registres Brian Ice (V4), V3 Master et
-                    GHV Research.
+                  <p style={styles.statsFooter}>
+                    Données consolidées : Brian Ice, GHV & V3 Master.
                   </p>
                 </div>
               </div>
@@ -193,8 +187,8 @@ const LotSearch = () => {
               </select>
             </div>
             <div style={{ flex: 1.5 }}>
-              <label style={styles.fieldLabel}>LOT #</label>
-              <div style={{ display: "flex", gap: "5px" }}>
+              <label style={styles.fieldLabel}>NUMÉRO DE LOT</label>
+              <div style={{ display: "flex", gap: "8px" }}>
                 <input
                   type="text"
                   placeholder="Ex: 124"
@@ -211,7 +205,7 @@ const LotSearch = () => {
           </div>
         </div>
 
-        {/* RÉSULTATS (Inchangé) */}
+        {/* RÉSULTATS */}
         <div style={styles.resultsContainer}>
           {results.map((item, idx) => {
             const config = BRANCH_CONFIG[item.branch] || BRANCH_CONFIG.default;
@@ -265,7 +259,7 @@ const LotSearch = () => {
                   {item.decals?.notes && (
                     <div style={styles.expertNotes}>
                       <span style={{ color: "#d3791d", fontWeight: "bold" }}>
-                        NOTE :
+                        EXPERTISE :
                       </span>{" "}
                       {item.decals.notes}
                     </div>
@@ -284,9 +278,9 @@ const styles = {
   container: {
     position: "relative",
     minHeight: "100vh",
-    backgroundColor: "#0a0a0a",
+    backgroundColor: "#050505",
     color: "#d1d1d1",
-    padding: "20px",
+    padding: "40px 20px",
     fontFamily: "Georgia, serif",
   },
   overlay: {
@@ -297,197 +291,242 @@ const styles = {
     bottom: 0,
     opacity: 0.1,
     zIndex: 0,
+    backgroundSize: "cover",
   },
   content: {
     position: "relative",
     zIndex: 1,
-    maxWidth: "650px",
+    maxWidth: "680px",
     margin: "0 auto",
   },
   header: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: "20px",
-    borderBottom: "1px solid #333",
-    paddingBottom: "10px",
+    marginBottom: "30px",
+    borderBottom: "1px solid #222",
+    paddingBottom: "20px",
   },
   mainTitle: {
-    fontSize: "1.2rem",
+    fontSize: "1.6rem",
     color: "#c1b49a",
     textTransform: "uppercase",
+    letterSpacing: "3px",
+    margin: 0,
+  },
+  subTitle: {
+    fontSize: "0.6rem",
+    color: "#555",
     letterSpacing: "2px",
+    marginTop: "5px",
   },
   backBtn: {
     background: "none",
     border: "1px solid #c1b49a",
     color: "#c1b49a",
-    padding: "5px 12px",
+    padding: "8px 16px",
     cursor: "pointer",
     fontSize: "0.7rem",
+    transition: "0.3s",
   },
 
   accordionWrapper: {
-    background: "rgba(20, 20, 20, 0.9)",
-    border: "1px solid #333",
-    marginBottom: "20px",
-    borderRadius: "2px",
+    background: "rgba(15, 15, 15, 0.95)",
+    border: "1px solid #222",
+    marginBottom: "25px",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
   },
   accordionHeader: {
     width: "100%",
-    padding: "12px 15px",
+    padding: "15px 20px",
     background: "none",
     border: "none",
-    color: "#c1b49a",
+    color: "#d3791d",
     display: "flex",
     justifyContent: "space-between",
     cursor: "pointer",
-    fontSize: "0.7rem",
+    fontSize: "0.75rem",
     fontWeight: "bold",
     letterSpacing: "1px",
   },
-  accordionBody: { padding: "0 15px 20px 15px", borderTop: "1px solid #222" },
+  accordionBody: { padding: "0 20px 25px 20px", borderTop: "1px solid #222" },
   statsGrid: {
     display: "flex",
     gap: "40px",
-    marginTop: "15px",
+    marginTop: "20px",
     flexWrap: "wrap",
   },
   statsCol: { flex: 1, minWidth: "250px" },
   statsTitle: {
-    fontSize: "0.6rem",
-    color: "#d3791d",
-    marginBottom: "12px",
-    borderBottom: "1px solid #d3791d",
+    fontSize: "0.65rem",
+    color: "#c1b49a",
+    marginBottom: "15px",
+    borderBottom: "1px solid #333",
     display: "inline-block",
-    letterSpacing: "1px",
+    paddingBottom: "3px",
   },
   statRow: {
     display: "flex",
     alignItems: "center",
-    gap: "10px",
-    marginBottom: "8px",
-    fontSize: "0.7rem",
+    gap: "12px",
+    marginBottom: "10px",
+    fontSize: "0.75rem",
   },
-  statLabel: { width: "100px", color: "#888", fontSize: "0.65rem" },
-  statValue: {
-    fontWeight: "bold",
-    color: "#fff",
-    marginLeft: "auto",
-    minWidth: "40px",
-    textAlign: "right",
-  },
+  statLabel: { width: "100px", color: "#777" },
+  statValue: { fontWeight: "bold", color: "#fff", marginLeft: "auto" },
   progressBarBg: {
     flex: 1,
-    height: "4px",
-    background: "#222",
+    height: "3px",
+    background: "#1a1a1a",
     borderRadius: "1px",
     overflow: "hidden",
   },
   progressBarFill: { height: "100%" },
+  statsFooter: {
+    fontSize: "0.6rem",
+    color: "#333",
+    marginTop: "20px",
+    fontStyle: "italic",
+  },
 
   searchBox: {
-    background: "rgba(20, 20, 20, 0.9)",
-    padding: "20px",
+    background: "#111",
+    padding: "30px",
     border: "1px solid #222",
-    marginBottom: "20px",
+    marginBottom: "30px",
+    borderRadius: "8px",
+    boxShadow: "0 20px 40px rgba(0,0,0,0.6)",
   },
   fieldLabel: {
     display: "block",
-    fontSize: "0.65rem",
+    fontSize: "0.7rem",
     color: "#d3791d",
     fontWeight: "bold",
-    marginBottom: "8px",
+    marginBottom: "10px",
+    letterSpacing: "1px",
   },
   select: {
     width: "100%",
     background: "#000",
     color: "#fff",
     border: "1px solid #333",
-    padding: "10px",
+    padding: "12px",
     outline: "none",
+    borderRadius: "4px",
   },
   input: {
     flex: 1,
     background: "#000",
     color: "#fff",
     border: "1px solid #333",
-    padding: "10px",
+    padding: "12px",
     outline: "none",
+    borderRadius: "4px",
+    fontSize: "1rem",
   },
   searchBtn: {
     background: "#d3791d",
     border: "none",
     color: "#000",
-    padding: "0 20px",
+    padding: "0 25px",
     fontWeight: "bold",
     cursor: "pointer",
+    borderRadius: "4px",
+    transition: "0.2s",
   },
 
   expertCard: {
     position: "relative",
-    background: "#151515",
-    padding: "25px",
+    background: "#1a1a1a",
+    padding: "30px",
     border: "1px solid #222",
-    marginBottom: "15px",
+    marginBottom: "20px",
+    borderRadius: "12px",
+    boxShadow: "0 10px 25px rgba(0,0,0,0.3)",
   },
   cardSideDecoration: {
     position: "absolute",
     left: 0,
-    top: 0,
-    bottom: 0,
+    top: 15,
+    bottom: 15,
     width: "4px",
+    borderRadius: "0 4px 4px 0",
   },
   cardHeader: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: "20px",
+    marginBottom: "25px",
   },
-  sourceText: { fontSize: "0.6rem", color: "#555" },
-  helmetTitle: { fontSize: "1.4rem", color: "#fff", margin: "4px 0 12px 0" },
+  sourceText: {
+    fontSize: "0.65rem",
+    color: "#444",
+    textTransform: "uppercase",
+    letterSpacing: "1px",
+  },
+  helmetTitle: {
+    fontSize: "1.6rem",
+    color: "#fff",
+    margin: "8px 0 15px 0",
+    letterSpacing: "-0.5px",
+  },
   badgeRow: { display: "flex", gap: "10px" },
   branchBadge: {
-    padding: "4px 10px",
-    fontSize: "0.65rem",
+    padding: "5px 12px",
+    fontSize: "0.7rem",
     fontWeight: "bold",
     color: "#fff",
+    borderRadius: "3px",
+    letterSpacing: "0.5px",
   },
   insigniaBadge: {
     border: "1px solid #d3791d",
     color: "#d3791d",
-    padding: "3px 10px",
-    fontSize: "0.65rem",
+    padding: "4px 12px",
+    fontSize: "0.7rem",
     fontWeight: "bold",
+    borderRadius: "3px",
   },
   stampArea: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    gap: "12px",
-    minWidth: "110px",
+    gap: "15px",
+    minWidth: "120px",
+    background: "rgba(0,0,0,0.2)",
+    padding: "15px",
+    borderRadius: "8px",
   },
   lotStamp: {
     background: "#d3791d",
     color: "#000",
-    padding: "4px 10px",
-    fontWeight: "bold",
-    fontSize: "1rem",
+    padding: "5px 15px",
+    fontWeight: "900",
+    fontSize: "1.1rem",
     textAlign: "center",
+    borderRadius: "2px",
+    width: "100%",
   },
   largeMiniature: {
     height: "55px",
-    filter: "drop-shadow(0px 5px 6px rgba(0,0,0,0.8))",
+    width: "auto",
+    filter: "drop-shadow(0px 8px 10px rgba(0,0,0,0.8))",
   },
-  dataSection: { borderTop: "1px solid #222", paddingTop: "15px" },
-  dataValue: { fontSize: "0.95rem", color: "#ccc", fontFamily: "sans-serif" },
-  expertNotes: {
-    background: "rgba(0,0,0,0.2)",
-    padding: "12px",
-    borderLeft: "2px solid #555",
-    fontSize: "0.85rem",
-    color: "#888",
+  dataSection: { borderTop: "1px solid #222", paddingTop: "20px" },
+  dataValue: {
+    fontSize: "1rem",
+    color: "#bbb",
+    fontFamily: "sans-serif",
+    lineHeight: "1.5",
     fontStyle: "italic",
+  },
+  expertNotes: {
+    background: "rgba(0,0,0,0.3)",
+    padding: "15px",
+    borderLeft: "2px solid #333",
+    fontSize: "0.9rem",
+    color: "#888",
+    marginTop: "15px",
   },
 };
 
