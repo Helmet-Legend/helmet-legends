@@ -14,7 +14,8 @@ const generateSerialNumber = () => {
   return `HL-${y}${m}${d}-${rand}`;
 };
 
-export const generateHelmetPDF = (helmet, lang = "fr") => {
+// La fonction devient 'async' pour gérer l'appel au QR Code
+export const generateHelmetPDF = async (helmet, lang = "fr") => {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const isFr = lang === "fr";
   const serialNumber = generateSerialNumber();
@@ -34,11 +35,9 @@ export const generateHelmetPDF = (helmet, lang = "fr") => {
     doc.saveGraphicsState();
     const gState = new doc.GState({ opacity: 0.06 });
     doc.setGState(gState);
-
     const size = 155;
     const xPos = (210 - size) / 2;
     const yPos = (297 - size) / 2;
-
     doc.addImage(logoPath, "PNG", xPos, yPos, size, size, undefined, "FAST");
     doc.restoreGraphicsState();
   } catch (e) {
@@ -115,9 +114,9 @@ export const generateHelmetPDF = (helmet, lang = "fr") => {
   const fields = [
     [isFr ? "Usine" : "Factory", helmet.manufacturer],
     [isFr ? "Modèle" : "Model", helmet.model],
-    [isFr ? "Lot" : "Lot", "#" + helmet.lotNumber],
+    [isFr ? "Lot" : "Lot", "#" + (helmet.lotNumber || helmet.lot_raw)],
     [isFr ? "Peinture" : "Paint", (helmet.paintCondition || "0") + "%"],
-    [isFr ? "Taille Coque" : "Shell Size", helmet.shellSize],
+    [isFr ? "Taille Coque" : "Shell Size", helmet.shellSize || helmet.size],
     [isFr ? "Taille Coiffe" : "Liner Size", helmet.linerSize],
     [isFr ? "Insignes" : "Decals", helmet.decals],
     [isFr ? "Poids" : "Weight", (helmet.weight || "0") + " g"],
@@ -147,7 +146,7 @@ export const generateHelmetPDF = (helmet, lang = "fr") => {
   doc.setTextColor(200, 200, 200);
   doc.text(doc.splitTextToSize(notesText, 75), 115, specsY + 12);
 
-  // 7. GALERIE PHOTOS (SANS TITRE POUR ÉVITER LE CHEVAUCHEMENT)
+  // 7. GALERIE PHOTOS
   const galleryY = 248;
   const otherPhotos = Object.entries(helmet.images || {})
     .filter(([k, v]) => k !== "main" && v !== null)
@@ -175,10 +174,46 @@ export const generateHelmetPDF = (helmet, lang = "fr") => {
     }
   });
 
-  // 8. PIED DE PAGE
-  doc.setFontSize(7);
-  doc.setTextColor(muted[0], muted[1], muted[2]);
-  doc.text("app.helmetlegends.com", 105, 290, { align: "center" });
+  // --- 8. AJOUT DU QR CODE (VIA API) ---
+  try {
+    const helmetUrl = `https://app.helmetlegends.com/helmet/${
+      helmet.id || "view"
+    }`;
+    // Paramètres : couleur dorée (ad8a56) et fond sombre (1a1812)
+    const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
+      helmetUrl
+    )}&color=ad8a56&bgcolor=1a1812`;
 
-  doc.save(`Archive_HL_${helmet.model}_${helmet.lotNumber}.pdf`);
+    const response = await fetch(qrImageUrl);
+    const blob = await response.blob();
+
+    // On convertit le blob en Base64 pour jsPDF
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+
+    reader.onloadend = () => {
+      const base64data = reader.result;
+
+      // On place le QR Code en bas à droite
+      doc.addImage(base64data, "PNG", 172, 252, 22, 22);
+
+      doc.setFontSize(5);
+      doc.setTextColor(gold[0], gold[1], gold[2]);
+      doc.text(isFr ? "SCANNER POUR ACCÉDER" : "SCAN TO ACCESS", 183, 277, {
+        align: "center",
+      });
+
+      // 9. PIED DE PAGE
+      doc.setFontSize(7);
+      doc.setTextColor(muted[0], muted[1], muted[2]);
+      doc.text("app.helmetlegends.com", 105, 290, { align: "center" });
+
+      // SAUVEGARDE FINALE
+      doc.save(`Archive_HL_${helmet.model}_${helmet.lotNumber || "Lot"}.pdf`);
+    };
+  } catch (err) {
+    console.error("Erreur QR Code", err);
+    // En cas d'erreur QR Code, on sauvegarde quand même le PDF
+    doc.save(`Archive_HL_${helmet.model}_${helmet.lotNumber || "Lot"}.pdf`);
+  }
 };
