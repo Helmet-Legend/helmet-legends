@@ -15,7 +15,7 @@ import {
 import { translations } from "../data/translations";
 
 export default function Home({ setScreen, lang, setLang }) {
-  const t = translations[lang].home;
+  const t = (translations[lang] || translations["fr"]).home;
 
   return (
     <div className="flex flex-col h-screen bg-[#1a1812] items-center justify-center p-6 text-[#d0c7a8] relative overflow-hidden">
