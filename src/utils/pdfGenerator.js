@@ -1,8 +1,5 @@
 import { jsPDF } from "jspdf";
 
-/**
- * CHEMIN DU LOGO DANS LE DOSSIER PUBLIC
- */
 const logoPath = "/icon-512.png";
 
 const generateSerialNumber = () => {
@@ -20,8 +17,9 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
   const serialNumber = generateSerialNumber();
 
   // 🎨 PALETTE EXPERT
-  const gold = [173, 138, 86];
-  const bg = [26, 24, 18];
+  const gold = [173, 138, 86]; // Or Mat (Design)
+  const brightGold = "ceac5d"; // Or Brillant (QR Code - Hex pour l'API)
+  const bg = [26, 24, 18]; // Fond Sombre
   const textCrème = [229, 229, 229];
   const muted = [140, 140, 140];
 
@@ -29,15 +27,22 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
   doc.setFillColor(bg[0], bg[1], bg[2]);
   doc.rect(0, 0, 210, 297, "F");
 
-  // 2. FILIGRANE (WATERMARK) PLEIN ÉCRAN
+  // 2. FILIGRANE (WATERMARK)
   try {
     doc.saveGraphicsState();
     const gState = new doc.GState({ opacity: 0.06 });
     doc.setGState(gState);
     const size = 155;
-    const xPos = (210 - size) / 2;
-    const yPos = (297 - size) / 2;
-    doc.addImage(logoPath, "PNG", xPos, yPos, size, size, undefined, "FAST");
+    doc.addImage(
+      logoPath,
+      "PNG",
+      (210 - size) / 2,
+      (297 - size) / 2,
+      size,
+      size,
+      undefined,
+      "FAST"
+    );
     doc.restoreGraphicsState();
   } catch (e) {
     console.warn("Filigrane ignoré");
@@ -56,7 +61,6 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
   doc.setFont("times", "bold");
   doc.setFontSize(32);
   doc.text("HELMET LEGENDS", 105, 28, { align: "center" });
-
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(muted[0], muted[1], muted[2]);
@@ -64,6 +68,7 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
     align: "center",
   });
 
+  // 5. RÉFÉRENCE ET DATE
   doc.setFontSize(8);
   doc.setTextColor(gold[0], gold[1], gold[2]);
   doc.text(`RÉFÉRENCE : ${serialNumber}`, 20, 48);
@@ -73,24 +78,26 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
   doc.setLineWidth(0.4);
   doc.line(20, 50, 190, 50);
 
-  // 5. PHOTO PRINCIPALE
+  // 6. PHOTO PRINCIPALE
   if (helmet.images?.main) {
-    doc.setDrawColor(gold[0], gold[1], gold[2]);
-    doc.setLineWidth(0.8);
-    doc.rect(45, 58, 120, 85);
-    doc.addImage(
-      helmet.images.main,
-      "JPEG",
-      46,
-      59,
-      118,
-      83,
-      undefined,
-      "FAST"
-    );
+    try {
+      doc.setDrawColor(gold[0], gold[1], gold[2]);
+      doc.setLineWidth(0.8);
+      doc.rect(45, 58, 120, 85);
+      doc.addImage(
+        helmet.images.main,
+        "JPEG",
+        46,
+        59,
+        118,
+        83,
+        undefined,
+        "FAST"
+      );
+    } catch (e) {}
   }
 
-  // 6. SPÉCIFICATIONS ET NOTES (2 COLONNES)
+  // 7. SPÉCIFICATIONS TECHNIQUES
   const specsY = 155;
   doc.setTextColor(gold[0], gold[1], gold[2]);
   doc.setFont("times", "bold");
@@ -100,12 +107,7 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
     20,
     specsY
   );
-  doc.text(
-    isFr ? "NOTES ET ANALYSE DE TERRAIN" : "FIELD ANALYSIS",
-    110,
-    specsY
-  );
-  doc.setLineWidth(0.4);
+  doc.text(isFr ? "NOTES ET ANALYSE" : "FIELD ANALYSIS", 110, specsY);
   doc.line(20, specsY + 2, 95, specsY + 2);
   doc.line(110, specsY + 2, 190, specsY + 2);
 
@@ -115,12 +117,8 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
     [isFr ? "Modèle" : "Model", helmet.model],
     [isFr ? "Lot" : "Lot", "#" + (helmet.lotNumber || helmet.lot_raw)],
     [isFr ? "Peinture" : "Paint", (helmet.paintCondition || "0") + "%"],
-    [isFr ? "Taille Coque" : "Shell Size", helmet.shellSize || helmet.size],
-    [isFr ? "Taille Coiffe" : "Liner Size", helmet.linerSize],
+    [isFr ? "Taille" : "Size", helmet.shellSize || helmet.size],
     [isFr ? "Insignes" : "Decals", helmet.decals],
-    [isFr ? "Poids" : "Weight", (helmet.weight || "0") + " g"],
-    [isFr ? "Coiffe" : "Liner", helmet.linerCondition || helmet.linerState],
-    [isFr ? "Jugulaire" : "Chinstrap", helmet.chinstrapState],
   ];
 
   fields.forEach(([label, val]) => {
@@ -131,26 +129,21 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
     doc.setTextColor(textCrème[0], textCrème[1], textCrème[2]);
     doc.setFontSize(9);
     doc.text(String(val || "-"), 55, curY);
-    doc.setDrawColor(60, 60, 60);
-    doc.setLineWidth(0.1);
-    doc.line(22, curY + 2, 95, curY + 2);
     curY += 8.5;
   });
 
   const notesText =
-    helmet.description ||
-    (isFr ? "Aucun historique documenté." : "No documented history.");
+    helmet.description || (isFr ? "Aucun historique." : "No history.");
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
   doc.setTextColor(200, 200, 200);
-  doc.text(doc.splitTextToSize(notesText, 75), 115, specsY + 12);
+  doc.text(doc.splitTextToSize(notesText, 75), 110, specsY + 12);
 
-  // 7. GALERIE PHOTOS
+  // 8. GALERIE PHOTOS
   const galleryY = 248;
   const otherPhotos = Object.entries(helmet.images || {})
-    .filter(([k, v]) => k !== "main" && v !== null)
+    .filter(([k, v]) => k !== "main" && v)
     .slice(0, 4);
-
   let xPos = 20;
   otherPhotos.forEach(([key, url]) => {
     try {
@@ -168,19 +161,18 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
         "FAST"
       );
       xPos += 45;
-    } catch (e) {
-      console.error("Erreur galerie", e);
-    }
+    } catch (e) {}
   });
 
-  // --- 8. AJOUT DU QR CODE (DÉPLACÉ EN HAUT À DROITE + PETIT CADRE) ---
+  // --- 9. QR CODE OPTIMISÉ (COIN HAUT DROITE) ---
   try {
     const helmetUrl = `https://app.helmetlegends.com/helmet/${
       helmet.id || "view"
     }`;
+    // Utilisation du 'brightGold' pour un contraste maximal
     const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
       helmetUrl
-    )}&color=ad8a56&bgcolor=1a1812`;
+    )}&color=${brightGold}&bgcolor=1a1812`;
 
     const response = await fetch(qrImageUrl);
     const blob = await response.blob();
@@ -190,29 +182,26 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
     reader.onloadend = () => {
       const base64data = reader.result;
 
-      // --- NOUVEAU : PETIT CADRE DISCRET AUTOUR DU QR CODE ---
+      // Cadre discret
       doc.setDrawColor(gold[0], gold[1], gold[2]);
-      doc.setLineWidth(0.3); // Trait fin pour la discrétion
-      // On dessine un carré légèrement plus grand (171,11) que l'image (172,12)
-      // Taille 24x24 pour laisser 1mm de marge autour de l'image de 22x22
+      doc.setLineWidth(0.3);
       doc.rect(171, 11, 24, 24);
 
-      // Image du QR Code à l'intérieur du petit cadre
+      // Image du QR Code
       doc.addImage(base64data, "PNG", 172, 12, 22, 22);
 
-      // Légende en dessous
+      // Légende
       doc.setFontSize(5);
       doc.setTextColor(gold[0], gold[1], gold[2]);
       doc.text(isFr ? "SCANNER LA FICHE" : "SCAN SHEET", 183, 37.5, {
         align: "center",
       });
 
-      // 9. PIED DE PAGE
+      // 10. PIED DE PAGE
       doc.setFontSize(7);
       doc.setTextColor(muted[0], muted[1], muted[2]);
       doc.text("app.helmetlegends.com", 105, 290, { align: "center" });
 
-      // SAUVEGARDE FINALE
       doc.save(`Archive_HL_${helmet.model}_${helmet.lotNumber || "Lot"}.pdf`);
     };
   } catch (err) {
