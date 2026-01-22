@@ -17,27 +17,26 @@ export default function Details({ setScreen, helmet, onEdit, lang }) {
 
   if (!helmet) return null;
 
-  // Récupération des photos existantes
   const availablePhotos = Object.entries(helmet.images || {})
     .filter(([_, value]) => value !== null)
     .map(([key, value]) => ({ id: key, url: value }));
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#1a1812] flex flex-col font-serif text-[#d0c7a8] overflow-hidden">
-      {/* Header Flottant */}
-      <div className="absolute top-0 left-0 right-0 z-10 p-6 flex justify-between items-center bg-gradient-to-b from-black/80 to-transparent">
+    <div className="min-h-screen bg-[#1a1812] font-serif text-[#d0c7a8] relative">
+      {/* Header - Rendu "Sticky" pour rester accessible au scroll */}
+      <div className="sticky top-0 left-0 right-0 z-30 p-4 md:p-6 flex justify-between items-center bg-black/60 backdrop-blur-lg border-b border-amber-900/20">
         <button
           onClick={() => setScreen("registry")}
-          className="p-2 bg-[#2a2822]/80 rounded-full backdrop-blur-md border border-[#3a3832] active:scale-95 transition-transform"
+          className="p-2 bg-[#2a2822] rounded-full border border-[#3a3832] hover:bg-amber-900 transition-colors"
         >
           <ChevronLeft size={24} />
         </button>
 
         <div className="text-center">
-          <h2 className="text-2xl font-black italic uppercase text-[#f0ede0] leading-none">
+          <h2 className="text-xl md:text-2xl font-black italic uppercase text-[#f0ede0] leading-none">
             {helmet.model}
           </h2>
-          <p className="text-[10px] uppercase tracking-[0.3em] text-amber-500 font-bold">
+          <p className="text-[9px] uppercase tracking-[0.3em] text-amber-500 font-bold">
             {isFr ? "Fiche Technique" : "Technical Sheet"}
           </p>
         </div>
@@ -45,125 +44,138 @@ export default function Details({ setScreen, helmet, onEdit, lang }) {
         <div className="flex gap-2">
           <button
             onClick={onEdit}
-            className="p-2 bg-amber-600 rounded-full text-[#1a1812] shadow-lg active:scale-95 transition-transform"
+            className="p-2 bg-amber-600 rounded-full text-[#1a1812] shadow-lg hover:scale-105 transition-transform"
           >
             <Edit3 size={20} />
           </button>
-
           <button
             onClick={() => generateHelmetPDF(helmet, lang)}
-            className="p-2 bg-amber-800 rounded-full text-[#f0ede0] shadow-lg active:scale-95 transition-transform"
+            className="p-2 bg-amber-800 rounded-full text-[#f0ede0] shadow-lg hover:scale-105 transition-transform"
           >
             <Download size={20} />
           </button>
         </div>
       </div>
 
-      {/* Galerie Photo Plein Écran */}
-      <div className="flex-grow flex items-center bg-black">
-        <div className="flex overflow-x-auto snap-x snap-mandatory h-full w-full no-scrollbar">
-          {availablePhotos.length > 0 ? (
-            availablePhotos.map((photo) => (
-              <div
-                key={photo.id}
-                className="flex-shrink-0 w-full h-full snap-center flex items-center justify-center relative"
-              >
-                <img
-                  src={photo.url}
-                  alt={photo.id}
-                  className="w-full h-full object-contain"
-                />
-                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 px-4 py-1 bg-black/50 backdrop-blur-sm border border-white/10 rounded-full text-[10px] uppercase font-black tracking-widest opacity-60">
-                  {isFr ? "Vue" : "View"} : {photo.id}
+      {/* Contenu Principal - Layout Grille sur Desktop */}
+      <div className="flex flex-col lg:flex-row lg:h-[calc(100vh-88px)]">
+        {/* Colonne GAUCHE : Galerie Photo */}
+        <div className="w-full lg:w-1/2 bg-black flex items-center justify-center relative h-[50vh] lg:h-full border-b lg:border-b-0 lg:border-r border-amber-900/30">
+          <div className="flex overflow-x-auto snap-x snap-mandatory h-full w-full no-scrollbar">
+            {availablePhotos.length > 0 ? (
+              availablePhotos.map((photo) => (
+                <div
+                  key={photo.id}
+                  className="flex-shrink-0 w-full h-full snap-center flex items-center justify-center p-4"
+                >
+                  <img
+                    src={photo.url}
+                    alt={photo.id}
+                    className="max-w-full max-h-full object-contain shadow-2xl"
+                  />
+                  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-4 py-1 bg-black/60 backdrop-blur-sm border border-amber-900/30 rounded-full text-[9px] uppercase font-black tracking-widest text-amber-500">
+                    {isFr ? "Vue" : "View"} : {photo.id}
+                  </div>
                 </div>
+              ))
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center opacity-20">
+                <HardHat size={64} />
+                <p className="mt-4 uppercase font-black tracking-widest text-xs">
+                  {isFr ? "Aucun visuel" : "No visuals"}
+                </p>
               </div>
-            ))
-          ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center opacity-20">
-              <HardHat size={64} />
-              <p className="mt-4 uppercase font-black tracking-widest text-xs">
-                {isFr ? "Aucun visuel" : "No visuals"}
+            )}
+          </div>
+        </div>
+
+        {/* Colonne DROITE : Informations */}
+        <div className="w-full lg:w-1/2 bg-[#2a2822] p-6 lg:p-12 lg:overflow-y-auto custom-scrollbar">
+          {/* Grille des informations principales */}
+          <div className="grid grid-cols-2 gap-4 mb-8">
+            <div className="p-4 bg-[#1a1812] rounded-xl border border-amber-900/20">
+              <p className="text-[9px] uppercase font-black opacity-40 mb-1 tracking-tighter">
+                {labels.labelFactory}
+              </p>
+              <p className="text-base font-bold text-amber-500">
+                {helmet.manufacturer || "N/A"}
               </p>
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* Panneau d'informations coulissant */}
-      <div className="bg-[#2a2822] border-t-2 border-[#8a7f5d] p-6 pb-12 max-h-[50vh] overflow-y-auto shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
-        {/* Grille des informations principales */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="p-3 bg-[#1a1812] rounded-xl border border-[#3a3832]">
-            <p className="text-[8px] uppercase font-black opacity-40 mb-1">
-              {labels.labelFactory}
-            </p>
-            <p className="text-sm font-bold text-amber-500">
-              {helmet.manufacturer || "N/A"}
-            </p>
-          </div>
-          <div className="p-3 bg-[#1a1812] rounded-xl border border-[#3a3832]">
-            <p className="text-[8px] uppercase font-black opacity-40 mb-1">
-              {labels.labelLot}
-            </p>
-            <p className="text-sm font-bold text-amber-500">
-              {helmet.lotNumber || "N/A"}
-            </p>
-          </div>
-        </div>
-
-        {/* Spécifications Techniques */}
-        <div className="grid grid-cols-3 gap-2 mb-6">
-          <div className="p-2 bg-[#1a1812]/50 rounded-lg border border-[#3a3832] text-center">
-            <p className="text-[7px] uppercase font-black opacity-40">
-              {labels.labelSize}
-            </p>
-            <p className="text-xs font-bold">{helmet.shellSize || "-"}</p>
-          </div>
-          <div className="p-2 bg-[#1a1812]/50 rounded-lg border border-[#3a3832] text-center">
-            <p className="text-[7px] uppercase font-black opacity-40">
-              {isFr ? "Taille Coiffe" : "Liner Size"}
-            </p>
-            <p className="text-xs font-bold">{helmet.linerSize || "-"}</p>
-          </div>
-          <div className="p-2 bg-[#1a1812]/50 rounded-lg border border-[#3a3832] text-center">
-            <p className="text-[7px] uppercase font-black opacity-40">
-              {isFr ? "Poids" : "Weight"} (g)
-            </p>
-            <p className="text-xs font-bold">{helmet.weight || "-"}</p>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <p className="text-[10px] uppercase font-black opacity-40 tracking-widest mb-1">
-              {isFr ? "Notes & Histoire" : "Notes & History"}
-            </p>
-            <p className="text-sm italic leading-relaxed opacity-80 whitespace-pre-wrap">
-              {helmet.description ||
-                (isFr
-                  ? "Aucun historique documenté pour cette pièce."
-                  : "No documented history for this item.")}
-            </p>
+            <div className="p-4 bg-[#1a1812] rounded-xl border border-amber-900/20">
+              <p className="text-[9px] uppercase font-black opacity-40 mb-1 tracking-tighter">
+                {labels.labelLot}
+              </p>
+              <p className="text-base font-bold text-amber-500">
+                {helmet.lotNumber || "N/A"}
+              </p>
+            </div>
           </div>
 
-          {/* Bouton Génération PDF */}
+          {/* Spécifications Techniques */}
+          <div className="grid grid-cols-3 gap-3 mb-8">
+            {[
+              { label: labels.labelSize, val: helmet.shellSize },
+              {
+                label: isFr ? "Taille Coiffe" : "Liner Size",
+                val: helmet.linerSize,
+              },
+              { label: isFr ? "Poids (g)" : "Weight (g)", val: helmet.weight },
+            ].map((spec, i) => (
+              <div
+                key={i}
+                className="p-3 bg-black/30 rounded-lg border border-amber-900/10 text-center"
+              >
+                <p className="text-[8px] uppercase font-black opacity-40 mb-1">
+                  {spec.label}
+                </p>
+                <p className="text-sm font-bold text-white">
+                  {spec.val || "-"}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Notes & Histoire */}
+          <div className="mb-10">
+            <div className="flex items-center gap-2 mb-3">
+              <ShieldCheck className="text-amber-600" size={16} />
+              <p className="text-[11px] uppercase font-black tracking-[0.2em] text-white">
+                {isFr ? "Expertise & Histoire" : "History & Notes"}
+              </p>
+            </div>
+            <div className="p-5 bg-black/20 rounded-2xl border border-amber-900/10">
+              <p className="text-sm italic leading-relaxed opacity-90 whitespace-pre-wrap font-serif">
+                {helmet.description ||
+                  (isFr
+                    ? "Aucun historique documenté pour cette pièce."
+                    : "No documented history for this item.")}
+              </p>
+            </div>
+          </div>
+
+          {/* Bouton Impression - Uniquement si nécessaire ici car déjà en haut */}
           <button
             onClick={() => generateHelmetPDF(helmet, lang)}
-            className="w-full py-4 mt-4 border-2 border-[#8a7f5d] rounded-xl flex items-center justify-center gap-3 text-[10px] uppercase font-black tracking-widest text-[#f0ede0] bg-[#1a1812] hover:bg-amber-900 active:scale-95 transition-all shadow-xl"
+            className="w-full py-5 bg-amber-600 hover:bg-amber-500 text-black rounded-xl flex items-center justify-center gap-4 text-xs uppercase font-black tracking-widest transition-all shadow-2xl mb-6"
           >
-            <Printer size={18} className="text-amber-500" />
-            {isFr
-              ? "Générer la Fiche Technique (PDF)"
-              : "Generate Technical Sheet (PDF)"}
+            <Printer size={20} />
+            {isFr ? "Générer Certificat PDF" : "Generate PDF Certificate"}
           </button>
 
-          <p className="text-[7px] text-center uppercase opacity-30 italic">
+          <p className="text-[8px] text-center uppercase opacity-30 italic tracking-widest">
             {isFr
-              ? "Document descriptif basé sur les données saisies par l'utilisateur"
-              : "Descriptive document based on user-provided data"}
+              ? "Base de données Helmet Legends - Archive Certifiée"
+              : "Helmet Legends Database - Certified Archive"}
           </p>
         </div>
       </div>
+
+      <style>{`
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #451a03; border-radius: 10px; }
+      `}</style>
     </div>
   );
 }
