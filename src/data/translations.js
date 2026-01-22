@@ -2,12 +2,12 @@
 export const translations = {
   fr: {
     home: {
-      expert: "Expert / Ajouter",
+      expert: "Aide a l'identification",
       handbook: "Manuel de l'Expert",
-      lotSearch: "Recherche de Lot",
-      registry: "Registre",
-      compare: "Comparer Insigne",
-      stats: "Voir les statistiques",
+      lotSearch: "Recherche par Lot",
+      registry: "Ma Collection",
+      compare: "Compareteur d'insigne",
+      stats: "Voir mes statistiques",
       lang: "English",
     },
     lotSearch: {
@@ -54,7 +54,7 @@ export const translations = {
   },
   en: {
     home: {
-      expert: "Expert / Add",
+      expert: "identification assistance",
       handbook: "Expert Handbook",
       lotSearch: "Lot Search",
       registry: "Registry",
