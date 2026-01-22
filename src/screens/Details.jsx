@@ -7,12 +7,22 @@ import {
   ShieldCheck,
   HardHat,
 } from "lucide-react";
-import { generateHelmetPDF } from "../utils/pdfGenerator";
 import { translations } from "../data/translations";
 
+// --- FONCTION DE SECOURS (Évite le crash si le fichier utils est absent) ---
+const generateHelmetPDF = (helmet, lang) => {
+  console.log("Génération PDF demandée pour :", helmet.model);
+  alert(
+    lang === "fr"
+      ? "Fonction PDF en cours de configuration..."
+      : "PDF Function coming soon..."
+  );
+};
+
 export default function Details({ setScreen, helmet, onEdit, lang }) {
-  const t = translations[lang].details;
-  const labels = translations[lang].add;
+  // Sécurité : si les traductions ne sont pas encore chargées
+  const detailsTranslations = translations[lang]?.details || {};
+  const labels = translations[lang]?.add || {};
   const isFr = lang === "fr";
 
   if (!helmet) return null;
@@ -23,7 +33,7 @@ export default function Details({ setScreen, helmet, onEdit, lang }) {
 
   return (
     <div className="min-h-screen bg-[#1a1812] font-serif text-[#d0c7a8] relative">
-      {/* Header - Rendu "Sticky" pour rester accessible au scroll */}
+      {/* Header Sticky */}
       <div className="sticky top-0 left-0 right-0 z-30 p-4 md:p-6 flex justify-between items-center bg-black/60 backdrop-blur-lg border-b border-amber-900/20">
         <button
           onClick={() => setScreen("registry")}
@@ -57,7 +67,7 @@ export default function Details({ setScreen, helmet, onEdit, lang }) {
         </div>
       </div>
 
-      {/* Contenu Principal - Layout Grille sur Desktop */}
+      {/* Contenu Principal */}
       <div className="flex flex-col lg:flex-row lg:h-[calc(100vh-88px)]">
         {/* Colonne GAUCHE : Galerie Photo */}
         <div className="w-full lg:w-1/2 bg-black flex items-center justify-center relative h-[50vh] lg:h-full border-b lg:border-b-0 lg:border-r border-amber-900/30">
@@ -91,7 +101,6 @@ export default function Details({ setScreen, helmet, onEdit, lang }) {
 
         {/* Colonne DROITE : Informations */}
         <div className="w-full lg:w-1/2 bg-[#2a2822] p-6 lg:p-12 lg:overflow-y-auto custom-scrollbar">
-          {/* Grille des informations principales */}
           <div className="grid grid-cols-2 gap-4 mb-8">
             <div className="p-4 bg-[#1a1812] rounded-xl border border-amber-900/20">
               <p className="text-[9px] uppercase font-black opacity-40 mb-1 tracking-tighter">
@@ -111,7 +120,6 @@ export default function Details({ setScreen, helmet, onEdit, lang }) {
             </div>
           </div>
 
-          {/* Spécifications Techniques */}
           <div className="grid grid-cols-3 gap-3 mb-8">
             {[
               { label: labels.labelSize, val: helmet.shellSize },
@@ -135,7 +143,6 @@ export default function Details({ setScreen, helmet, onEdit, lang }) {
             ))}
           </div>
 
-          {/* Notes & Histoire */}
           <div className="mb-10">
             <div className="flex items-center gap-2 mb-3">
               <ShieldCheck className="text-amber-600" size={16} />
@@ -153,7 +160,6 @@ export default function Details({ setScreen, helmet, onEdit, lang }) {
             </div>
           </div>
 
-          {/* Bouton Impression - Uniquement si nécessaire ici car déjà en haut */}
           <button
             onClick={() => generateHelmetPDF(helmet, lang)}
             className="w-full py-5 bg-amber-600 hover:bg-amber-500 text-black rounded-xl flex items-center justify-center gap-4 text-xs uppercase font-black tracking-widest transition-all shadow-2xl mb-6"
