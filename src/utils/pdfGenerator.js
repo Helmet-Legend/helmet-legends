@@ -14,7 +14,6 @@ const generateSerialNumber = () => {
   return `HL-${y}${m}${d}-${rand}`;
 };
 
-// La fonction devient 'async' pour gérer l'appel au QR Code
 export const generateHelmetPDF = async (helmet, lang = "fr") => {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const isFr = lang === "fr";
@@ -41,10 +40,10 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
     doc.addImage(logoPath, "PNG", xPos, yPos, size, size, undefined, "FAST");
     doc.restoreGraphicsState();
   } catch (e) {
-    console.warn("Filigrane ignoré : vérifiez le fichier dans public.", e);
+    console.warn("Filigrane ignoré");
   }
 
-  // 3. TRIPLE CADRE DORÉ
+  // 3. TRIPLE CADRE DORÉ GLOBAL
   doc.setDrawColor(gold[0], gold[1], gold[2]);
   doc.setLineWidth(1.2);
   doc.rect(6, 6, 198, 285);
@@ -174,32 +173,37 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
     }
   });
 
-  // --- 8. AJOUT DU QR CODE (VIA API) ---
+  // --- 8. AJOUT DU QR CODE (DÉPLACÉ EN HAUT À DROITE + PETIT CADRE) ---
   try {
     const helmetUrl = `https://app.helmetlegends.com/helmet/${
       helmet.id || "view"
     }`;
-    // Paramètres : couleur dorée (ad8a56) et fond sombre (1a1812)
     const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
       helmetUrl
     )}&color=ad8a56&bgcolor=1a1812`;
 
     const response = await fetch(qrImageUrl);
     const blob = await response.blob();
-
-    // On convertit le blob en Base64 pour jsPDF
     const reader = new FileReader();
     reader.readAsDataURL(blob);
 
     reader.onloadend = () => {
       const base64data = reader.result;
 
-      // On place le QR Code en bas à droite
-      doc.addImage(base64data, "PNG", 172, 252, 22, 22);
+      // --- NOUVEAU : PETIT CADRE DISCRET AUTOUR DU QR CODE ---
+      doc.setDrawColor(gold[0], gold[1], gold[2]);
+      doc.setLineWidth(0.3); // Trait fin pour la discrétion
+      // On dessine un carré légèrement plus grand (171,11) que l'image (172,12)
+      // Taille 24x24 pour laisser 1mm de marge autour de l'image de 22x22
+      doc.rect(171, 11, 24, 24);
 
+      // Image du QR Code à l'intérieur du petit cadre
+      doc.addImage(base64data, "PNG", 172, 12, 22, 22);
+
+      // Légende en dessous
       doc.setFontSize(5);
       doc.setTextColor(gold[0], gold[1], gold[2]);
-      doc.text(isFr ? "SCANNER POUR ACCÉDER" : "SCAN TO ACCESS", 183, 277, {
+      doc.text(isFr ? "SCANNER LA FICHE" : "SCAN SHEET", 183, 37.5, {
         align: "center",
       });
 
@@ -213,7 +217,6 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
     };
   } catch (err) {
     console.error("Erreur QR Code", err);
-    // En cas d'erreur QR Code, on sauvegarde quand même le PDF
     doc.save(`Archive_HL_${helmet.model}_${helmet.lotNumber || "Lot"}.pdf`);
   }
 };
