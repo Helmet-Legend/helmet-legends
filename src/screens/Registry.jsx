@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+// Assure-toi que le chemin de ton image de fond est correct
 import monFondExpert from "../assets/helmet-bg.png";
 import {
   Plus,
@@ -7,9 +8,7 @@ import {
   Shield,
   ArrowLeft,
   Database,
-  Info,
   Download,
-  Check,
   Loader2,
 } from "lucide-react";
 
@@ -22,36 +21,34 @@ export default function Registry({
 }) {
   const isFr = lang === "fr";
   const [downloadingId, setDownloadingId] = useState(null);
-  const [successId, setSuccessId] = useState(null);
 
+  // Fonction de simulation pour le bouton PDF
   const handleDownloadPDF = async (helmet) => {
     setDownloadingId(helmet.id);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setDownloadingId(null);
-      setSuccessId(helmet.id);
-      setTimeout(() => setSuccessId(null), 3000);
-    } catch (error) {
-      console.error("Erreur lors du téléchargement", error);
-      setDownloadingId(null);
-    }
+    // Simulation d'un délai de génération
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    setDownloadingId(null);
+    alert(
+      isFr
+        ? "Certificat d'expertise généré !"
+        : "Expertise certificate generated!"
+    );
   };
 
   return (
-    // On change min-h-screen et on enlève overflow-hidden pour permettre le scroll naturel
     <div className="min-h-screen bg-[#1a1812] text-[#d0c7a8] font-serif relative">
-      {/* --- IMAGE DE FOND FIXE --- */}
+      {/* --- IMAGE DE FOND --- */}
       <div
         className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat scale-110"
         style={{
           backgroundImage: `url(${monFondExpert})`,
-          filter: "brightness(0.2) blur(8px)", // Légèrement plus sombre pour la lisibilité
+          filter: "brightness(0.15) blur(10px)",
         }}
       ></div>
 
-      {/* CONTENEUR PRINCIPAL : On enlève h-screen ici */}
+      {/* --- CONTENU PRINCIPAL --- */}
       <div className="relative z-10 p-4 md:p-8 pb-32 max-w-5xl mx-auto">
-        {/* HEADER FIXE OU STICKY POUR ORDINATEUR */}
+        {/* HEADER STICKY */}
         <div className="sticky top-0 z-20 flex items-center justify-between mb-8 border-b-2 border-amber-800 pb-4 backdrop-blur-xl bg-black/40 p-4 rounded-2xl shadow-2xl">
           <div className="flex items-center gap-3">
             <Shield className="text-amber-500" size={28} />
@@ -76,7 +73,7 @@ export default function Registry({
           {isFr ? "Ajouter une nouvelle pièce" : "Add New Piece"}
         </button>
 
-        {/* LISTE EN GRILLE (1 col mobile, 2 cols desktop) */}
+        {/* LISTE EN GRILLE */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {!helmets || helmets.length === 0 ? (
             <div className="col-span-full text-center py-20 bg-black/40 backdrop-blur-md rounded-2xl border border-dashed border-amber-900/30">
@@ -88,14 +85,14 @@ export default function Registry({
           ) : (
             helmets.map((h) => (
               <div
-                key={h.id || Math.random()}
+                key={h.id}
                 className="group bg-black/60 backdrop-blur-lg border border-amber-900/30 rounded-2xl overflow-hidden hover:border-amber-500/50 transition-all duration-300 flex h-32 shadow-xl"
               >
-                {/* Miniature : Taille fixe pour éviter l'envahissement de l'écran */}
+                {/* ✅ MINIATURE CORRIGÉE : Accès direct à la colonne image_url_main */}
                 <div className="w-32 h-full bg-black flex-shrink-0 border-r border-amber-900/20">
-                  {h.images?.main ? (
+                  {h.image_url_main ? (
                     <img
-                      src={h.images.main}
+                      src={h.image_url_main}
                       alt="Helmet"
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
@@ -106,26 +103,28 @@ export default function Registry({
                   )}
                 </div>
 
-                {/* Infos */}
+                {/* INFOS */}
                 <div className="flex-1 p-4 flex flex-col justify-between min-w-0">
                   <div className="flex justify-between items-start gap-2">
                     <div className="truncate">
                       <h3 className="text-amber-500 font-black uppercase italic truncate text-base">
-                        {h.model}
+                        {h.model || "Modèle Inconnu"}
                       </h3>
+                      {/* ✅ NUMÉRO DE LOT CORRIGÉ : lot_number au lieu de lotNumber */}
                       <p className="text-[10px] text-white/40 font-bold tracking-widest">
-                        LOT #{h.lotNumber}
+                        LOT #{h.lot_number || "---"}
                       </p>
                     </div>
 
-                    {/* Actions */}
+                    {/* ACTIONS */}
                     <div className="flex gap-2">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDownloadPDF(h);
                         }}
-                        className="p-1.5 text-amber-700 hover:text-amber-400"
+                        className="p-1.5 text-amber-700 hover:text-amber-400 transition-colors"
+                        title="Download PDF"
                       >
                         {downloadingId === h.id ? (
                           <Loader2 size={16} className="animate-spin" />
@@ -136,22 +135,32 @@ export default function Registry({
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          onDelete(h.id);
+                          if (
+                            window.confirm(
+                              isFr
+                                ? "Supprimer cette archive ?"
+                                : "Delete this record?"
+                            )
+                          ) {
+                            onDelete(h.id);
+                          }
                         }}
-                        className="p-1.5 text-red-900/40 hover:text-red-500"
+                        className="p-1.5 text-red-900/40 hover:text-red-500 transition-colors"
+                        title="Delete"
                       >
                         <Trash2 size={16} />
                       </button>
                     </div>
                   </div>
 
+                  {/* BAS DE CARTE */}
                   <div className="flex justify-between items-center mt-auto">
-                    <span className="text-[9px] bg-amber-900/20 px-2 py-0.5 rounded border border-amber-900/40 text-amber-200">
+                    <span className="text-[9px] bg-amber-900/20 px-2 py-0.5 rounded border border-amber-900/40 text-amber-200 uppercase font-bold">
                       {h.manufacturer || "N/A"}
                     </span>
                     <button
                       onClick={() => onEdit(h)}
-                      className="flex items-center gap-1 text-[10px] font-bold text-amber-500 hover:text-white transition-colors uppercase"
+                      className="flex items-center gap-1 text-[10px] font-bold text-amber-500 hover:text-white transition-colors uppercase tracking-wider"
                     >
                       {isFr ? "Détails" : "Details"} <ChevronRight size={14} />
                     </button>
