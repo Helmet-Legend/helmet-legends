@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "Helmet Legends Application",
   "keywords": [],
-  "main": "src/index.tsx",
+  "main": "src/index.js",
   "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
     "firebase": "^11.0.0",
     "jspdf": "^2.5.1",
     "qrcode": "^1.5.3",
