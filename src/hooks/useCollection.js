@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../supabaseClient"; // Import de la connexion
+import { supabase } from "../supabaseClient";
 
 export function useCollection() {
   const [collection, setCollection] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. CHARGER LES DONNÉES : Depuis la base SQL Supabase
+  // 1. CHARGER LES DONNÉES
   const fetchCollection = async () => {
     try {
       setLoading(true);
@@ -27,37 +27,48 @@ export function useCollection() {
     fetchCollection();
   }, []);
 
-  // 2. AJOUTER OU METTRE À JOUR : Synchronisé avec l'ID expert
+  // 2. AJOUTER OU METTRE À JOUR
   const addOrUpdate = async (helmet) => {
     try {
-      // Récupérer l'expert connecté pour lier le casque
       const {
         data: { user },
       } = await supabase.auth.getUser();
 
       const helmetData = {
-        ...helmet,
-        user_id: user.id, // Sécurité : on lie le casque à l'utilisateur
+        user_id: user.id,
+        model: helmet.model,
+        manufacturer: helmet.manufacturer,
+        lot_number: helmet.lotNumber,
+        description: helmet.description,
+        shell_size: helmet.shellSize,
+        liner_size: helmet.linerSize,
+        paint_condition: helmet.paintCondition,
+        liner_condition: helmet.linerCondition,
+        chinstrap_state: helmet.chinstrapState,
+        decals: helmet.decals,
+        expertise_message: helmet.expertiseMessage,
+        image_url_main: helmet.images?.main,
+        image_url_front: helmet.images?.front,
+        image_url_left: helmet.images?.left,
+        image_url_right: helmet.images?.right,
+        image_url_interior: helmet.images?.interior,
       };
 
-      // Si c'est un nouveau casque sans ID, Supabase le générera
-      // Sinon, upsert mettra à jour la ligne existante
-      const { error } = await supabase.from("helmets").upsert(helmetData);
+      if (helmet.id) helmetData.id = helmet.id;
 
+      const { error } = await supabase.from("helmets").upsert(helmetData);
       if (error) throw error;
 
-      // Rafraîchir la liste locale après modification
       fetchCollection();
     } catch (error) {
       alert("Erreur de sauvegarde Cloud : " + error.message);
     }
   };
 
-  // 3. SUPPRIMER : Directement dans la base de données
+  // 3. SUPPRIMER
   const remove = async (id) => {
     try {
       const { error } = await supabase.from("helmets").delete().eq("id", id);
-
       if (error) throw error;
       setCollection((prev) => prev.filter((h) => h.id !== id));
     } catch (error) {
@@ -65,10 +76,8 @@ export function useCollection() {
     }
   };
 
-  // Calcul des statistiques (toujours dynamique)
   const stats = {
     total: collection.length,
-    // Vous pourrez ajouter ici des filtres par modèle (M35, M40...) plus tard
   };
 
   return { collection, addOrUpdate, remove, stats, loading };

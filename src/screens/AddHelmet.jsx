@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { X, ImageIcon, AlertTriangle, CheckCircle } from "lucide-react";
+import { X, ImageIcon, AlertTriangle, CheckCircle, Upload } from "lucide-react";
 import { TexturedButton } from "../components/TexturedButton";
-import { compressImage } from "../utils/imageCompressor";
 import { translations } from "../data/translations";
+import { supabase } from "../supabaseClient";
+
+const CLOUD_NAME = "dmdoihdah";
+const UPLOAD_PRESET = "helmet_legends_unsigned";
 
 const MANUFACTURERS = {
   ET: "Eisenhüttenwerke, Thale",
@@ -29,7 +32,6 @@ export const getExpertise = (helmet, lang) => {
 
   if (!mdl) return isFr ? "Sélectionnez un modèle..." : "Select a model...";
 
-  // Logique Transition [cite: 8, 10, 80]
   if (
     mdl.includes("16") ||
     mdl.includes("17") ||
@@ -37,8 +39,8 @@ export const getExpertise = (helmet, lang) => {
     mdl.includes("Autrichien")
   ) {
     return isFr
-      ? "TRANSITION : Vérifiez les insignes Pocher[cite: 80]. Souvent reconditionnés avec peinture mate à l'oxyde d'aluminium[cite: 101]."
-      : "TRANSITION: Check for Pocher decals[cite: 80]. Often refurbished with matte aluminum oxide paint[cite: 101].";
+      ? "TRANSITION : Vérifiez les insignes Pocher. Souvent reconditionnés avec peinture mate à l'oxyde d'aluminium."
+      : "TRANSITION: Check for Pocher decals. Often refurbished with matte aluminum oxide paint.";
   }
 
   if (!lot || !mkr)
@@ -46,37 +48,49 @@ export const getExpertise = (helmet, lang) => {
       ? "Données manquantes (Usine + Lot)..."
       : "Missing data (Factory + Lot)...";
 
-  // Logique M35 [cite: 10, 21, 66]
   if (mdl.includes("M35")) {
     if (lot > 5500)
       return isFr
-        ? `ALERTE : Lot #${lot} élevé. Transition M40 probable[cite: 101].`
-        : `ALERT: Lot #${lot} high. M40 transition likely[cite: 101].`;
+        ? `ALERTE : Lot #${lot} élevé. Transition M40 probable.`
+        : `ALERT: Lot #${lot} high. M40 transition likely.`;
     return isFr
-      ? "M35 : Standard double insignes [cite: 41]."
-      : "M35: Standard double decals[cite: 41].";
+      ? "M35 : Standard double insignes."
+      : "M35: Standard double decals.";
   }
 
-  // Logique M40 & M42 [cite: 46, 51, 94]
   if (mdl.includes("M40") && dec.includes("Double"))
     return isFr
-      ? "ANOMALIE : Décret Mars 1940 (M40 mono-insigne) [cite: 45, 46]."
-      : "ANOMALY: March 1940 Decree (M40 single decal)[cite: 45, 46].";
+      ? "ANOMALIE : Décret Mars 1940 (M40 mono-insigne)."
+      : "ANOMALY: March 1940 Decree (M40 single decal).";
   if (mdl.includes("M42") && dec.includes("Double"))
     return isFr
-      ? "ALERTE : M42 double insignes aberrant (Risque de faux) [cite: 51, 158]."
-      : "ALERT: M42 double decal is incorrect (Risk of fake)[cite: 51, 158].";
+      ? "ALERTE : M42 double insignes aberrant (Risque de faux)."
+      : "ALERT: M42 double decal is incorrect (Risk of fake).";
 
   return isFr
     ? "Configuration conforme aux standards."
     : "Configuration consistent with standards.";
 };
 
+// Upload vers Cloudinary via fetch (sans widget externe)
+const uploadToCloudinary = async (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", UPLOAD_PRESET);
+
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+    { method: "POST", body: formData }
+  );
+  const data = await res.json();
+  if (!data.secure_url) throw new Error("Upload échoué");
+  return data.secure_url;
+};
+
 export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
   const t = translations[lang].add;
   const isFr = lang === "fr";
 
-  // --- STRUCTURE DU SOUS-MENU (GROUPES) ---
   const MODEL_GROUPS = isFr
     ? [
         {
@@ -173,6 +187,8 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
       },
     }
   );
+  const [uploading, setUploading] = useState({});
+  const [saving, setSaving] = useState(false);
   const [validation, setValidation] = useState({
     message: "",
     color: "text-gray-500",
@@ -181,7 +197,7 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
 
   useEffect(() => {
     const msg = getExpertise(current, lang);
-    let color =
+    const color =
       msg.includes("ALERTE") ||
       msg.includes("ANOMALIE") ||
       msg.includes("ALERT")
@@ -205,17 +221,71 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
     lang,
   ]);
 
+  // Upload image vers Cloudinary
   const handleUpload = async (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
+    setUploading((prev) => ({ ...prev, [type]: true }));
     try {
-      const compressed = await compressImage(file);
+      const url = await uploadToCloudinary(file);
       setCurrent((prev) => ({
         ...prev,
-        images: { ...prev.images, [type]: compressed },
+        images: { ...prev.images, [type]: url },
       }));
     } catch (error) {
+      alert(isFr ? "Erreur upload image" : "Image upload error");
       console.error(error);
+    } finally {
+      setUploading((prev) => ({ ...prev, [type]: false }));
+    }
+  };
+
+  // Sauvegarde dans Supabase
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      const helmetData = {
+        user_id: user.id,
+        model: current.model,
+        manufacturer: current.manufacturer,
+        lot_number: current.lotNumber,
+        description: current.description,
+        shell_size: current.shellSize,
+        liner_size: current.linerSize,
+        paint_condition: current.paintCondition,
+        liner_condition: current.linerCondition,
+        chinstrap_state: current.chinstrapState,
+        decals: current.decals,
+        expertise_message: getExpertise(current, lang),
+        image_url_main: current.images.main,
+        image_url_front: current.images.front,
+        image_url_left: current.images.left,
+        image_url_right: current.images.right,
+        image_url_interior: current.images.interior,
+      };
+
+      // Ajout de l'id si modification
+      if (current.id) helmetData.id = current.id;
+
+      const { error } = await supabase
+        .from("helmets")
+        .upsert(helmetData, { onConflict: "id" });
+
+      if (error) throw error;
+
+      // Callback pour mise à jour UI locale
+      if (onSave)
+        onSave({ ...current, expertiseMessage: getExpertise(current, lang) });
+      setScreen("registry");
+    } catch (error) {
+      alert((isFr ? "Erreur sauvegarde : " : "Save error: ") + error.message);
+      console.error(error);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -400,12 +470,14 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
           </div>
         </div>
 
+        {/* Zone Upload Photos */}
         <div className="pt-4 space-y-3">
           <UploadRow
             type="main"
             label={isFr ? "Principale" : "Main"}
             current={current}
             onUpload={handleUpload}
+            uploading={uploading}
             height="h-32"
           />
           <div className="grid grid-cols-4 gap-2">
@@ -416,6 +488,7 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
                 label={v}
                 current={current}
                 onUpload={handleUpload}
+                uploading={uploading}
               />
             ))}
           </div>
@@ -432,21 +505,33 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
         />
 
         <TexturedButton
-          label={current.id ? (isFr ? "Mettre à jour" : "Update") : t.btnSave}
-          onClick={() => {
-            onSave({
-              ...current,
-              expertiseMessage: getExpertise(current, lang),
-            });
-            setScreen("registry");
-          }}
+          label={
+            saving
+              ? isFr
+                ? "Sauvegarde..."
+                : "Saving..."
+              : current.id
+              ? isFr
+                ? "Mettre à jour"
+                : "Update"
+              : t.btnSave
+          }
+          onClick={handleSave}
+          disabled={saving}
         />
       </div>
     </div>
   );
 }
 
-const UploadRow = ({ type, label, current, onUpload, height = "h-16" }) => (
+const UploadRow = ({
+  type,
+  label,
+  current,
+  onUpload,
+  uploading,
+  height = "h-16",
+}) => (
   <label
     className={`relative flex flex-col items-center justify-center bg-[#1a1812] border-2 border-[#3a3832] border-dashed rounded-xl cursor-pointer overflow-hidden ${height}`}
   >
@@ -456,7 +541,12 @@ const UploadRow = ({ type, label, current, onUpload, height = "h-16" }) => (
       className="hidden"
       onChange={(e) => onUpload(e, type)}
     />
-    {current.images[type] ? (
+    {uploading[type] ? (
+      <div className="flex flex-col items-center gap-1 opacity-60">
+        <Upload size={14} className="animate-bounce" />
+        <span className="text-[6px] uppercase font-black">Upload...</span>
+      </div>
+    ) : current.images[type] ? (
       <img
         src={current.images[type]}
         className="w-full h-full object-cover"
