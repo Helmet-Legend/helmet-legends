@@ -54,11 +54,20 @@ export function useCollection() {
         image_url_interior: helmet.images?.interior,
       };
 
-      if (helmet.id) helmetData.id = helmet.id;
+      let error;
 
-      const { error } = await supabase.from("helmets").upsert(helmetData);
+      if (helmet.id) {
+        // Mise à jour d'un casque existant
+        ({ error } = await supabase
+          .from("helmets")
+          .update(helmetData)
+          .eq("id", helmet.id));
+      } else {
+        // Nouvel ajout — insert simple sans upsert
+        ({ error } = await supabase.from("helmets").insert(helmetData));
+      }
+
       if (error) throw error;
-
       fetchCollection();
     } catch (error) {
       alert("Erreur de sauvegarde Cloud : " + error.message);
