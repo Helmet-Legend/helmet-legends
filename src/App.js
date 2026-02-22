@@ -143,7 +143,7 @@ export default function App() {
             onDelete={handleDelete}
             onEdit={(h) => {
               setSelectedHelmet(h);
-              setScreen("add");
+              setScreen(h ? "details" : "add");
             }}
           />
         );
@@ -163,7 +163,9 @@ export default function App() {
           <Details
             setScreen={setScreen}
             helmet={selectedHelmet}
-            onEdit={() => setScreen("add")}
+            onEdit={() => {
+              setScreen("add");
+            }}
             lang={lang}
           />
         );
