@@ -104,6 +104,31 @@ export default function App() {
     }
   };
 
+  // --- 5. CONVERSION snake_case → camelCase pour édition ---
+  const toEditFormat = (h) => {
+    if (!h) return null;
+    return {
+      id: h.id,
+      model: h.model,
+      manufacturer: h.manufacturer,
+      lotNumber: h.lot_number,
+      description: h.description,
+      shellSize: h.shell_size,
+      linerSize: h.liner_size,
+      paintCondition: h.paint_condition,
+      linerCondition: h.liner_condition,
+      chinstrapState: h.chinstrap_state,
+      decals: h.decals,
+      images: {
+        main: h.image_url_main || null,
+        front: h.image_url_front || null,
+        left: h.image_url_left || null,
+        right: h.image_url_right || null,
+        interior: h.image_url_interior || null,
+      },
+    };
+  };
+
   const renderScreen = () => {
     switch (screen) {
       case "home":
@@ -128,7 +153,7 @@ export default function App() {
           <AddHelmet
             setScreen={setScreen}
             onSave={handleSave}
-            helmet={selectedHelmet}
+            helmet={toEditFormat(selectedHelmet)}
             lang={lang}
           />
         );
