@@ -2,6 +2,7 @@ import { jsPDF } from "jspdf";
 
 const logoPath = "/icon-512.png";
 
+// Fonction utilitaire pour générer le numéro de série
 const generateSerialNumber = () => {
   const date = new Date();
   const y = date.getFullYear();
@@ -11,19 +12,36 @@ const generateSerialNumber = () => {
   return `HL-${y}${m}${d}-${rand}`;
 };
 
+// Fonction utilitaire pour transformer une URL en Base64 (évite les bugs de téléchargement jsPDF)
+const getBase64FromUrl = async (url) => {
+  try {
+    const data = await fetch(url);
+    const blob = await data.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch (e) {
+    console.error("Erreur de conversion d'image en Base64", e);
+    return null;
+  }
+};
+
 export const generateHelmetPDF = async (helmet, lang = "fr") => {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const isFr = lang === "fr";
   const serialNumber = generateSerialNumber();
 
-  // 🎨 PALETTE EXPERT
-  const gold = [173, 138, 86]; // Or Mat (Design)
-  const brightGold = "ceac5d"; // Or Brillant (QR Code - Hex pour l'API)
-  const bg = [26, 24, 18]; // Fond Sombre
+  // 🎨 PALETTE COULEURS
+  const gold = [173, 138, 86];
+  const brightGold = "ceac5d"; // Hex pour l'API QR
+  const bg = [26, 24, 18];
   const textCrème = [229, 229, 229];
   const muted = [140, 140, 140];
 
-  // 1. FOND DE PAGE SOMBRE
+  // 1. FOND DE PAGE
   doc.setFillColor(bg[0], bg[1], bg[2]);
   doc.rect(0, 0, 210, 297, "F");
 
@@ -48,7 +66,7 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
     console.warn("Filigrane ignoré");
   }
 
-  // 3. TRIPLE CADRE DORÉ GLOBAL
+  // 3. CADRES DORÉS
   doc.setDrawColor(gold[0], gold[1], gold[2]);
   doc.setLineWidth(1.2);
   doc.rect(6, 6, 198, 285);
@@ -78,7 +96,7 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
   doc.setLineWidth(0.4);
   doc.line(20, 50, 190, 50);
 
-  // 6. PHOTO PRINCIPALE
+  // 6. PHOTO PRINCIPALE (Avec gestion asynchrone sécurisée)
   if (helmet.images?.main) {
     try {
       doc.setDrawColor(gold[0], gold[1], gold[2]);
@@ -94,7 +112,9 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
         undefined,
         "FAST"
       );
-    } catch (e) {}
+    } catch (e) {
+      console.error("Erreur image principale", e);
+    }
   }
 
   // 7. SPÉCIFICATIONS TECHNIQUES
@@ -145,7 +165,7 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
     .filter(([k, v]) => k !== "main" && v)
     .slice(0, 4);
   let xPos = 20;
-  otherPhotos.forEach(([key, url]) => {
+  for (const [key, url] of otherPhotos) {
     try {
       doc.setDrawColor(gold[0], gold[1], gold[2]);
       doc.setLineWidth(0.2);
@@ -162,50 +182,42 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
       );
       xPos += 45;
     } catch (e) {}
-  });
+  }
 
-  // --- 9. QR CODE OPTIMISÉ (COIN HAUT DROITE) ---
+  // 9. QR CODE (Optimisé avec AWAIT)
   try {
     const helmetUrl = `https://app.helmetlegends.com/helmet/${
       helmet.id || "view"
     }`;
-    // Utilisation du 'brightGold' pour un contraste maximal
     const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
       helmetUrl
     )}&color=${brightGold}&bgcolor=1a1812`;
 
-    const response = await fetch(qrImageUrl);
-    const blob = await response.blob();
-    const reader = new FileReader();
-    reader.readAsDataURL(blob);
+    const qrBase64 = await getBase64FromUrl(qrImageUrl);
 
-    reader.onloadend = () => {
-      const base64data = reader.result;
-
-      // Cadre discret
+    if (qrBase64) {
       doc.setDrawColor(gold[0], gold[1], gold[2]);
       doc.setLineWidth(0.3);
       doc.rect(171, 11, 24, 24);
-
-      // Image du QR Code
-      doc.addImage(base64data, "PNG", 172, 12, 22, 22);
-
-      // Légende
+      doc.addImage(qrBase64, "PNG", 172, 12, 22, 22);
       doc.setFontSize(5);
       doc.setTextColor(gold[0], gold[1], gold[2]);
       doc.text(isFr ? "SCANNER LA FICHE" : "SCAN SHEET", 183, 37.5, {
         align: "center",
       });
-
-      // 10. PIED DE PAGE
-      doc.setFontSize(7);
-      doc.setTextColor(muted[0], muted[1], muted[2]);
-      doc.text("app.helmetlegends.com", 105, 290, { align: "center" });
-
-      doc.save(`Archive_HL_${helmet.model}_${helmet.lotNumber || "Lot"}.pdf`);
-    };
+    }
   } catch (err) {
     console.error("Erreur QR Code", err);
-    doc.save(`Archive_HL_${helmet.model}_${helmet.lotNumber || "Lot"}.pdf`);
   }
+
+  // 10. PIED DE PAGE ET SAUVEGARDE
+  doc.setFontSize(7);
+  doc.setTextColor(muted[0], muted[1], muted[2]);
+  doc.text("app.helmetlegends.com", 105, 290, { align: "center" });
+
+  const safeModelName = (helmet.model || "Helmet").replace(
+    /[/\\?%*:|"<>]/g,
+    "-"
+  );
+  doc.save(`Archive_HL_${safeModelName}.pdf`);
 };
