@@ -16,8 +16,6 @@ export default function App() {
   const [screen, setScreen] = useState("home");
   const [selectedHelmet, setSelectedHelmet] = useState(null);
   const [lang, setLang] = useState("fr");
-
-  // ✅ NOUVEL ÉTAT : La collection provient directement de Supabase
   const [collection, setCollection] = useState([]);
 
   // --- 1. LOGIQUE DE SESSION ---
@@ -35,35 +33,74 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // --- 2. RÉCUPÉRATION DE LA COLLECTION (Source de Vérité) ---
+  // --- 2. RÉCUPÉRATION DE LA COLLECTION ---
   const fetchCollection = async () => {
     if (!session?.user) return;
 
     const { data, error } = await supabase
       .from("helmets")
       .select("*")
-      .order("created_at", { ascending: false }); // Les plus récents en haut
+      .order("created_at", { ascending: false });
 
     if (error) {
       console.error("Erreur fetch:", error.message);
     } else {
-      setCollection(data || []); // ✅ On met à jour la liste locale avec la DB
+      setCollection(data || []);
     }
   };
 
-  // On recharge la liste dès que la session est active
   useEffect(() => {
     if (session) fetchCollection();
   }, [session]);
 
-  // --- 3. SUPPRESSION RÉELLE DANS SUPABASE ---
+  // --- 3. SAUVEGARDE ---
+  const handleSave = async (helmetData) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const payload = {
+      user_id: user.id,
+      model: helmetData.model,
+      manufacturer: helmetData.manufacturer,
+      lot_number: helmetData.lotNumber,
+      description: helmetData.description,
+      shell_size: helmetData.shellSize,
+      liner_size: helmetData.linerSize,
+      paint_condition: helmetData.paintCondition,
+      liner_condition: helmetData.linerCondition,
+      chinstrap_state: helmetData.chinstrapState,
+      decals: helmetData.decals,
+      expertise_message: helmetData.expertiseMessage,
+      image_url_main: helmetData.images?.main,
+      image_url_front: helmetData.images?.front,
+      image_url_left: helmetData.images?.left,
+      image_url_right: helmetData.images?.right,
+      image_url_interior: helmetData.images?.interior,
+    };
+
+    let error;
+
+    if (helmetData.id) {
+      ({ error } = await supabase
+        .from("helmets")
+        .update(payload)
+        .eq("id", helmetData.id));
+    } else {
+      ({ error } = await supabase.from("helmets").insert(payload));
+    }
+
+    if (error) throw new Error(error.message);
+    await fetchCollection();
+  };
+
+  // --- 4. SUPPRESSION ---
   const handleDelete = async (id) => {
     const { error } = await supabase.from("helmets").delete().eq("id", id);
-
     if (error) {
       alert("Erreur suppression : " + error.message);
     } else {
-      fetchCollection(); // ✅ On recharge pour supprimer le doublon visuel
+      fetchCollection();
     }
   };
 
@@ -77,11 +114,11 @@ export default function App() {
           <Registry
             setScreen={setScreen}
             lang={lang}
-            helmets={collection} // ✅ Utilise la liste de Supabase
-            onDelete={handleDelete} // ✅ Utilise la fonction de suppression DB
+            helmets={collection}
+            onDelete={handleDelete}
             onEdit={(h) => {
               setSelectedHelmet(h);
-              setScreen(h ? "add" : "add"); // On va sur add pour modifier
+              setScreen("add");
             }}
           />
         );
@@ -90,18 +127,32 @@ export default function App() {
         return (
           <AddHelmet
             setScreen={setScreen}
-            onSave={fetchCollection} // ✅ Recharge la liste après sauvegarde
+            onSave={handleSave}
             helmet={selectedHelmet}
+            lang={lang}
+          />
+        );
+
+      case "details":
+        return (
+          <Details
+            setScreen={setScreen}
+            helmet={selectedHelmet}
+            onEdit={() => setScreen("add")}
             lang={lang}
           />
         );
 
       case "stats":
         return (
-          <Stats setScreen={setScreen} total={collection.length} lang={lang} />
+          <Stats
+            setScreen={setScreen}
+            total={collection.length}
+            stats={{ total: collection.length }}
+            lang={lang}
+          />
         );
 
-      // ... (Gardez Expert, Compare, Handbook, LotSearch identiques)
       case "expert":
         return (
           <Expert
@@ -110,10 +161,13 @@ export default function App() {
             lang={lang}
           />
         );
+
       case "compare":
         return <Compare setScreen={setScreen} lang={lang} />;
+
       case "handbook":
         return <Handbook setScreen={setScreen} lang={lang} />;
+
       case "lotsearch":
         return <LotSearch setScreen={setScreen} lang={lang} />;
 
