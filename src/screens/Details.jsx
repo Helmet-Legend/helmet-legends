@@ -8,7 +8,7 @@ import {
   HardHat,
 } from "lucide-react";
 import { translations } from "../data/translations";
-import { generateHelmetPDF } from "../utils/generateHelmetPDF";
+import { generateHelmetPDF } from "../utils/pdfGenerator";
 
 export default function Details({ setScreen, helmet, onEdit, lang }) {
   const labels = translations[lang]?.add || {};
