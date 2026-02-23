@@ -8,114 +8,7 @@ import {
   HardHat,
 } from "lucide-react";
 import { translations } from "../data/translations";
-
-const generateHelmetPDF = (helmet, lang) => {
-  const isFr = lang === "fr";
-  const photos = [
-    helmet.image_url_main,
-    helmet.image_url_front,
-    helmet.image_url_left,
-    helmet.image_url_right,
-    helmet.image_url_interior,
-  ].filter(Boolean);
-
-  const photoHTML = photos
-    .map(
-      (url) => `
-    <img src="${url}" style="width:180px;height:140px;object-fit:cover;border-radius:8px;border:1px solid #8a7f5d;" />
-  `
-    )
-    .join("");
-
-  const win = window.open("", "_blank");
-  win.document.write(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8"/>
-      <title>Helmet Legends - ${helmet.model}</title>
-      <style>
-        body { font-family: Georgia, serif; background: #1a1812; color: #d0c7a8; padding: 40px; max-width: 800px; margin: 0 auto; }
-        h1 { color: #f0ede0; font-size: 28px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; }
-        .subtitle { color: #d97706; font-size: 11px; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 32px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-        .field { background: #2a2822; padding: 12px 16px; border-radius: 8px; border: 1px solid #3a3832; }
-        .field-label { font-size: 9px; text-transform: uppercase; color: #6b7280; font-weight: bold; margin-bottom: 4px; }
-        .field-value { color: #d97706; font-weight: bold; font-size: 14px; }
-        .photos { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
-        .expertise { background: #2a2822; border: 1px solid #3a3832; border-radius: 12px; padding: 20px; margin-bottom: 24px; }
-        .expertise-title { color: #d97706; font-size: 10px; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 12px; }
-        .footer { text-align: center; font-size: 9px; color: #6b7280; text-transform: uppercase; letter-spacing: 2px; margin-top: 40px; border-top: 1px solid #3a3832; padding-top: 16px; }
-        @media print { body { background: white; color: black; } .field { background: #f9f9f9; } }
-      </style>
-    </head>
-    <body>
-      <h1>${helmet.model || "Modèle Inconnu"}</h1>
-      <p class="subtitle">Helmet Legends · ${
-        isFr ? "Certificat d'Archive" : "Archive Certificate"
-      }</p>
-
-      <div class="grid">
-        <div class="field">
-          <div class="field-label">${isFr ? "Fabricant" : "Manufacturer"}</div>
-          <div class="field-value">${helmet.manufacturer || "N/A"}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">${
-            isFr ? "Numéro de Lot" : "Lot Number"
-          }</div>
-          <div class="field-value">${helmet.lot_number || "N/A"}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">${isFr ? "Taille Coque" : "Shell Size"}</div>
-          <div class="field-value">${helmet.shell_size || "-"}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">${
-            isFr ? "Taille Coiffe" : "Liner Size"
-          }</div>
-          <div class="field-value">${helmet.liner_size || "-"}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">${
-            isFr ? "État Peinture" : "Paint Condition"
-          }</div>
-          <div class="field-value">${helmet.paint_condition || "-"}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">${isFr ? "Insignes" : "Decals"}</div>
-          <div class="field-value">${helmet.decals || "-"}</div>
-        </div>
-      </div>
-
-      ${photos.length > 0 ? `<div class="photos">${photoHTML}</div>` : ""}
-
-      <div class="expertise">
-        <div class="expertise-title">⚔ ${
-          isFr ? "Expertise & Historique" : "Expertise & History"
-        }</div>
-        <p style="font-style:italic;font-size:13px;line-height:1.7;">${
-          helmet.expertise_message || ""
-        }</p>
-        ${
-          helmet.description
-            ? `<p style="font-size:12px;margin-top:12px;opacity:0.8;">${helmet.description}</p>`
-            : ""
-        }
-      </div>
-
-      <div class="footer">
-        Helmet Legends · ${
-          isFr ? "Base de données certifiée" : "Certified database"
-        } · ${new Date().toLocaleDateString()}
-      </div>
-
-      <script>window.onload = () => { window.print(); }</script>
-    </body>
-    </html>
-  `);
-  win.document.close();
-};
+import { generateHelmetPDF } from "../utils/generateHelmetPDF";
 
 export default function Details({ setScreen, helmet, onEdit, lang }) {
   const labels = translations[lang]?.add || {};
@@ -123,7 +16,6 @@ export default function Details({ setScreen, helmet, onEdit, lang }) {
 
   if (!helmet) return null;
 
-  // Lit les URLs directement depuis le format Supabase (snake_case)
   const photos = [
     { id: "main", url: helmet.image_url_main },
     { id: "front", url: helmet.image_url_front },

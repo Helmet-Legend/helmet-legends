@@ -1,30 +1,16 @@
 import { jsPDF } from "jspdf";
 
-const logoPath = "/icon-512.png";
-
-// Fonction utilitaire pour générer le numéro de série
-const generateSerialNumber = () => {
-  const date = new Date();
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  const rand = Math.floor(1000 + Math.random() * 9000);
-  return `HL-${y}${m}${d}-${rand}`;
-};
-
-// Fonction utilitaire pour transformer une URL en Base64 (évite les bugs de téléchargement jsPDF)
-const getBase64FromUrl = async (url) => {
+const getImageData = async (url) => {
   try {
-    const data = await fetch(url);
-    const blob = await data.blob();
-    return new Promise((resolve, reject) => {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onloadend = () => resolve(reader.result);
-      reader.onerror = reject;
       reader.readAsDataURL(blob);
     });
   } catch (e) {
-    console.error("Erreur de conversion d'image en Base64", e);
+    console.warn("Image non chargée:", url);
     return null;
   }
 };
@@ -32,41 +18,18 @@ const getBase64FromUrl = async (url) => {
 export const generateHelmetPDF = async (helmet, lang = "fr") => {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const isFr = lang === "fr";
-  const serialNumber = generateSerialNumber();
 
-  // 🎨 PALETTE COULEURS
   const gold = [173, 138, 86];
-  const brightGold = "ceac5d"; // Hex pour l'API QR
+  const brightGold = "ceac5d";
   const bg = [26, 24, 18];
   const textCrème = [229, 229, 229];
   const muted = [140, 140, 140];
 
-  // 1. FOND DE PAGE
+  // Fond sombre
   doc.setFillColor(bg[0], bg[1], bg[2]);
   doc.rect(0, 0, 210, 297, "F");
 
-  // 2. FILIGRANE (WATERMARK)
-  try {
-    doc.saveGraphicsState();
-    const gState = new doc.GState({ opacity: 0.06 });
-    doc.setGState(gState);
-    const size = 155;
-    doc.addImage(
-      logoPath,
-      "PNG",
-      (210 - size) / 2,
-      (297 - size) / 2,
-      size,
-      size,
-      undefined,
-      "FAST"
-    );
-    doc.restoreGraphicsState();
-  } catch (e) {
-    console.warn("Filigrane ignoré");
-  }
-
-  // 3. CADRES DORÉS
+  // Cadres dorés
   doc.setDrawColor(gold[0], gold[1], gold[2]);
   doc.setLineWidth(1.2);
   doc.rect(6, 6, 198, 285);
@@ -74,117 +37,117 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
   doc.rect(8, 8, 194, 281);
   doc.rect(9.5, 9.5, 191, 278);
 
-  // 4. EN-TÊTE
+  // En-tête
   doc.setTextColor(gold[0], gold[1], gold[2]);
   doc.setFont("times", "bold");
   doc.setFontSize(32);
   doc.text("HELMET LEGENDS", 105, 28, { align: "center" });
+
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(muted[0], muted[1], muted[2]);
-  doc.text(isFr ? "FICHE DESCRIPTIVE" : "DESCRIPTIVE SHEET", 105, 36, {
-    align: "center",
-  });
+  doc.text(
+    isFr ? "FICHE DESCRIPTIVE D'ARCHIVE" : "ARCHIVE DESCRIPTIVE SHEET",
+    105,
+    36,
+    { align: "center" }
+  );
 
-  // 5. RÉFÉRENCE ET DATE
-  doc.setFontSize(8);
+  // Référence + Date
+  const ref = helmet.id ? helmet.id.slice(0, 8).toUpperCase() : "N/A";
+  const date = new Date().toLocaleDateString(isFr ? "fr-FR" : "en-US");
+  doc.setFontSize(9);
   doc.setTextColor(gold[0], gold[1], gold[2]);
-  doc.text(`RÉFÉRENCE : ${serialNumber}`, 20, 48);
-  doc.text(`ÉMIS LE : ${new Date().toLocaleDateString("fr-FR")}`, 190, 48, {
+  doc.text(`${isFr ? "RÉFÉRENCE" : "REFERENCE"} : #${ref}`, 20, 47);
+  doc.text(`${isFr ? "ÉMIS LE" : "ISSUED ON"} : ${date}`, 190, 47, {
     align: "right",
   });
-  doc.setLineWidth(0.4);
-  doc.line(20, 50, 190, 50);
+  doc.setLineWidth(0.3);
+  doc.line(15, 50, 195, 50);
 
-  // 6. PHOTO PRINCIPALE (Avec gestion asynchrone sécurisée)
-  if (helmet.images?.main) {
+  // Photo principale
+  const mainPhoto = helmet.image_url_main;
+  if (mainPhoto) {
     try {
-      doc.setDrawColor(gold[0], gold[1], gold[2]);
-      doc.setLineWidth(0.8);
-      doc.rect(45, 58, 120, 85);
-      doc.addImage(
-        helmet.images.main,
-        "JPEG",
-        46,
-        59,
-        118,
-        83,
-        undefined,
-        "FAST"
-      );
+      const imgData = await getImageData(mainPhoto);
+      if (imgData) {
+        doc.setDrawColor(gold[0], gold[1], gold[2]);
+        doc.setLineWidth(0.8);
+        doc.rect(45, 55, 120, 88);
+        doc.addImage(imgData, "JPEG", 46, 56, 118, 86, undefined, "FAST");
+      }
     } catch (e) {
-      console.error("Erreur image principale", e);
+      console.error("Erreur image principale");
     }
   }
 
-  // 7. SPÉCIFICATIONS TECHNIQUES
-  const specsY = 155;
+  // Ligne séparatrice
+  doc.setLineWidth(0.3);
+  doc.line(15, 152, 195, 152);
+
+  // Spécifications
+  const specsY = 162;
   doc.setTextColor(gold[0], gold[1], gold[2]);
   doc.setFont("times", "bold");
-  doc.setFontSize(14);
+  doc.setFontSize(11);
   doc.text(
     isFr ? "SPÉCIFICATIONS TECHNIQUES" : "TECHNICAL SPECIFICATIONS",
     20,
     specsY
   );
-  doc.text(isFr ? "NOTES ET ANALYSE" : "FIELD ANALYSIS", 110, specsY);
   doc.line(20, specsY + 2, 95, specsY + 2);
-  doc.line(110, specsY + 2, 190, specsY + 2);
 
-  let curY = specsY + 12;
+  let curY = specsY + 10;
   const fields = [
     [isFr ? "Usine" : "Factory", helmet.manufacturer],
     [isFr ? "Modèle" : "Model", helmet.model],
-    [isFr ? "Lot" : "Lot", "#" + (helmet.lotNumber || helmet.lot_raw)],
-    [isFr ? "Peinture" : "Paint", (helmet.paintCondition || "0") + "%"],
-    [isFr ? "Taille" : "Size", helmet.shellSize || helmet.size],
-    [isFr ? "Insignes" : "Decals", helmet.decals],
+    [isFr ? "Lot" : "Lot", "#" + (helmet.lot_number || "-")],
+    [isFr ? "Peinture" : "Paint", helmet.paint_condition || "-"],
+    [isFr ? "Taille Coque" : "Shell Size", helmet.shell_size || "-"],
+    [isFr ? "Insignes" : "Decals", helmet.decals || "-"],
   ];
 
   fields.forEach(([label, val]) => {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8);
     doc.setTextColor(muted[0], muted[1], muted[2]);
-    doc.text(label.toUpperCase() + " :", 22, curY);
+    doc.text("• " + label.toUpperCase(), 22, curY);
     doc.setTextColor(textCrème[0], textCrème[1], textCrème[2]);
+    doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
-    doc.text(String(val || "-"), 55, curY);
-    curY += 8.5;
+    doc.text(String(val || "-"), 58, curY);
+    curY += 9;
   });
 
+  // Notes & Analyse
+  doc.setTextColor(gold[0], gold[1], gold[2]);
+  doc.setFont("times", "bold");
+  doc.setFontSize(11);
+  doc.text(
+    isFr ? "NOTES ET ANALYSE DE TERRAIN" : "FIELD ANALYSIS NOTES",
+    110,
+    specsY
+  );
+  doc.line(110, specsY + 2, 193, specsY + 2);
+
   const notesText =
-    helmet.description || (isFr ? "Aucun historique." : "No history.");
+    helmet.expertise_message ||
+    helmet.description ||
+    (isFr ? "Aucun historique disponible." : "No history available.");
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
   doc.setTextColor(200, 200, 200);
-  doc.text(doc.splitTextToSize(notesText, 75), 110, specsY + 12);
+  const splitNotes = doc.splitTextToSize(notesText, 78);
+  doc.text(splitNotes, 112, specsY + 10);
 
-  // 8. GALERIE PHOTOS
-  const galleryY = 248;
-  const otherPhotos = Object.entries(helmet.images || {})
-    .filter(([k, v]) => k !== "main" && v)
-    .slice(0, 4);
-  let xPos = 20;
-  for (const [key, url] of otherPhotos) {
-    try {
-      doc.setDrawColor(gold[0], gold[1], gold[2]);
-      doc.setLineWidth(0.2);
-      doc.rect(xPos, galleryY, 40, 30);
-      doc.addImage(
-        url,
-        "JPEG",
-        xPos + 0.5,
-        galleryY + 0.5,
-        39,
-        29,
-        undefined,
-        "FAST"
-      );
-      xPos += 45;
-    } catch (e) {}
+  // Description si présente
+  if (helmet.description && helmet.expertise_message) {
+    const descY = specsY + 10 + splitNotes.length * 5 + 4;
+    const splitDesc = doc.splitTextToSize(helmet.description, 78);
+    doc.text(splitDesc, 112, descY);
   }
 
-  // 9. QR CODE (Optimisé avec AWAIT)
+  // QR Code
   try {
     const helmetUrl = `https://app.helmetlegends.com/helmet/${
       helmet.id || "view"
@@ -192,32 +155,27 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
     const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
       helmetUrl
     )}&color=${brightGold}&bgcolor=1a1812`;
-
-    const qrBase64 = await getBase64FromUrl(qrImageUrl);
-
+    const qrBase64 = await getImageData(qrImageUrl);
     if (qrBase64) {
       doc.setDrawColor(gold[0], gold[1], gold[2]);
-      doc.setLineWidth(0.3);
       doc.rect(171, 11, 24, 24);
       doc.addImage(qrBase64, "PNG", 172, 12, 22, 22);
-      doc.setFontSize(5);
-      doc.setTextColor(gold[0], gold[1], gold[2]);
-      doc.text(isFr ? "SCANNER LA FICHE" : "SCAN SHEET", 183, 37.5, {
-        align: "center",
-      });
     }
-  } catch (err) {
-    console.error("Erreur QR Code", err);
-  }
+  } catch (err) {}
 
-  // 10. PIED DE PAGE ET SAUVEGARDE
+  // Pied de page
+  doc.setLineWidth(0.3);
+  doc.line(15, 275, 195, 275);
+  doc.setFont("helvetica", "italic");
   doc.setFontSize(7);
   doc.setTextColor(muted[0], muted[1], muted[2]);
-  doc.text("app.helmetlegends.com", 105, 290, { align: "center" });
+  const disclaimer = isFr
+    ? "Cet outil fournit une aide à l'analyse historique et ne constitue en aucun cas une certification d'authenticité ou d'attribution. Toute conclusion finale relève de l'expertise humaine."
+    : "This tool provides historical analysis assistance and does not constitute any certification of authenticity. Final conclusions rely on human expertise.";
+  const splitDisclaimer = doc.splitTextToSize(disclaimer, 170);
+  doc.text(splitDisclaimer, 105, 280, { align: "center" });
 
-  const safeModelName = (helmet.model || "Helmet").replace(
-    /[/\\?%*:|"<>]/g,
-    "-"
-  );
-  doc.save(`Archive_HL_${safeModelName}.pdf`);
+  // Sauvegarde
+  const fileName = `HL_Archive_${helmet.model || "Certificat"}_${ref}.pdf`;
+  doc.save(fileName);
 };
