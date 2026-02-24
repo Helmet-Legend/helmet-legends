@@ -24,6 +24,15 @@ export default function Details({ setScreen, helmet, onEdit, lang }) {
     { id: "interior", url: helmet.image_url_interior },
   ].filter((p) => p.url);
 
+  const handlePDF = async () => {
+    try {
+      await generateHelmetPDF(helmet, lang);
+    } catch (e) {
+      console.error(e);
+      alert("Erreur PDF : " + e.message);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#1a1812] font-serif text-[#d0c7a8] relative">
       {/* Header */}
@@ -52,7 +61,7 @@ export default function Details({ setScreen, helmet, onEdit, lang }) {
             <Edit3 size={20} />
           </button>
           <button
-            onClick={() => generateHelmetPDF(helmet, lang)}
+            onClick={handlePDF}
             className="p-2 bg-amber-800 rounded-full text-[#f0ede0] shadow-lg hover:scale-105 transition-transform"
           >
             <Download size={20} />
@@ -162,7 +171,7 @@ export default function Details({ setScreen, helmet, onEdit, lang }) {
           </div>
 
           <button
-            onClick={() => generateHelmetPDF(helmet, lang)}
+            onClick={handlePDF}
             className="w-full py-5 bg-amber-600 hover:bg-amber-500 text-black rounded-xl flex items-center justify-center gap-4 text-xs uppercase font-black tracking-widest transition-all shadow-2xl mb-6"
           >
             <Printer size={20} />
