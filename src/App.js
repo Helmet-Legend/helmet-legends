@@ -9,34 +9,15 @@ import Expert from "./screens/Expert";
 import Compare from "./screens/Compare";
 import Handbook from "./screens/Handbook";
 import LotSearch from "./screens/LotSearch";
-import Login from "./screens/Login";
 
 export default function App() {
-  const [session, setSession] = useState(null);
   const [screen, setScreen] = useState("home");
   const [selectedHelmet, setSelectedHelmet] = useState(null);
   const [lang, setLang] = useState("fr");
   const [collection, setCollection] = useState([]);
 
-  // --- 1. LOGIQUE DE SESSION ---
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  // --- 2. RÉCUPÉRATION DE LA COLLECTION ---
+  // --- 1. RÉCUPÉRATION DE LA COLLECTION ---
   const fetchCollection = async () => {
-    if (!session?.user) return;
-
     const { data, error } = await supabase
       .from("helmets")
       .select("*")
@@ -50,17 +31,12 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (session) fetchCollection();
-  }, [session]);
+    fetchCollection();
+  }, []);
 
-  // --- 3. SAUVEGARDE ---
+  // --- 2. SAUVEGARDE ---
   const handleSave = async (helmetData) => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
     const payload = {
-      user_id: user.id,
       model: helmetData.model,
       manufacturer: helmetData.manufacturer,
       lot_number: helmetData.lotNumber,
@@ -94,7 +70,7 @@ export default function App() {
     await fetchCollection();
   };
 
-  // --- 4. SUPPRESSION ---
+  // --- 3. SUPPRESSION ---
   const handleDelete = async (id) => {
     const { error } = await supabase.from("helmets").delete().eq("id", id);
     if (error) {
@@ -104,7 +80,7 @@ export default function App() {
     }
   };
 
-  // --- 5. CONVERSION snake_case → camelCase pour édition ---
+  // --- 4. CONVERSION snake_case → camelCase pour édition ---
   const toEditFormat = (h) => {
     if (!h) return null;
     return {
@@ -203,18 +179,8 @@ export default function App() {
     }
   };
 
-  if (!session) return <Login />;
-
   return (
     <div className="min-h-screen bg-[#2a2822]">
-      <div className="bg-black/20 p-2 flex justify-end">
-        <button
-          onClick={() => supabase.auth.signOut()}
-          className="text-[9px] text-amber-500/50 uppercase font-black hover:text-red-500 transition-colors"
-        >
-          Déconnexion expert
-        </button>
-      </div>
       {renderScreen()}
     </div>
   );
