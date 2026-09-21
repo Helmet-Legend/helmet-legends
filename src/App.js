@@ -47,7 +47,12 @@ export default function App() {
 
   // --- 2. SAUVEGARDE ---
   const handleSave = async (helmetData) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     const payload = {
+      user_id: user?.id,
       model: helmetData.model,
       manufacturer: helmetData.manufacturer,
       lot_number: helmetData.lotNumber,
