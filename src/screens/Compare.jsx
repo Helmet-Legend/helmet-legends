@@ -154,7 +154,8 @@ const computeSSIM = (a, b) => {
   return Math.max(0, Math.min(1, ssim));
 };
 
-export default function Compare({ setScreen }) {
+export default function Compare({ setScreen, lang }) {
+  const isFr = lang === "fr";
   const [userImg, setUserImg] = useState(null);
   const [refImg, setRefImg] = useState(AUTHENTIC_DECALS[0]);
   const [fileInfo, setFileInfo] = useState(null);
@@ -200,10 +201,12 @@ export default function Compare({ setScreen }) {
   const runOpticalOptimization = () => {
     if (!userImg) return;
     setIsOptimizing(true);
-    setOptimizationStep("Lecture de l'image...");
+    setOptimizationStep(isFr ? "Lecture de l'image..." : "Reading image...");
 
     setTimeout(() => {
-      setOptimizationStep("Normalisation du contraste...");
+      setOptimizationStep(
+        isFr ? "Normalisation du contraste..." : "Normalizing contrast..."
+      );
       applyAutoContrast(userImg).then((enhanced) => {
         setUserImg(enhanced);
         setTimeout(() => {
@@ -245,10 +248,16 @@ export default function Compare({ setScreen }) {
         score,
         verdict:
           score >= 75
-            ? "Similitude élevée"
+            ? isFr
+              ? "Similitude élevée"
+              : "High similarity"
             : score >= 50
-            ? "Similitude modérée"
-            : "Similitude faible",
+            ? isFr
+              ? "Similitude modérée"
+              : "Moderate similarity"
+            : isFr
+            ? "Similitude faible"
+            : "Low similarity",
       });
     }, 700);
   };
@@ -296,7 +305,7 @@ export default function Compare({ setScreen }) {
           <div className="flex items-center gap-3">
             <Target className="text-amber-500 animate-pulse" size={28} />
             <h2 className="text-2xl font-black uppercase italic tracking-tighter text-white">
-              Banc d'Optique
+              {isFr ? "Banc d'Optique" : "Optical Bench"}
             </h2>
           </div>
           <button
@@ -312,7 +321,7 @@ export default function Compare({ setScreen }) {
           {/* SÉLECTEUR DE RÉFÉRENCE */}
           <div className="mb-6">
             <label className="text-[10px] font-black text-amber-600 uppercase mb-2 block tracking-[0.3em]">
-              Référence Authentique
+              {isFr ? "Référence Authentique" : "Authentic Reference"}
             </label>
             <select
               className="w-full bg-black/60 backdrop-blur-md border-2 border-amber-900/30 p-4 rounded-2xl text-sm font-bold text-amber-500 outline-none focus:border-amber-500 transition-all shadow-lg"
@@ -322,7 +331,7 @@ export default function Compare({ setScreen }) {
             >
               {AUTHENTIC_DECALS.map((d) => (
                 <option key={d.id} value={d.id}>
-                  {d.name.toUpperCase()}
+                  {(isFr ? d.name : d.nameEn || d.name).toUpperCase()}
                 </option>
               ))}
             </select>
@@ -365,7 +374,7 @@ export default function Compare({ setScreen }) {
               className="relative bg-black rounded-[2.5rem] overflow-hidden border-2 border-green-900/40 shadow-2xl"
             >
               <div className="absolute top-4 left-4 z-10 bg-green-900/80 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-green-500/50">
-                Référence
+                {isFr ? "Référence" : "Reference"}
               </div>
               <div
                 className="w-full h-full"
@@ -394,7 +403,7 @@ export default function Compare({ setScreen }) {
               }`}
             >
               <div className="absolute top-4 left-4 z-10 bg-amber-900/80 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-amber-500/50">
-                Votre Photo
+                {isFr ? "Votre Photo" : "Your Photo"}
               </div>
               {!userImg ? (
                 <label className="flex flex-col items-center justify-center h-full cursor-pointer hover:bg-amber-900/10 transition-colors">
@@ -403,7 +412,7 @@ export default function Compare({ setScreen }) {
                     className="text-amber-500 opacity-20 mb-4"
                   />
                   <span className="text-xs font-black uppercase text-amber-500 opacity-40 italic">
-                    Charger l'insigne
+                    {isFr ? "Charger l'insigne" : "Upload the insignia"}
                   </span>
                   <input
                     type="file"
@@ -443,7 +452,7 @@ export default function Compare({ setScreen }) {
                       disabled={!userImg || isOptimizing}
                       className="flex-grow py-6 bg-amber-600 text-black rounded-3xl font-black uppercase italic tracking-tighter hover:bg-amber-500 disabled:opacity-20 active:scale-95 transition-all text-xl shadow-xl border-b-4 border-amber-800"
                     >
-                      Normaliser le contraste
+                      {isFr ? "Normaliser le contraste" : "Normalize contrast"}
                     </button>
                   ) : (
                     <button
@@ -451,7 +460,7 @@ export default function Compare({ setScreen }) {
                       disabled={isScanning}
                       className="flex-grow py-6 bg-green-600 text-white rounded-3xl font-black uppercase italic tracking-tighter animate-pulse shadow-xl border-b-4 border-green-800 text-xl"
                     >
-                      Comparer les deux images
+                      {isFr ? "Comparer les deux images" : "Compare both images"}
                     </button>
                   )}
                   <button
@@ -498,7 +507,9 @@ export default function Compare({ setScreen }) {
                       </span>
                     </div>
                     <p className="text-xs text-white/40 uppercase tracking-[0.3em] font-bold ml-[56px]">
-                      Similarité visuelle calculée
+                      {isFr
+                        ? "Similarité visuelle calculée"
+                        : "Computed visual similarity"}
                     </p>
                   </div>
                   <span className="text-8xl font-black text-amber-500 tracking-tighter drop-shadow-[0_0_30px_rgba(245,158,11,0.3)]">
@@ -520,14 +531,12 @@ export default function Compare({ setScreen }) {
                     <ShieldCheck size={120} />
                   </div>
                   <h5 className="text-sm font-black uppercase text-amber-600 mb-6 italic tracking-widest flex items-center gap-3">
-                    <Cpu size={18} /> Méthode :
+                    <Cpu size={18} /> {isFr ? "Méthode :" : "Method:"}
                   </h5>
                   <p className="text-2xl text-amber-100/90 leading-relaxed italic font-medium">
-                    Comparaison structurelle (SSIM) entre la zone actuellement
-                    cadrée de la référence et celle de votre photo. Ceci est
-                    une aide visuelle et ne constitue en aucun cas une
-                    certification d'authenticité — seule une expertise
-                    physique fait foi.
+                    {isFr
+                      ? "Comparaison structurelle (SSIM) entre la zone actuellement cadrée de la référence et celle de votre photo. Ceci est une aide visuelle et ne constitue en aucun cas une certification d'authenticité — seule une expertise physique fait foi."
+                      : "Structural comparison (SSIM) between the currently framed area of the reference and that of your photo. This is a visual aid and does not constitute a certification of authenticity in any way — only a physical expert appraisal is conclusive."}
                   </p>
                 </div>
 
@@ -538,7 +547,7 @@ export default function Compare({ setScreen }) {
                   }}
                   className="w-full py-6 text-sm font-black uppercase opacity-40 hover:opacity-100 transition-all underline underline-offset-8 decoration-2 tracking-[0.4em] italic"
                 >
-                  Réinitialiser la comparaison
+                  {isFr ? "Réinitialiser la comparaison" : "Reset comparison"}
                 </button>
               </div>
             )}

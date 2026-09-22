@@ -108,7 +108,7 @@ export default function Registry({
                   <div className="flex justify-between items-start gap-2">
                     <div className="truncate">
                       <h3 className="text-amber-500 font-black uppercase italic truncate text-base">
-                        {h.model || "Modèle Inconnu"}
+                        {h.model || (isFr ? "Modèle Inconnu" : "Unknown Model")}
                       </h3>
                       {/* ✅ NUMÉRO DE LOT CORRIGÉ : lot_number au lieu de lotNumber */}
                       <p className="text-[10px] text-white/40 font-bold tracking-widest">
