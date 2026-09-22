@@ -22,14 +22,79 @@ const MANUFACTURERS = {
   AW: "A. Wegner, Berlin (AW)",
 };
 
+const BRANCHES = ["Heer", "Luftwaffe", "Kriegsmarine", "Waffen-SS", "Polizei"];
+
+// Compatibilité fabricant × branche, d'après l'Encyclopédie et Synthèse
+// d'Expertise des Casques Allemands (1934-1945), chapitres 2, 4-8 et
+// annexes A-D. "never" = aucun contrat d'usine documenté (faux quasi
+// certain) ; "rare" = production limitée/tardive, à vérifier avec soin.
+const BRANCH_COMPATIBILITY = {
+  ET: { Heer: "ok", Luftwaffe: "ok", Kriegsmarine: "ok", "Waffen-SS": "ok", Polizei: "ok" },
+  Q: { Heer: "ok", Luftwaffe: "ok", Kriegsmarine: "rare", "Waffen-SS": "ok", Polizei: "ok" },
+  SE: { Heer: "ok", Luftwaffe: "ok", Kriegsmarine: "rare", "Waffen-SS": "never", Polizei: "ok" },
+  HKP: { Heer: "ok", Luftwaffe: "ok", Kriegsmarine: "rare", "Waffen-SS": "never", Polizei: "ok" },
+  NS: { Heer: "ok", Luftwaffe: "ok", Kriegsmarine: "never", "Waffen-SS": "never", Polizei: "ok" },
+  EF: { Heer: "ok", Luftwaffe: "ok", Kriegsmarine: "ok", "Waffen-SS": "ok", Polizei: "ok" },
+};
+
+const BRANCH_MESSAGES = {
+  never: {
+    fr: (mkr, br) =>
+      `INCOHÉRENCE MAJEURE : ${mkr} n'a jamais reçu de contrat d'usine pour la branche ${br}. Cette combinaison est statistiquement un faux ou un remontage, sauf provenance exceptionnellement documentée.`,
+    en: (mkr, br) =>
+      `MAJOR INCONSISTENCY: ${mkr} never held a factory contract for ${br}. This combination is statistically a fake or a composite, barring exceptionally documented provenance.`,
+  },
+  rare: {
+    fr: (mkr, br) =>
+      `VIGILANCE : la production ${mkr} pour la branche ${br} est rare/tardive et documentée de façon limitée. Vérifiez la cohérence d'ensemble (style d'insigne, modèle de coque, lot).`,
+    en: (mkr, br) =>
+      `CAUTION: ${mkr} production for ${br} is rare/late and only loosely documented. Check overall consistency (decal style, shell model, lot).`,
+  },
+};
+
+// Fourchette de datation déduite de la configuration d'insigne, d'après
+// la chronologie unifiée des ordres réglementaires (chapitre 4.1 / 2bis.5).
+const getDateEstimate = (branch, decals, isFr) => {
+  if (!branch || !decals) return null;
+  if (branch === "Polizei") {
+    return isFr
+      ? "Police : le double insigne a été maintenu tout au long de la guerre — aucune date précise déductible de la seule configuration."
+      : "Police: the double decal was retained throughout the war — no precise date can be inferred from configuration alone.";
+  }
+  const cutoff =
+    branch === "Waffen-SS"
+      ? isFr
+        ? "oct.–nov. 1943"
+        : "Oct–Nov 1943"
+      : isFr
+      ? "28 août 1943"
+      : "Aug 28, 1943";
+  if (decals.includes("Double"))
+    return isFr
+      ? "Datation estimée : antérieure à mars 1940 (configuration double insigne / Zweiemblem)."
+      : "Estimated dating: prior to March 1940 (double-decal / Zweiemblem configuration).";
+  if (decals.includes("Mono"))
+    return isFr
+      ? `Datation estimée : entre mars 1940 et ${cutoff} (insigne simple).`
+      : `Estimated dating: between March 1940 and ${cutoff} (single decal).`;
+  if (decals === "Aucun")
+    return isFr
+      ? `Datation estimée : postérieure au ${cutoff} (coque neutre, sans décalcomanie).`
+      : `Estimated dating: after ${cutoff} (neutral shell, no decal).`;
+  return null;
+};
+
 export const getExpertise = (helmet, lang) => {
   const lot = parseInt(helmet.lotNumber);
   const mkr = helmet.manufacturer?.toUpperCase();
   const mdl = helmet.model;
   const dec = helmet.decals;
+  const branch = helmet.branch;
   const isFr = lang === "fr";
 
   if (!mdl) return isFr ? "Sélectionnez un modèle..." : "Select a model...";
+
+  const messages = [];
 
   if (
     mdl.includes("16") ||
@@ -37,38 +102,59 @@ export const getExpertise = (helmet, lang) => {
     mdl.includes("18") ||
     mdl.includes("Autrichien")
   ) {
-    return isFr
-      ? "TRANSITION : Vérifiez les insignes Pocher. Souvent reconditionnés avec peinture mate à l'oxyde d'aluminium."
-      : "TRANSITION: Check for Pocher decals. Often refurbished with matte aluminum oxide paint.";
+    messages.push(
+      isFr
+        ? "TRANSITION : Vérifiez les insignes Pocher. Souvent reconditionnés avec peinture mate à l'oxyde d'aluminium."
+        : "TRANSITION: Check for Pocher decals. Often refurbished with matte aluminum oxide paint."
+    );
+  } else if (!lot || !mkr) {
+    messages.push(
+      isFr
+        ? "Données manquantes (Usine + Lot)..."
+        : "Missing data (Factory + Lot)..."
+    );
+  } else if (mdl.includes("M35")) {
+    messages.push(
+      lot > 5500
+        ? isFr
+          ? `ALERTE : Lot #${lot} élevé. Transition M40 probable.`
+          : `ALERT: Lot #${lot} high. M40 transition likely.`
+        : isFr
+        ? "M35 : Standard double insignes."
+        : "M35: Standard double decals."
+    );
+  } else if (mdl.includes("M40") && dec.includes("Double")) {
+    messages.push(
+      isFr
+        ? "ANOMALIE : Décret Mars 1940 (M40 mono-insigne)."
+        : "ANOMALY: March 1940 Decree (M40 single decal)."
+    );
+  } else if (mdl.includes("M42") && dec.includes("Double")) {
+    messages.push(
+      isFr
+        ? "ALERTE : M42 double insignes aberrant (Risque de faux)."
+        : "ALERT: M42 double decal is incorrect (Risk of fake)."
+    );
+  } else {
+    messages.push(
+      isFr
+        ? "Configuration conforme aux standards."
+        : "Configuration consistent with standards."
+    );
   }
 
-  if (!lot || !mkr)
-    return isFr
-      ? "Données manquantes (Usine + Lot)..."
-      : "Missing data (Factory + Lot)...";
-
-  if (mdl.includes("M35")) {
-    if (lot > 5500)
-      return isFr
-        ? `ALERTE : Lot #${lot} élevé. Transition M40 probable.`
-        : `ALERT: Lot #${lot} high. M40 transition likely.`;
-    return isFr
-      ? "M35 : Standard double insignes."
-      : "M35: Standard double decals.";
+  // Cohérence fabricant × branche (chapitres 2, 4-8, annexes A-D)
+  const status = mkr && branch && BRANCH_COMPATIBILITY[mkr]?.[branch];
+  if (status && status !== "ok") {
+    const mkrName = MANUFACTURERS[mkr] || mkr;
+    messages.push(BRANCH_MESSAGES[status][isFr ? "fr" : "en"](mkrName, branch));
   }
 
-  if (mdl.includes("M40") && dec.includes("Double"))
-    return isFr
-      ? "ANOMALIE : Décret Mars 1940 (M40 mono-insigne)."
-      : "ANOMALY: March 1940 Decree (M40 single decal).";
-  if (mdl.includes("M42") && dec.includes("Double"))
-    return isFr
-      ? "ALERTE : M42 double insignes aberrant (Risque de faux)."
-      : "ALERT: M42 double decal is incorrect (Risk of fake).";
+  // Datation estimée d'après la configuration d'insigne (chapitre 4.1 / 2bis.5)
+  const dateMsg = getDateEstimate(branch, dec, isFr);
+  if (dateMsg) messages.push(dateMsg);
 
-  return isFr
-    ? "Configuration conforme aux standards."
-    : "Configuration consistent with standards.";
+  return messages.join(" — ");
 };
 
 const uploadToCloudinary = async (file) => {
@@ -135,6 +221,15 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
       ];
 
   const SHELL_SIZES = ["60", "62", "64", "66", "68", "70", "72", "74"];
+  // Correspondance taille de coque / tour de tête (chapitre 1.5 de l'Encyclopédie)
+  const HEAD_CIRCUMFERENCE = {
+    60: "53 cm",
+    62: "55 cm",
+    64: "57 cm",
+    66: "59 cm",
+    68: "61 cm",
+    70: "63 cm",
+  };
   const LINER_SIZES = [
     "50",
     "51",
@@ -162,11 +257,30 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
     ? ["Aucun", "Mono-insigne", "Double insignes"]
     : ["None", "Single Decal", "Double Decals"];
 
+  // Types de jugulaire par période, d'après le chapitre 9 (Analyse forensique
+  // des jugulaires) de l'Encyclopédie — cuir, boucle et fixations associés.
+  const CHINSTRAP_OPTIONS = isFr
+    ? [
+        "1935–1940 : cuir de vachette, boucle aluminium",
+        "1940–1943 : cuir de vachette, boucle acier zingué peinte Feldgrau",
+        "1943–1945 : cuir de porc, boucle acier brossé/phosphaté",
+        "Pressstoff / toile (fin de guerre)",
+        "Inconnu / non documenté",
+      ]
+    : [
+        "1935–1940: cowhide leather, aluminum buckle",
+        "1940–1943: cowhide leather, Feldgrau-painted zinc-plated steel buckle",
+        "1943–1945: pigskin leather, brushed/phosphated steel buckle",
+        "Pressstoff / webbing (late war)",
+        "Unknown / undocumented",
+      ];
+
   const [current, setCurrent] = useState(
     helmet || {
       id: null,
       model: "",
       manufacturer: "",
+      branch: "",
       lotNumber: "",
       description: "",
       shellSize: "",
@@ -194,25 +308,23 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
 
   useEffect(() => {
     const msg = getExpertise(current, lang);
-    const color =
-      msg.includes("ALERTE") ||
-      msg.includes("ANOMALIE") ||
-      msg.includes("ALERT")
-        ? "text-orange-500"
-        : "text-blue-400";
+    const isWarning = /ALERTE|ANOMALIE|ALERT|ANOMALY|INCOHÉRENCE|INCONSISTENCY|VIGILANCE|CAUTION/.test(
+      msg
+    );
+    const color = isWarning ? "text-orange-500" : "text-blue-400";
     setValidation({
       message: msg,
       color,
-      icon:
-        color === "text-orange-500" ? (
-          <AlertTriangle size={14} />
-        ) : (
-          <CheckCircle size={14} />
-        ),
+      icon: isWarning ? (
+        <AlertTriangle size={14} />
+      ) : (
+        <CheckCircle size={14} />
+      ),
     });
   }, [
     current.model,
     current.manufacturer,
+    current.branch,
     current.lotNumber,
     current.decals,
     lang,
@@ -359,6 +471,24 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
           </div>
         </div>
 
+        <div className="space-y-2">
+          <label className="text-[9px] uppercase font-black text-gray-500">
+            {isFr ? "Branche / Arme" : "Branch / Service"}
+          </label>
+          <select
+            className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-xs font-bold text-[#f0ede0] outline-none"
+            value={current.branch || ""}
+            onChange={(e) => setCurrent({ ...current, branch: e.target.value })}
+          >
+            <option value="">--</option>
+            {BRANCHES.map((b) => (
+              <option key={b} value={b}>
+                {b}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div
           className={`p-4 rounded-2xl bg-[#1a1812] border-2 ${validation.color.replace(
             "text",
@@ -394,6 +524,12 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
                 </option>
               ))}
             </select>
+            {HEAD_CIRCUMFERENCE[current.shellSize] && (
+              <p className="text-[8px] text-amber-600/70 italic">
+                ≈ {HEAD_CIRCUMFERENCE[current.shellSize]}{" "}
+                {isFr ? "de tour de tête" : "head circumference"}
+              </p>
+            )}
           </div>
           <div className="space-y-2">
             <label className="text-[9px] uppercase font-black text-gray-500">
@@ -433,6 +569,26 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
               ))}
             </select>
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-[9px] uppercase font-black text-gray-500">
+            {t.labelStrap}
+          </label>
+          <select
+            className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-xs text-[#f0ede0] outline-none"
+            value={current.chinstrapState}
+            onChange={(e) =>
+              setCurrent({ ...current, chinstrapState: e.target.value })
+            }
+          >
+            <option value="">--</option>
+            {CHINSTRAP_OPTIONS.map((opt) => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="pt-4 space-y-3">

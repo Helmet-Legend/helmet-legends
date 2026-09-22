@@ -103,13 +103,21 @@ export default function Details({ setScreen, helmet, onEdit, lang }) {
 
         {/* Informations */}
         <div className="w-full lg:w-1/2 bg-[#2a2822] p-6 lg:p-12 lg:overflow-y-auto custom-scrollbar">
-          <div className="grid grid-cols-2 gap-4 mb-8">
+          <div className="grid grid-cols-3 gap-4 mb-8">
             <div className="p-4 bg-[#1a1812] rounded-xl border border-amber-900/20">
               <p className="text-[9px] uppercase font-black opacity-40 mb-1 tracking-tighter">
                 {labels.labelFactory}
               </p>
               <p className="text-base font-bold text-amber-500">
                 {helmet.manufacturer || "N/A"}
+              </p>
+            </div>
+            <div className="p-4 bg-[#1a1812] rounded-xl border border-amber-900/20">
+              <p className="text-[9px] uppercase font-black opacity-40 mb-1 tracking-tighter">
+                {isFr ? "Branche" : "Branch"}
+              </p>
+              <p className="text-base font-bold text-amber-500">
+                {helmet.branch || "N/A"}
               </p>
             </div>
             <div className="p-4 bg-[#1a1812] rounded-xl border border-amber-900/20">

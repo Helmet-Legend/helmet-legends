@@ -208,6 +208,7 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
   let curY = specsY + 10;
   const fields = [
     [isFr ? "Usine" : "Factory", helmet.manufacturer],
+    [isFr ? "Branche" : "Branch", helmet.branch || "-"],
     [isFr ? "Modèle" : "Model", helmet.model],
     [isFr ? "Lot" : "Lot", "#" + (helmet.lot_number || "-")],
     [isFr ? "Taille Coque" : "Shell Size", helmet.shell_size || "-"],
@@ -226,7 +227,7 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     doc.text(String(val || "-"), 58, curY);
-    curY += 8.5;
+    curY += 8;
   });
 
   // Notes & Analyse
