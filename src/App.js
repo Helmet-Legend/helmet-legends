@@ -30,13 +30,29 @@ export default function App() {
     }
   };
 
+  // --- 1bis. CONNEXION AUTOMATIQUE (anonyme si aucune session) ---
   useEffect(() => {
-    fetchCollection();
+    const ensureSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        const { error } = await supabase.auth.signInAnonymously();
+        if (error) console.error("Erreur connexion anonyme :", error);
+      }
+      fetchCollection();
+    };
+    ensureSession();
   }, []);
 
   // --- 2. SAUVEGARDE ---
   const handleSave = async (helmetData) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     const payload = {
+      user_id: user?.id,
       model: helmetData.model,
       manufacturer: helmetData.manufacturer,
       lot_number: helmetData.lotNumber,
