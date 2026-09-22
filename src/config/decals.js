@@ -4,6 +4,7 @@ import luftNSImg from "../assets/LUFT-NSM42.png";
 import etHeerImg from "../assets/et-heer-decal.webp";
 import quistHeerImg from "../assets/quist-heer-decal.webp";
 import quistTricoloreImg from "../assets/quist-tricolore-decal.webp";
+import quistSSImg from "../assets/quist-ss-decal.webp";
 
 export const AUTHENTIC_DECALS = [
   {
@@ -39,5 +40,12 @@ export const AUTHENTIC_DECALS = [
     img: quistTricoloreImg,
     description:
       "Écusson tricolore (noir/blanc/rouge) authentique de l'usine Quist.",
+  },
+  {
+    id: "quist-ss",
+    name: "Quist - Runes SS",
+    img: quistSSImg,
+    description:
+      "Insigne Waffen-SS authentique de l'usine Quist, runes SS argentées sur fond clair.",
   },
 ];
