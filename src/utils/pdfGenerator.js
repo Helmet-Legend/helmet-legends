@@ -16,6 +16,13 @@ const getImageData = async (url) => {
   }
 };
 
+const SECONDARY_VIEWS = [
+  { id: "front", fr: "Face avant", en: "Front" },
+  { id: "left", fr: "Côté gauche", en: "Left side" },
+  { id: "right", fr: "Côté droit", en: "Right side" },
+  { id: "interior", fr: "Intérieur", en: "Interior" },
+];
+
 export const generateHelmetPDF = async (helmet, lang = "fr") => {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const isFr = lang === "fr";
@@ -38,11 +45,23 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
   doc.rect(8, 8, 194, 281);
   doc.rect(9.5, 9.5, 191, 278);
 
-  // En-tête
-  doc.setTextColor(gold[0], gold[1], gold[2]);
-  doc.setFont("times", "bold");
-  doc.setFontSize(32);
-  doc.text("HELMET LEGENDS", 105, 28, { align: "center" });
+  // Récupération des visuels en parallèle (logo, QR, photos)
+  const secondaryPhotos = SECONDARY_VIEWS.filter((v) => helmet[`image_url_${v.id}`]);
+  const [logoData, mainImgData, ...secondaryImgData] = await Promise.all([
+    getImageData(`${window.location.origin}/icon-512.png`),
+    helmet.image_url_main ? getImageData(helmet.image_url_main) : Promise.resolve(null),
+    ...secondaryPhotos.map((v) => getImageData(helmet[`image_url_${v.id}`])),
+  ]);
+
+  // En-tête : logo de la marque
+  if (logoData) {
+    doc.addImage(logoData, "PNG", 84.5, 8, 41, 41, undefined, "FAST");
+  } else {
+    doc.setTextColor(gold[0], gold[1], gold[2]);
+    doc.setFont("times", "bold");
+    doc.setFontSize(28);
+    doc.text("HELMET LEGENDS", 105, 28, { align: "center" });
+  }
 
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
@@ -50,7 +69,7 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
   doc.text(
     isFr ? "FICHE DESCRIPTIVE D'ARCHIVE" : "ARCHIVE DESCRIPTIVE SHEET",
     105,
-    36,
+    55,
     { align: "center" }
   );
 
@@ -59,35 +78,87 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
   const date = new Date().toLocaleDateString(isFr ? "fr-FR" : "en-US");
   doc.setFontSize(9);
   doc.setTextColor(gold[0], gold[1], gold[2]);
-  doc.text(`${isFr ? "RÉFÉRENCE" : "REFERENCE"} : #${ref}`, 20, 47);
-  doc.text(`${isFr ? "ÉMIS LE" : "ISSUED ON"} : ${date}`, 190, 47, {
+  doc.text(`${isFr ? "RÉFÉRENCE" : "REFERENCE"} : #${ref}`, 20, 61);
+  doc.text(`${isFr ? "ÉMIS LE" : "ISSUED ON"} : ${date}`, 190, 61, {
     align: "right",
   });
   doc.setLineWidth(0.3);
-  doc.line(15, 50, 195, 50);
+  doc.line(15, 64, 195, 64);
 
-  // Photo principale
-  const mainPhoto = helmet.image_url_main;
-  if (mainPhoto) {
-    try {
-      const imgData = await getImageData(mainPhoto);
-      if (imgData) {
-        doc.setDrawColor(gold[0], gold[1], gold[2]);
-        doc.setLineWidth(0.8);
-        doc.rect(45, 55, 120, 88);
-        doc.addImage(imgData, "JPEG", 46, 56, 118, 86, undefined, "FAST");
-      }
-    } catch (e) {
-      console.error("Erreur image principale");
+  // QR Code (coin supérieur droit, en miroir du logo)
+  try {
+    const helmetUrl = `https://app.helmetlegends.com/helmet/${
+      helmet.id || "view"
+    }`;
+    const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
+      helmetUrl
+    )}&color=${brightGold}&bgcolor=1a1812`;
+    const qrBase64 = await getImageData(qrImageUrl);
+    if (qrBase64) {
+      doc.setDrawColor(gold[0], gold[1], gold[2]);
+      doc.rect(171, 11, 24, 24);
+      doc.addImage(qrBase64, "PNG", 172, 12, 22, 22);
+      doc.setFontSize(5.5);
+      doc.setTextColor(muted[0], muted[1], muted[2]);
+      doc.text(isFr ? "Vérifier" : "Verify", 183, 37, { align: "center" });
     }
+  } catch (err) {}
+
+  // Photo principale + photos secondaires
+  // Le bloc visuel occupe toujours 69→160 ; la photo principale s'étend
+  // jusqu'en bas s'il n'y a aucune photo secondaire à afficher en dessous.
+  const hasSecondary = secondaryImgData.some(Boolean);
+  const mainPhotoHeight = hasSecondary ? 70 : 91;
+
+  doc.setDrawColor(gold[0], gold[1], gold[2]);
+  doc.setLineWidth(0.8);
+  doc.rect(45, 69, 120, mainPhotoHeight);
+  if (mainImgData) {
+    doc.addImage(mainImgData, "JPEG", 46, 70, 118, mainPhotoHeight - 2, undefined, "FAST");
+  } else {
+    doc.setFontSize(8);
+    doc.setTextColor(muted[0], muted[1], muted[2]);
+    doc.text(
+      isFr ? "AUCUN VISUEL PRINCIPAL" : "NO MAIN PHOTO",
+      105,
+      69 + mainPhotoHeight / 2,
+      { align: "center" }
+    );
+  }
+
+  if (hasSecondary) {
+    const boxW = 27;
+    const gap = 3;
+    const n = secondaryPhotos.length;
+    const rowWidth = n * boxW + (n - 1) * gap;
+    const startX = 45 + (120 - rowWidth) / 2;
+    const thumbY = 142;
+    const thumbH = 24;
+
+    secondaryPhotos.forEach((view, i) => {
+      const x = startX + i * (boxW + gap);
+      doc.setDrawColor(gold[0], gold[1], gold[2]);
+      doc.setLineWidth(0.5);
+      doc.rect(x, thumbY, boxW, thumbH);
+      const imgData = secondaryImgData[i];
+      if (imgData) {
+        doc.addImage(imgData, "JPEG", x + 0.8, thumbY + 0.8, boxW - 1.6, thumbH - 1.6, undefined, "FAST");
+      }
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(6);
+      doc.setTextColor(muted[0], muted[1], muted[2]);
+      doc.text((isFr ? view.fr : view.en).toUpperCase(), x + boxW / 2, thumbY + thumbH + 4, {
+        align: "center",
+      });
+    });
   }
 
   // Ligne séparatrice
   doc.setLineWidth(0.3);
-  doc.line(15, 152, 195, 152);
+  doc.line(15, 172, 195, 172);
 
-  // Spécifications
-  const specsY = 162;
+  // Spécifications — carte d'identité complète du casque
+  const specsY = 182;
   doc.setTextColor(gold[0], gold[1], gold[2]);
   doc.setFont("times", "bold");
   doc.setFontSize(11);
@@ -98,14 +169,20 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
   );
   doc.line(20, specsY + 2, 95, specsY + 2);
 
+  const addedOn = helmet.created_at
+    ? new Date(helmet.created_at).toLocaleDateString(isFr ? "fr-FR" : "en-US")
+    : "-";
+
   let curY = specsY + 10;
   const fields = [
     [isFr ? "Usine" : "Factory", helmet.manufacturer],
     [isFr ? "Modèle" : "Model", helmet.model],
     [isFr ? "Lot" : "Lot", "#" + (helmet.lot_number || "-")],
-    [isFr ? "Peinture" : "Paint", helmet.paint_condition || "-"],
     [isFr ? "Taille Coque" : "Shell Size", helmet.shell_size || "-"],
+    [isFr ? "Coiffe" : "Liner", helmet.liner_size || "-"],
+    [isFr ? "Peinture" : "Paint", helmet.paint_condition || "-"],
     [isFr ? "Insignes" : "Decals", helmet.decals || "-"],
+    [isFr ? "Ajouté le" : "Added on", addedOn],
   ];
 
   fields.forEach(([label, val]) => {
@@ -117,7 +194,7 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     doc.text(String(val || "-"), 58, curY);
-    curY += 9;
+    curY += 8.5;
   });
 
   // Notes & Analyse
@@ -137,7 +214,7 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
     (isFr ? "Aucun historique disponible." : "No history available.");
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
-  doc.setTextColor(200, 200, 200);
+  doc.setTextColor(textCrème[0], textCrème[1], textCrème[2]);
   const splitNotes = doc.splitTextToSize(notesText, 78);
   doc.text(splitNotes, 112, specsY + 10);
 
@@ -146,22 +223,6 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
     const splitDesc = doc.splitTextToSize(helmet.description, 78);
     doc.text(splitDesc, 112, descY);
   }
-
-  // QR Code
-  try {
-    const helmetUrl = `https://app.helmetlegends.com/helmet/${
-      helmet.id || "view"
-    }`;
-    const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
-      helmetUrl
-    )}&color=${brightGold}&bgcolor=1a1812`;
-    const qrBase64 = await getImageData(qrImageUrl);
-    if (qrBase64) {
-      doc.setDrawColor(gold[0], gold[1], gold[2]);
-      doc.rect(171, 11, 24, 24);
-      doc.addImage(qrBase64, "PNG", 172, 12, 22, 22);
-    }
-  } catch (err) {}
 
   // Pied de page
   doc.setLineWidth(0.3);
