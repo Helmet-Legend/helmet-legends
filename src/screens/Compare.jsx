@@ -21,12 +21,145 @@ import {
 // Assure-toi que ce fichier existe dans ton dossier config
 import { AUTHENTIC_DECALS } from "../config/decals";
 
+// Taille de la grille utilisée pour la comparaison structurelle (SSIM)
+const SAMPLE_SIZE = 48;
+
+// Applique un étirement de contraste réel (min-max) à une image, en se
+// basant sur sa luminance — corrige les écarts d'exposition entre la
+// photo de l'utilisateur et la référence en studio.
+const applyAutoContrast = (dataUrl) =>
+  new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const px = imageData.data;
+        let min = 255;
+        let max = 0;
+        for (let i = 0; i < px.length; i += 4) {
+          const lum = 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2];
+          if (lum < min) min = lum;
+          if (lum > max) max = lum;
+        }
+        const range = Math.max(max - min, 1);
+        for (let i = 0; i < px.length; i += 4) {
+          for (let c = 0; c < 3; c++) {
+            px[i + c] = Math.min(
+              255,
+              Math.max(0, ((px[i + c] - min) / range) * 255)
+            );
+          }
+        }
+        ctx.putImageData(imageData, 0, 0);
+        resolve(canvas.toDataURL("image/jpeg", 0.92));
+      } catch (e) {
+        resolve(dataUrl);
+      }
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+
+// Extrait, dans une petite grille NxN, exactement la zone actuellement
+// visible à l'écran (celle que l'utilisateur a cadrée/zoomée), en
+// recalculant l'inverse de la mise en page "object-contain" + du zoom/pan
+// partagé entre les deux images.
+const extractVisibleCrop = (boxEl, imgEl, zoom, position) => {
+  const canvas = document.createElement("canvas");
+  canvas.width = SAMPLE_SIZE;
+  canvas.height = SAMPLE_SIZE;
+  const ctx = canvas.getContext("2d");
+  if (!boxEl || !imgEl || !imgEl.naturalWidth) return canvas;
+
+  const cw = boxEl.clientWidth;
+  const ch = boxEl.clientHeight;
+  const iw = imgEl.naturalWidth;
+  const ih = imgEl.naturalHeight;
+  if (!cw || !ch) return canvas;
+
+  const s = Math.min(cw / iw, ch / ih);
+  const fx = (cw - iw * s) / 2;
+  const fy = (ch - ih * s) / 2;
+  const ccx = cw / 2;
+  const ccy = ch / 2;
+
+  const toSource = (screenX, screenY) => {
+    const localX = ccx + (screenX - ccx - position.x) / zoom;
+    const localY = ccy + (screenY - ccy - position.y) / zoom;
+    return { x: (localX - fx) / s, y: (localY - fy) / s };
+  };
+
+  const p0 = toSource(0, 0);
+  const p1 = toSource(cw, ch);
+
+  const sx = Math.max(0, Math.min(p0.x, p1.x));
+  const sy = Math.max(0, Math.min(p0.y, p1.y));
+  const sw = Math.min(iw - sx, Math.abs(p1.x - p0.x));
+  const sh = Math.min(ih - sy, Math.abs(p1.y - p0.y));
+  if (sw <= 0 || sh <= 0) return canvas;
+
+  ctx.drawImage(imgEl, sx, sy, sw, sh, 0, 0, SAMPLE_SIZE, SAMPLE_SIZE);
+  return canvas;
+};
+
+const toGrayscaleArray = (canvas) => {
+  const ctx = canvas.getContext("2d");
+  const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const gray = new Float64Array(canvas.width * canvas.height);
+  for (let i = 0, p = 0; i < data.length; i += 4, p++) {
+    gray[p] = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+  }
+  return gray;
+};
+
+// Indice de similarité structurelle (SSIM), calculé globalement sur la
+// grille échantillonnée — même métrique que celle utilisée pour comparer
+// des images en traitement du signal. 1 = identique, 0 = sans rapport.
+const computeSSIM = (a, b) => {
+  const n = a.length;
+  let meanA = 0;
+  let meanB = 0;
+  for (let i = 0; i < n; i++) {
+    meanA += a[i];
+    meanB += b[i];
+  }
+  meanA /= n;
+  meanB /= n;
+
+  let varA = 0;
+  let varB = 0;
+  let covAB = 0;
+  for (let i = 0; i < n; i++) {
+    const da = a[i] - meanA;
+    const db = b[i] - meanB;
+    varA += da * da;
+    varB += db * db;
+    covAB += da * db;
+  }
+  varA /= n - 1;
+  varB /= n - 1;
+  covAB /= n - 1;
+
+  const C1 = (0.01 * 255) ** 2;
+  const C2 = (0.03 * 255) ** 2;
+  const ssim =
+    ((2 * meanA * meanB + C1) * (2 * covAB + C2)) /
+    ((meanA ** 2 + meanB ** 2 + C1) * (varA + varB + C2));
+
+  return Math.max(0, Math.min(1, ssim));
+};
+
 export default function Compare({ setScreen }) {
   const [userImg, setUserImg] = useState(null);
   const [refImg, setRefImg] = useState(AUTHENTIC_DECALS[0]);
   const [fileInfo, setFileInfo] = useState(null);
 
-  // ÉTATS IA & OPTIQUE
+  // ÉTATS DE COMPARAISON
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [optimizationStep, setOptimizationStep] = useState("");
   const [isOptimized, setIsOptimized] = useState(false);
@@ -38,6 +171,12 @@ export default function Compare({ setScreen }) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const isDragging = useRef(false);
   const startPos = useRef({ x: 0, y: 0 });
+
+  // RÉFÉRENCES DOM (pour extraire la zone actuellement cadrée)
+  const refBoxRef = useRef(null);
+  const refImgElRef = useRef(null);
+  const userBoxRef = useRef(null);
+  const userImgElRef = useRef(null);
 
   // GESTION IMPORTATION
   const handleUserUpload = (e) => {
@@ -57,47 +196,61 @@ export default function Compare({ setScreen }) {
     }
   };
 
-  // MODULE DE TRAITEMENT OPTIQUE
+  // NORMALISATION DE L'IMAGE (étirement de contraste réel)
   const runOpticalOptimization = () => {
     if (!userImg) return;
     setIsOptimizing(true);
+    setOptimizationStep("Lecture de l'image...");
 
-    const steps = [
-      { msg: "Analyse de la distance...", delay: 800 },
-      { msg: "Recadrage par IA...", delay: 1000 },
-      { msg: "Normalisation de la luminance...", delay: 1200 },
-      { msg: "Correction colorimétrique...", delay: 800 },
-    ];
-
-    let currentDelay = 0;
-    steps.forEach((step, index) => {
-      setTimeout(() => {
-        setOptimizationStep(step.msg);
-        if (index === steps.length - 1) {
-          setTimeout(() => {
-            setIsOptimizing(false);
-            setIsOptimized(true);
-            setOptimizationStep("");
-          }, 800);
-        }
-      }, currentDelay);
-      currentDelay += step.delay;
-    });
+    setTimeout(() => {
+      setOptimizationStep("Normalisation du contraste...");
+      applyAutoContrast(userImg).then((enhanced) => {
+        setUserImg(enhanced);
+        setTimeout(() => {
+          setIsOptimizing(false);
+          setIsOptimized(true);
+          setOptimizationStep("");
+        }, 300);
+      });
+    }, 300);
   };
 
-  // ANALYSE IA
+  // COMPARAISON STRUCTURELLE (SSIM, calculée localement — aucun serveur)
   const runAIAnalysis = () => {
+    if (!userImg) return;
     setIsScanning(true);
     setAiResult(null);
 
+    // Court délai purement visuel (animation de scan) ; le calcul lui-même
+    // est quasi instantané.
     setTimeout(() => {
+      const refCanvas = extractVisibleCrop(
+        refBoxRef.current,
+        refImgElRef.current,
+        zoom,
+        position
+      );
+      const userCanvas = extractVisibleCrop(
+        userBoxRef.current,
+        userImgElRef.current,
+        zoom,
+        position
+      );
+      const score = Math.round(
+        computeSSIM(toGrayscaleArray(refCanvas), toGrayscaleArray(userCanvas)) *
+          100
+      );
       setIsScanning(false);
-      const score = Math.floor(Math.random() * (98 - 85 + 1)) + 85;
       setAiResult({
-        score: score,
-        verdict: score > 92 ? "Haute Similitude" : "Analyse Incertaine",
+        score,
+        verdict:
+          score >= 75
+            ? "Similitude élevée"
+            : score >= 50
+            ? "Similitude modérée"
+            : "Similitude faible",
       });
-    }, 3000);
+    }, 700);
   };
 
   // LOGIQUE DE MOUVEMENT
@@ -143,7 +296,7 @@ export default function Compare({ setScreen }) {
           <div className="flex items-center gap-3">
             <Target className="text-amber-500 animate-pulse" size={28} />
             <h2 className="text-2xl font-black uppercase italic tracking-tighter text-white">
-              Banc d'Optique IA
+              Banc d'Optique
             </h2>
           </div>
           <button
@@ -186,7 +339,7 @@ export default function Compare({ setScreen }) {
             onTouchMove={onMove}
             onTouchEnd={onEnd}
           >
-            {/* OVERLAY OPTIMISATION */}
+            {/* OVERLAY NORMALISATION */}
             {isOptimizing && (
               <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-md flex flex-col items-center justify-center rounded-3xl">
                 <Wand2
@@ -199,7 +352,7 @@ export default function Compare({ setScreen }) {
               </div>
             )}
 
-            {/* LASER SCAN IA */}
+            {/* SCAN VISUEL (animation) */}
             {isScanning && (
               <div className="absolute inset-0 z-50 pointer-events-none">
                 <div className="w-full h-1.5 bg-amber-400 shadow-[0_0_30px_#f59e0b] absolute top-0 animate-scan"></div>
@@ -207,9 +360,12 @@ export default function Compare({ setScreen }) {
             )}
 
             {/* IMAGE RÉFÉRENCE */}
-            <div className="relative bg-black rounded-[2.5rem] overflow-hidden border-2 border-green-900/40 shadow-2xl">
+            <div
+              ref={refBoxRef}
+              className="relative bg-black rounded-[2.5rem] overflow-hidden border-2 border-green-900/40 shadow-2xl"
+            >
               <div className="absolute top-4 left-4 z-10 bg-green-900/80 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-green-500/50">
-                Original Certifié
+                Référence
               </div>
               <div
                 className="w-full h-full"
@@ -219,7 +375,9 @@ export default function Compare({ setScreen }) {
                 }}
               >
                 <img
+                  ref={refImgElRef}
                   src={refImg.img}
+                  crossOrigin="anonymous"
                   className="w-full h-full object-contain pointer-events-none opacity-90"
                   alt="Ref"
                 />
@@ -228,6 +386,7 @@ export default function Compare({ setScreen }) {
 
             {/* IMAGE UTILISATEUR */}
             <div
+              ref={userBoxRef}
               className={`relative bg-black rounded-[2.5rem] overflow-hidden border-2 transition-all duration-700 shadow-2xl ${
                 isOptimized
                   ? "border-green-500/60 shadow-[0_0_30px_rgba(34,197,94,0.1)]"
@@ -235,7 +394,7 @@ export default function Compare({ setScreen }) {
               }`}
             >
               <div className="absolute top-4 left-4 z-10 bg-amber-900/80 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-amber-500/50">
-                Spécimen Analysé
+                Votre Photo
               </div>
               {!userImg ? (
                 <label className="flex flex-col items-center justify-center h-full cursor-pointer hover:bg-amber-900/10 transition-colors">
@@ -259,13 +418,12 @@ export default function Compare({ setScreen }) {
                   style={{
                     transform: `translate(${position.x}px, ${position.y}px) scale(${zoom})`,
                     transformOrigin: "center",
-                    filter: isOptimized
-                      ? "brightness(1.1) contrast(1.1) saturate(1.1)"
-                      : "none",
                   }}
                 >
                   <img
+                    ref={userImgElRef}
                     src={userImg}
+                    crossOrigin="anonymous"
                     className="w-full h-full object-contain pointer-events-none"
                     alt="User"
                   />
@@ -285,7 +443,7 @@ export default function Compare({ setScreen }) {
                       disabled={!userImg || isOptimizing}
                       className="flex-grow py-6 bg-amber-600 text-black rounded-3xl font-black uppercase italic tracking-tighter hover:bg-amber-500 disabled:opacity-20 active:scale-95 transition-all text-xl shadow-xl border-b-4 border-amber-800"
                     >
-                      Optimiser le cliché
+                      Normaliser le contraste
                     </button>
                   ) : (
                     <button
@@ -293,7 +451,7 @@ export default function Compare({ setScreen }) {
                       disabled={isScanning}
                       className="flex-grow py-6 bg-green-600 text-white rounded-3xl font-black uppercase italic tracking-tighter animate-pulse shadow-xl border-b-4 border-green-800 text-xl"
                     >
-                      Lancer l'Expertise IA
+                      Comparer les deux images
                     </button>
                   )}
                   <button
@@ -325,12 +483,12 @@ export default function Compare({ setScreen }) {
                 </div>
               </div>
             ) : (
-              /* RÉSULTAT IA VERSION GÉANTE */
+              /* RÉSULTAT DE LA COMPARAISON */
               <div className="animate-in fade-in zoom-in duration-700 space-y-10">
                 <div className="flex justify-between items-end border-b border-white/10 pb-8">
                   <div className="flex flex-col gap-3">
                     <div className="flex items-center gap-4">
-                      {aiResult.score > 90 ? (
+                      {aiResult.score >= 75 ? (
                         <CheckCircle2 className="text-green-500" size={40} />
                       ) : (
                         <AlertCircle className="text-amber-500" size={40} />
@@ -340,7 +498,7 @@ export default function Compare({ setScreen }) {
                       </span>
                     </div>
                     <p className="text-xs text-white/40 uppercase tracking-[0.3em] font-bold ml-[56px]">
-                      Biométrie certifiée par IA
+                      Similarité visuelle calculée
                     </p>
                   </div>
                   <span className="text-8xl font-black text-amber-500 tracking-tighter drop-shadow-[0_0_30px_rgba(245,158,11,0.3)]">
@@ -356,18 +514,20 @@ export default function Compare({ setScreen }) {
                   ></div>
                 </div>
 
-                {/* NOTE MÉTHODOLOGIQUE AGRANDIE */}
+                {/* NOTE MÉTHODOLOGIQUE */}
                 <div className="bg-amber-900/10 border-2 border-amber-900/40 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden group">
                   <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                     <ShieldCheck size={120} />
                   </div>
                   <h5 className="text-sm font-black uppercase text-amber-600 mb-6 italic tracking-widest flex items-center gap-3">
-                    <Cpu size={18} /> Note de Laboratoire :
+                    <Cpu size={18} /> Méthode :
                   </h5>
                   <p className="text-2xl text-amber-100/90 leading-relaxed italic font-medium">
-                    "Analyse morphologique des tracés, densité pigmentaire des
-                    encres et examen du 'crazing' (micro-craquelures) pour
-                    validation de l'authenticité organique."
+                    Comparaison structurelle (SSIM) entre la zone actuellement
+                    cadrée de la référence et celle de votre photo. Ceci est
+                    une aide visuelle et ne constitue en aucun cas une
+                    certification d'authenticité — seule une expertise
+                    physique fait foi.
                   </p>
                 </div>
 
@@ -378,7 +538,7 @@ export default function Compare({ setScreen }) {
                   }}
                   className="w-full py-6 text-sm font-black uppercase opacity-40 hover:opacity-100 transition-all underline underline-offset-8 decoration-2 tracking-[0.4em] italic"
                 >
-                  Réinitialiser l'Expertise
+                  Réinitialiser la comparaison
                 </button>
               </div>
             )}
