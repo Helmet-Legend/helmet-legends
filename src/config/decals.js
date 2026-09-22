@@ -8,6 +8,7 @@ import quistSSImg from "../assets/quist-ss-decal.webp";
 import etSSImg from "../assets/et-ss-decal.webp";
 import etKMImg from "../assets/et-km-decal.webp";
 import quistKMImg from "../assets/quist-km-decal.webp";
+import luftDroptailImg from "../assets/luft-droptail-decal.webp";
 
 export const AUTHENTIC_DECALS = [
   {
@@ -71,5 +72,12 @@ export const AUTHENTIC_DECALS = [
     img: quistKMImg,
     description:
       "Insigne Kriegsmarine authentique de l'usine Quist, aigle doré sur fond noir.",
+  },
+  {
+    id: "luft-droptail",
+    name: "Luftwaffe - Aigle 'Droptail'",
+    img: luftDroptailImg,
+    description:
+      "Insigne Luftwaffe authentique, aigle aux ailes déployées type 'Droptail'.",
   },
 ];
