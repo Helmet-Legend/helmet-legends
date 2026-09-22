@@ -7,6 +7,7 @@ import quistTricoloreImg from "../assets/quist-tricolore-decal.webp";
 import quistSSImg from "../assets/quist-ss-decal.webp";
 import etSSImg from "../assets/et-ss-decal.webp";
 import etKMImg from "../assets/et-km-decal.webp";
+import quistKMImg from "../assets/quist-km-decal.webp";
 
 export const AUTHENTIC_DECALS = [
   {
@@ -63,5 +64,12 @@ export const AUTHENTIC_DECALS = [
     img: etKMImg,
     description:
       "Insigne Kriegsmarine authentique de l'usine ET (Thale), aigle doré sur fond noir.",
+  },
+  {
+    id: "quist-km",
+    name: "Quist - Aigle Kriegsmarine",
+    img: quistKMImg,
+    description:
+      "Insigne Kriegsmarine authentique de l'usine Quist, aigle doré sur fond noir.",
   },
 ];
