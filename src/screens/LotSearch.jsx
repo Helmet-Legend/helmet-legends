@@ -32,33 +32,49 @@ const MFR_STATS = [
   { name: "HKP (Berlin tardif)", count: 2144 },
 ];
 
+const RESULTS_PAGE_SIZE = 20;
+
 const LotSearch = () => {
   const [db, setDb] = useState([]);
+  const [dbLoading, setDbLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMfr, setSelectedMfr] = useState("ET");
   const [results, setResults] = useState([]);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(RESULTS_PAGE_SIZE);
   const [isStatsOpen, setIsStatsOpen] = useState(false);
 
   useEffect(() => {
     fetch("/DATABASE_ULTIME_NORMALISEE.json")
       .then((res) => res.json())
       .then((data) => setDb(data))
-      .catch((err) => console.error(err));
+      .catch((err) => console.error(err))
+      .finally(() => setDbLoading(false));
   }, []);
 
   const handleSearch = () => {
     if (!searchTerm) return;
     const numericInput = searchTerm.replace(/\D/g, "");
     const rawInput = searchTerm.trim().toUpperCase();
+    // Comparé en nombre (et non en chaîne) pour ignorer les zéros de tête :
+    // un lot stocké "0086" doit être trouvé en tapant "86".
+    const numericValue = numericInput ? parseInt(numericInput, 10) : null;
     const matches = db.filter((item) => {
       const mfrMatch =
         item.manufacturer?.toUpperCase() === selectedMfr.toUpperCase();
+      if (!mfrMatch) return false;
+      const itemNumeric =
+        item.lot_number != null ? parseInt(item.lot_number, 10) : null;
       const lotMatch =
-        item.lot_number === numericInput ||
+        (numericValue !== null &&
+          itemNumeric !== null &&
+          itemNumeric === numericValue) ||
         item.lot_raw?.toUpperCase() === rawInput;
-      return mfrMatch && lotMatch;
+      return lotMatch;
     });
     setResults(matches);
+    setHasSearched(true);
+    setVisibleCount(RESULTS_PAGE_SIZE);
   };
 
   return (
@@ -177,13 +193,13 @@ const LotSearch = () => {
                 onChange={(e) => setSelectedMfr(e.target.value)}
                 style={styles.select}
               >
-                <option value="ET">ET / ckl (Thale)</option>
+                <option value="ET">ET (Thale)</option>
+                <option value="CKL">CKL (Thale tardif)</option>
                 <option value="Q">Q (Quist)</option>
-                <option value="SE">SE / hkp (Berlin)</option>
+                <option value="SE">SE (Berlin)</option>
+                <option value="HKP">HKP (Berlin tardif)</option>
                 <option value="NS">NS (Esslingen)</option>
                 <option value="EF">EF (Fulda)</option>
-                <option value="CKL">CKL (Fin de guerre)</option>
-                <option value="HKP">HKP (Fin de guerre)</option>
               </select>
             </div>
             <div style={{ flex: 1.5 }}>
@@ -195,19 +211,42 @@ const LotSearch = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                  disabled={dbLoading}
                   style={styles.input}
                 />
-                <button onClick={handleSearch} style={styles.searchBtn}>
-                  ANALYSER
+                <button
+                  onClick={handleSearch}
+                  disabled={dbLoading}
+                  style={{
+                    ...styles.searchBtn,
+                    opacity: dbLoading ? 0.5 : 1,
+                    cursor: dbLoading ? "not-allowed" : "pointer",
+                  }}
+                >
+                  {dbLoading ? "CHARGEMENT..." : "ANALYSER"}
                 </button>
               </div>
+              {dbLoading && (
+                <p style={styles.loadingHint}>
+                  Chargement de la base de référence (32 668 entrées)…
+                </p>
+              )}
             </div>
           </div>
         </div>
 
         {/* RÉSULTATS */}
+        {hasSearched && (
+          <p style={styles.resultsSummary}>
+            {results.length === 0
+              ? "Aucun résultat pour ce fabricant et ce numéro de lot."
+              : `${results.length} résultat${
+                  results.length > 1 ? "s" : ""
+                } trouvé${results.length > 1 ? "s" : ""}`}
+          </p>
+        )}
         <div style={styles.resultsContainer}>
-          {results.map((item, idx) => {
+          {results.slice(0, visibleCount).map((item, idx) => {
             const config = BRANCH_CONFIG[item.branch] || BRANCH_CONFIG.default;
             return (
               <div key={idx} style={styles.expertCard}>
@@ -269,6 +308,14 @@ const LotSearch = () => {
             );
           })}
         </div>
+        {visibleCount < results.length && (
+          <button
+            onClick={() => setVisibleCount((c) => c + RESULTS_PAGE_SIZE)}
+            style={styles.loadMoreBtn}
+          >
+            VOIR PLUS ({results.length - visibleCount} restants)
+          </button>
+        )}
       </div>
     </div>
   );
@@ -404,6 +451,33 @@ const styles = {
     fontWeight: "bold",
     marginBottom: "10px",
     letterSpacing: "1px",
+  },
+  loadingHint: {
+    marginTop: "10px",
+    fontSize: "0.7rem",
+    color: "#777",
+    fontStyle: "italic",
+  },
+  resultsSummary: {
+    fontSize: "0.75rem",
+    color: "#c1b49a",
+    letterSpacing: "0.5px",
+    marginBottom: "15px",
+  },
+  loadMoreBtn: {
+    display: "block",
+    width: "100%",
+    background: "none",
+    border: "1px solid #d3791d",
+    color: "#d3791d",
+    padding: "14px",
+    marginTop: "5px",
+    marginBottom: "30px",
+    cursor: "pointer",
+    fontWeight: "bold",
+    fontSize: "0.75rem",
+    letterSpacing: "1px",
+    borderRadius: "4px",
   },
   select: {
     width: "100%",
