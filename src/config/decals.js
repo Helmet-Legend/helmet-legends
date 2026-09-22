@@ -6,6 +6,7 @@ import quistHeerImg from "../assets/quist-heer-decal.webp";
 import quistTricoloreImg from "../assets/quist-tricolore-decal.webp";
 import quistSSImg from "../assets/quist-ss-decal.webp";
 import etSSImg from "../assets/et-ss-decal.webp";
+import etKMImg from "../assets/et-km-decal.webp";
 
 export const AUTHENTIC_DECALS = [
   {
@@ -55,5 +56,12 @@ export const AUTHENTIC_DECALS = [
     img: etSSImg,
     description:
       "Insigne Waffen-SS authentique de l'usine ET (Thale), runes SS sur fond doré/beige.",
+  },
+  {
+    id: "et-km",
+    name: "ET - Aigle Kriegsmarine",
+    img: etKMImg,
+    description:
+      "Insigne Kriegsmarine authentique de l'usine ET (Thale), aigle doré sur fond noir.",
   },
 ];
