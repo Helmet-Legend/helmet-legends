@@ -10,6 +10,7 @@ import etKMImg from "../assets/et-km-decal.webp";
 import quistKMImg from "../assets/quist-km-decal.webp";
 import luftDroptailImg from "../assets/luft-droptail-decal.webp";
 import nsLuftImg from "../assets/ns-luft-decal.webp";
+import etPartiImg from "../assets/et-parti-decal.webp";
 
 export const AUTHENTIC_DECALS = [
   {
@@ -87,5 +88,12 @@ export const AUTHENTIC_DECALS = [
     img: nsLuftImg,
     description:
       "Insigne Luftwaffe authentique de l'usine NS (Esslingen), aigle doré tenant la croix gammée.",
+  },
+  {
+    id: "et-parti",
+    name: "ET - Insigne du Parti (NSDAP)",
+    img: etPartiImg,
+    description:
+      "Insigne du Parti authentique de l'usine ET (Thale), écusson rouge, croix gammée noire sur cercle clair.",
   },
 ];
