@@ -6,7 +6,7 @@ export const translations = {
       handbook: "Manuel de l'Expert",
       lotSearch: "Recherche par Lot",
       registry: "Ma Collection",
-      compare: "Compareteur d'insigne",
+      compare: "Comparateur d'insigne",
       stats: "Voir mes statistiques",
       lang: "English",
     },

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { SearchX } from "lucide-react";
-import expertBg from "../assets/expert-bg.png";
+import expertBg from "../assets/expert-bg.jpg";
 
 // IMPORTATION DES ASSETS
 import heerImg from "../assets/heer_decal.png";
