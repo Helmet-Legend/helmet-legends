@@ -23,12 +23,52 @@ import {
   Flame,
   ShieldCheck,
   Layers,
+  CheckSquare,
+  Square,
+  ClipboardList,
 } from "lucide-react";
+
+const CHECKLIST_ITEMS = [
+  {
+    id: "pulver",
+    fr: "Scintillement solaire : la poudre d'aluminium (Pulver) d'un décal d'époque a un éclat incomparable ; un faux en plastique moderne est terne ou gris.",
+    en: "Solar scintillation: period aluminum powder (Pulver) has an incomparable shine; a modern plastic fake is dull or grey.",
+  },
+  {
+    id: "choc",
+    fr: "Comportement au choc : un décal d'époque en celluloïd s'écaille en micro-morceaux secs ; un faux moderne se recourbe ou se décolle en bloc.",
+    en: "Impact behavior: a period celluloid decal flakes off in dry micro-pieces; a modern fake curls or peels off in one piece.",
+  },
+  {
+    id: "uv",
+    fr: "Test UV : les fils de coiffe/jugulaire d'époque (lin, coton) restent mats sous lampe noire ; les fils synthétiques modernes brillent d'un blanc fluorescent.",
+    en: "UV test: period liner/chinstrap threads (linen, cotton) stay matte under blacklight; modern synthetic threads glow fluorescent white.",
+  },
+  {
+    id: "coherence",
+    fr: "Cohérence globale : l'usure de la coque, du liner, de la jugulaire et des décalcomanies ne présente aucune contradiction temporelle ou topographique.",
+    en: "Overall consistency: wear on the shell, liner, chinstrap and decals shows no temporal or topographical contradiction.",
+  },
+  {
+    id: "etat",
+    fr: "Le mythe de l'état parfait : un casque en excellent état n'est ni une preuve d'authenticité ni un motif de suspicion — il appelle simplement une vérification croisée plus poussée.",
+    en: "The 'perfect condition' myth: excellent condition is neither proof of authenticity nor a reason for suspicion — it simply calls for deeper cross-checking.",
+  },
+  {
+    id: "odeur",
+    fr: "Expertise olfactive : une odeur de solvant, de colle ou de cirage moderne doit immédiatement éveiller la méfiance, même si l'aspect visuel semble convaincant.",
+    en: "Olfactory test: a smell of solvent, glue or modern polish should immediately raise suspicion, even if the visual appearance looks convincing.",
+  },
+];
 
 const Handbook = ({ setScreen, lang }) => {
   const [openSection, setOpenSection] = useState(null);
+  const [checklist, setChecklist] = useState({});
   const isFr = lang === "fr";
   const toggleSection = (id) => setOpenSection(openSection === id ? null : id);
+  const toggleCheck = (id) =>
+    setChecklist((c) => ({ ...c, [id]: !c[id] }));
+  const checkedCount = Object.values(checklist).filter(Boolean).length;
 
   const sections = [
     {
@@ -332,13 +372,24 @@ const Handbook = ({ setScreen, lang }) => {
             Très fréquent sur casques de transition M16/M18 réutilisés[cite:
             80].
           </p>
-          <p>
+          <p className="mb-3">
             •{" "}
             <span className="text-amber-500 font-bold underline">
               Champagne Runes :
             </span>{" "}
             Analyses de 2015 révélant une peinture au pochoir avec pigment
             spécifique plutôt qu'une décalcomanie.
+          </p>
+          <p>
+            •{" "}
+            <span className="text-red-400 font-bold underline">
+              Tabou NS &amp; SE :
+            </span>{" "}
+            Ni Schwerte (NS) ni Lauter (SE/hkp) n'ont jamais reçu de contrat
+            d'usine pour la SS. Toute rune sur une coque NS ou SE est
+            statistiquement un faux — seule exception documentée : un
+            reconditionnement d'insignes Pocher en dépôt sur des coques NS,
+            jamais une production neuve.
           </p>
         </div>
       ),
@@ -527,8 +578,56 @@ const Handbook = ({ setScreen, lang }) => {
       ),
     },
     {
+      id: "buyers_checklist",
+      title: isFr
+        ? "XIII. Checklist d'Achat"
+        : "XIII. Buyer's Checklist",
+      icon: <ClipboardList size={20} />,
+      content: (
+        <div className="space-y-4">
+          <p className="text-xs italic opacity-60 mb-2">
+            {isFr
+              ? "Auto-évaluation avant achat — cochez chaque critère vérifié sur la pièce. Un outil d'aide personnelle, pas une certification."
+              : "Self-assessment before buying — check each criterion you've verified on the piece. A personal aid, not a certification."}
+          </p>
+          <div className="space-y-3">
+            {CHECKLIST_ITEMS.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => toggleCheck(item.id)}
+                className={`w-full text-left flex items-start gap-3 p-4 rounded-xl border transition-all ${
+                  checklist[item.id]
+                    ? "bg-green-900/20 border-green-700/40"
+                    : "bg-black/30 border-amber-900/20"
+                }`}
+              >
+                {checklist[item.id] ? (
+                  <CheckSquare
+                    size={20}
+                    className="text-green-500 shrink-0 mt-0.5"
+                  />
+                ) : (
+                  <Square
+                    size={20}
+                    className="text-amber-700 shrink-0 mt-0.5"
+                  />
+                )}
+                <span className="text-sm leading-relaxed">
+                  {isFr ? item.fr : item.en}
+                </span>
+              </button>
+            ))}
+          </div>
+          <div className="text-center pt-2 text-xs uppercase font-black tracking-widest text-amber-500">
+            {checkedCount} / {CHECKLIST_ITEMS.length}{" "}
+            {isFr ? "critères vérifiés" : "criteria verified"}
+          </div>
+        </div>
+      ),
+    },
+    {
       id: "metrology",
-      title: isFr ? "XIII. Table de Métrologie" : "XIII. Metrology Table",
+      title: isFr ? "XIV. Table de Métrologie" : "XIV. Metrology Table",
       icon: <Scale size={20} />,
       content: (
         <div className="overflow-x-auto">
@@ -558,6 +657,17 @@ const Handbook = ({ setScreen, lang }) => {
               })}
             </tbody>
           </table>
+          <div className="mt-5 p-4 bg-amber-900/10 rounded-xl border border-amber-900/30 text-sm italic leading-relaxed">
+            <span className="text-amber-500 font-bold not-italic uppercase text-xs tracking-widest">
+              L'épreuve de la balance :
+            </span>{" "}
+            l'acier allemand d'époque, d'épaisseur constante (1,1-1,2 mm),
+            donne une coque nue dans une fourchette générale d'environ
+            850 à 1 100 g selon la taille. De nombreuses reproductions
+            modernes utilisent un acier d'épaisseur différente, d'où un
+            poids sensiblement décalé — un test simple et peu coûteux, à
+            utiliser en complément des critères visuels, jamais seul.
+          </div>
         </div>
       ),
     },
