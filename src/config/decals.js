@@ -9,6 +9,7 @@ import etSSImg from "../assets/et-ss-decal.webp";
 import etKMImg from "../assets/et-km-decal.webp";
 import quistKMImg from "../assets/quist-km-decal.webp";
 import luftDroptailImg from "../assets/luft-droptail-decal.webp";
+import nsLuftImg from "../assets/ns-luft-decal.webp";
 
 export const AUTHENTIC_DECALS = [
   {
@@ -79,5 +80,12 @@ export const AUTHENTIC_DECALS = [
     img: luftDroptailImg,
     description:
       "Insigne Luftwaffe authentique, aigle aux ailes déployées type 'Droptail'.",
+  },
+  {
+    id: "ns-luft",
+    name: "NS - Aigle Luftwaffe",
+    img: nsLuftImg,
+    description:
+      "Insigne Luftwaffe authentique de l'usine NS (Esslingen), aigle doré tenant la croix gammée.",
   },
 ];
