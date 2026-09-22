@@ -5,6 +5,7 @@ import etHeerImg from "../assets/et-heer-decal.webp";
 import quistHeerImg from "../assets/quist-heer-decal.webp";
 import quistTricoloreImg from "../assets/quist-tricolore-decal.webp";
 import quistSSImg from "../assets/quist-ss-decal.webp";
+import etSSImg from "../assets/et-ss-decal.webp";
 
 export const AUTHENTIC_DECALS = [
   {
@@ -47,5 +48,12 @@ export const AUTHENTIC_DECALS = [
     img: quistSSImg,
     description:
       "Insigne Waffen-SS authentique de l'usine Quist, runes SS argentées sur fond clair.",
+  },
+  {
+    id: "et-ss",
+    name: "ET - Runes SS",
+    img: etSSImg,
+    description:
+      "Insigne Waffen-SS authentique de l'usine ET (Thale), runes SS sur fond doré/beige.",
   },
 ];
