@@ -2,6 +2,19 @@
 import bigfootImg from "../assets/bigfoot-quist.png";
 import luftNSImg from "../assets/LUFT-NSM42.png";
 import etHeerImg from "../assets/et-heer-decal.webp";
+import quistHeerImg from "../assets/quist-heer-decal.webp";
+import quistTricoloreImg from "../assets/quist-tricolore-decal.webp";
+import quistSSImg from "../assets/quist-ss-decal.webp";
+import etSSImg from "../assets/et-ss-decal.webp";
+import etKMImg from "../assets/et-km-decal.webp";
+import quistKMImg from "../assets/quist-km-decal.webp";
+import luftDroptailImg from "../assets/luft-droptail-decal.webp";
+import nsLuftImg from "../assets/ns-luft-decal.webp";
+import etPartiImg from "../assets/et-parti-decal.webp";
+import quistPolizeiImg from "../assets/quist-polizei-decal.webp";
+import quistPartiImg from "../assets/quist-parti-decal.webp";
+import nsPolizeiImg from "../assets/ns-polizei-decal.webp";
+import efSSImg from "../assets/ef-ss-decal.webp";
 
 export const AUTHENTIC_DECALS = [
   {
@@ -23,5 +36,96 @@ export const AUTHENTIC_DECALS = [
     img: etHeerImg,
     description:
       "Insigne Heer authentique de l'usine ET (Thale), décal doré sur fond noir.",
+  },
+  {
+    id: "quist-heer-decal",
+    name: "Quist - Aigle Heer",
+    img: quistHeerImg,
+    description:
+      "Insigne Heer authentique de l'usine Quist, aigle blanc sur fond noir.",
+  },
+  {
+    id: "quist-tricolore",
+    name: "Quist - Écusson tricolore",
+    img: quistTricoloreImg,
+    description:
+      "Écusson tricolore (noir/blanc/rouge) authentique de l'usine Quist.",
+  },
+  {
+    id: "quist-ss",
+    name: "Quist - Runes SS",
+    img: quistSSImg,
+    description:
+      "Insigne Waffen-SS authentique de l'usine Quist, runes SS argentées sur fond clair.",
+  },
+  {
+    id: "et-ss",
+    name: "ET - Runes SS",
+    img: etSSImg,
+    description:
+      "Insigne Waffen-SS authentique de l'usine ET (Thale), runes SS sur fond doré/beige.",
+  },
+  {
+    id: "et-km",
+    name: "ET - Aigle Kriegsmarine",
+    img: etKMImg,
+    description:
+      "Insigne Kriegsmarine authentique de l'usine ET (Thale), aigle doré sur fond noir.",
+  },
+  {
+    id: "quist-km",
+    name: "Quist - Aigle Kriegsmarine",
+    img: quistKMImg,
+    description:
+      "Insigne Kriegsmarine authentique de l'usine Quist, aigle doré sur fond noir.",
+  },
+  {
+    id: "luft-droptail",
+    name: "Luftwaffe - Aigle 'Droptail'",
+    img: luftDroptailImg,
+    description:
+      "Insigne Luftwaffe authentique, aigle aux ailes déployées type 'Droptail'.",
+  },
+  {
+    id: "ns-luft",
+    name: "NS - Aigle Luftwaffe",
+    img: nsLuftImg,
+    description:
+      "Insigne Luftwaffe authentique de l'usine NS (Esslingen), aigle doré tenant la croix gammée.",
+  },
+  {
+    id: "et-parti",
+    name: "ET - Insigne du Parti (NSDAP)",
+    img: etPartiImg,
+    description:
+      "Insigne du Parti authentique de l'usine ET (Thale), écusson rouge, croix gammée noire sur cercle clair.",
+  },
+  {
+    id: "quist-polizei",
+    name: "Quist - Aigle Polizei",
+    img: quistPolizeiImg,
+    description:
+      "Insigne Polizei authentique de l'usine Quist, aigle couronné d'une couronne de feuilles de chêne.",
+  },
+  {
+    id: "quist-parti",
+    name: "Quist - Insigne du Parti (NSDAP)",
+    img: quistPartiImg,
+    description:
+      "Insigne du Parti authentique de l'usine Quist, écusson rouge, croix gammée noire sur cercle clair.",
+  },
+  {
+    id: "ns-polizei",
+    name: "NS - Aigle Polizei",
+    img: nsPolizeiImg,
+    description:
+      "Insigne Polizei authentique de l'usine NS (Esslingen), aigle couronné d'une couronne de feuilles de chêne.",
+  },
+  {
+    id: "ef-ss",
+    name: "EF - Runes SS",
+    img: efSSImg,
+    description:
+      "Insigne Waffen-SS authentique de l'usine EF (Fulda), runes SS argentées sur fond clair.",
   },
 ];
