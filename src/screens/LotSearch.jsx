@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { SearchX } from "lucide-react";
 import expertBg from "../assets/expert-bg.png";
 
 // IMPORTATION DES ASSETS
@@ -35,8 +36,8 @@ const MFR_STATS = [
 const RESULTS_PAGE_SIZE = 20;
 
 const LotSearch = () => {
-  const [db, setDb] = useState([]);
-  const [dbLoading, setDbLoading] = useState(true);
+  const [db, setDb] = useState(null);
+  const [dbLoading, setDbLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMfr, setSelectedMfr] = useState("ET");
   const [results, setResults] = useState([]);
@@ -44,22 +45,13 @@ const LotSearch = () => {
   const [visibleCount, setVisibleCount] = useState(RESULTS_PAGE_SIZE);
   const [isStatsOpen, setIsStatsOpen] = useState(false);
 
-  useEffect(() => {
-    fetch("/DATABASE_ULTIME_NORMALISEE.json")
-      .then((res) => res.json())
-      .then((data) => setDb(data))
-      .catch((err) => console.error(err))
-      .finally(() => setDbLoading(false));
-  }, []);
-
-  const handleSearch = () => {
-    if (!searchTerm) return;
+  const runSearch = (data) => {
     const numericInput = searchTerm.replace(/\D/g, "");
     const rawInput = searchTerm.trim().toUpperCase();
     // Comparé en nombre (et non en chaîne) pour ignorer les zéros de tête :
     // un lot stocké "0086" doit être trouvé en tapant "86".
     const numericValue = numericInput ? parseInt(numericInput, 10) : null;
-    const matches = db.filter((item) => {
+    const matches = data.filter((item) => {
       const mfrMatch =
         item.manufacturer?.toUpperCase() === selectedMfr.toUpperCase();
       if (!mfrMatch) return false;
@@ -77,6 +69,27 @@ const LotSearch = () => {
     setVisibleCount(RESULTS_PAGE_SIZE);
   };
 
+  // La base (16 Mo / 32 668 entrées) n'est chargée qu'au premier lancement
+  // d'une recherche, pas à l'ouverture de l'écran.
+  const handleSearch = async () => {
+    if (!searchTerm) return;
+    if (db) {
+      runSearch(db);
+      return;
+    }
+    setDbLoading(true);
+    try {
+      const res = await fetch("/DATABASE_ULTIME_NORMALISEE.json");
+      const data = await res.json();
+      setDb(data);
+      runSearch(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setDbLoading(false);
+    }
+  };
+
   return (
     <div style={styles.container}>
       <div style={{ ...styles.overlay, backgroundImage: `url(${expertBg})` }} />
@@ -86,7 +99,9 @@ const LotSearch = () => {
           <div>
             <h1 style={styles.mainTitle}>Registre d'Expertise</h1>
             <p style={styles.subTitle}>
-              {db.length.toLocaleString()} ENTRÉES CERTIFIÉES
+              {db
+                ? `${db.length.toLocaleString()} ENTRÉES CERTIFIÉES`
+                : "BASE PRÊTE À L'ANALYSE"}
             </p>
           </div>
           <button
@@ -236,13 +251,21 @@ const LotSearch = () => {
         </div>
 
         {/* RÉSULTATS */}
-        {hasSearched && (
+        {hasSearched && results.length === 0 && (
+          <div style={styles.emptyState}>
+            <SearchX size={48} strokeWidth={1.5} color="#444" />
+            <p style={styles.emptyStateTitle}>Aucun résultat</p>
+            <p style={styles.emptyStateHint}>
+              Aucune entrée ne correspond à ce fabricant et ce numéro de lot.
+              Vérifiez le numéro, ou essayez un autre fabricant.
+            </p>
+          </div>
+        )}
+        {hasSearched && results.length > 0 && (
           <p style={styles.resultsSummary}>
-            {results.length === 0
-              ? "Aucun résultat pour ce fabricant et ce numéro de lot."
-              : `${results.length} résultat${
-                  results.length > 1 ? "s" : ""
-                } trouvé${results.length > 1 ? "s" : ""}`}
+            {`${results.length} résultat${
+              results.length > 1 ? "s" : ""
+            } trouvé${results.length > 1 ? "s" : ""}`}
           </p>
         )}
         <div style={styles.resultsContainer}>
@@ -463,6 +486,33 @@ const styles = {
     color: "#c1b49a",
     letterSpacing: "0.5px",
     marginBottom: "15px",
+  },
+  emptyState: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    textAlign: "center",
+    gap: "12px",
+    padding: "50px 20px",
+    background: "#111",
+    border: "1px solid #222",
+    borderRadius: "8px",
+    marginBottom: "30px",
+  },
+  emptyStateTitle: {
+    fontSize: "0.9rem",
+    color: "#888",
+    fontWeight: "bold",
+    textTransform: "uppercase",
+    letterSpacing: "1px",
+    margin: 0,
+  },
+  emptyStateHint: {
+    fontSize: "0.75rem",
+    color: "#555",
+    maxWidth: "360px",
+    lineHeight: "1.5",
+    margin: 0,
   },
   loadMoreBtn: {
     display: "block",
