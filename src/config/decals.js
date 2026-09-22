@@ -13,6 +13,7 @@ import nsLuftImg from "../assets/ns-luft-decal.webp";
 import etPartiImg from "../assets/et-parti-decal.webp";
 import quistPolizeiImg from "../assets/quist-polizei-decal.webp";
 import quistPartiImg from "../assets/quist-parti-decal.webp";
+import nsPolizeiImg from "../assets/ns-polizei-decal.webp";
 
 export const AUTHENTIC_DECALS = [
   {
@@ -111,5 +112,12 @@ export const AUTHENTIC_DECALS = [
     img: quistPartiImg,
     description:
       "Insigne du Parti authentique de l'usine Quist, écusson rouge, croix gammée noire sur cercle clair.",
+  },
+  {
+    id: "ns-polizei",
+    name: "NS - Aigle Polizei",
+    img: nsPolizeiImg,
+    description:
+      "Insigne Polizei authentique de l'usine NS (Esslingen), aigle couronné d'une couronne de feuilles de chêne.",
   },
 ];
