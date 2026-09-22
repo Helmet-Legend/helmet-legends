@@ -12,6 +12,7 @@ import luftDroptailImg from "../assets/luft-droptail-decal.webp";
 import nsLuftImg from "../assets/ns-luft-decal.webp";
 import etPartiImg from "../assets/et-parti-decal.webp";
 import quistPolizeiImg from "../assets/quist-polizei-decal.webp";
+import quistPartiImg from "../assets/quist-parti-decal.webp";
 
 export const AUTHENTIC_DECALS = [
   {
@@ -103,5 +104,12 @@ export const AUTHENTIC_DECALS = [
     img: quistPolizeiImg,
     description:
       "Insigne Polizei authentique de l'usine Quist, aigle couronné d'une couronne de feuilles de chêne.",
+  },
+  {
+    id: "quist-parti",
+    name: "Quist - Insigne du Parti (NSDAP)",
+    img: quistPartiImg,
+    description:
+      "Insigne du Parti authentique de l'usine Quist, écusson rouge, croix gammée noire sur cercle clair.",
   },
 ];
