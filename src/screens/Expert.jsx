@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 // --- FOND D'ÉCRAN ---
-import fondExpertise from "../assets/expert-bg.png";
+import fondExpertise from "../assets/expert-bg.jpg";
 
 // --- MINIATURES DE SÉLECTION (Étapes 1 & 2) ---
-import rolledEdgeImg from "../assets/rolled-edge-small.png";
-import rawEdgeImg from "../assets/raw-edge-small.png";
-import bushingVentImg from "../assets/bushing-vent-small.png";
-import stampedVentImg from "../assets/stamped-vent-small.png";
+import rolledEdgeImg from "../assets/rolled-edge-small.jpg";
+import rawEdgeImg from "../assets/raw-edge-small.jpg";
+import bushingVentImg from "../assets/bushing-vent-small.jpg";
+import stampedVentImg from "../assets/stamped-vent-small.jpg";
 
 // --- IMAGES HERO DYNAMIQUES (Étape 3) ---
-import m35HeroImg from "../assets/m35-hero.png";
-import m40HeroImg from "../assets/m40-hero.png";
-import m42HeroImg from "../assets/m42-hero.png";
+import m35HeroImg from "../assets/m35-hero.jpg";
+import m40HeroImg from "../assets/m40-hero.jpg";
+import m42HeroImg from "../assets/m42-hero.jpg";
 
 import { X, Microscope, ArrowLeft, ChevronRight } from "lucide-react";
 
