@@ -16,6 +16,37 @@ const getImageData = async (url) => {
   }
 };
 
+// Rend transparents les pixels noirs/quasi-noirs d'une image (le logo est
+// détouré sur fond noir plein) pour qu'il se fonde dans le fond du PDF
+// au lieu d'apparaître posé dans un carré.
+const stripBlackBackground = (dataUrl, threshold = 35) =>
+  new Promise((resolve) => {
+    if (!dataUrl) return resolve(dataUrl);
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const px = imageData.data;
+        for (let i = 0; i < px.length; i += 4) {
+          if (px[i] <= threshold && px[i + 1] <= threshold && px[i + 2] <= threshold) {
+            px[i + 3] = 0;
+          }
+        }
+        ctx.putImageData(imageData, 0, 0);
+        resolve(canvas.toDataURL("image/png"));
+      } catch (e) {
+        resolve(dataUrl);
+      }
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+
 const SECONDARY_VIEWS = [
   { id: "front", fr: "Face avant", en: "Front" },
   { id: "left", fr: "Côté gauche", en: "Left side" },
@@ -47,11 +78,12 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
 
   // Récupération des visuels en parallèle (logo, QR, photos)
   const secondaryPhotos = SECONDARY_VIEWS.filter((v) => helmet[`image_url_${v.id}`]);
-  const [logoData, mainImgData, ...secondaryImgData] = await Promise.all([
+  const [rawLogoData, mainImgData, ...secondaryImgData] = await Promise.all([
     getImageData(`${window.location.origin}/icon-512.png`),
     helmet.image_url_main ? getImageData(helmet.image_url_main) : Promise.resolve(null),
     ...secondaryPhotos.map((v) => getImageData(helmet[`image_url_${v.id}`])),
   ]);
+  const logoData = await stripBlackBackground(rawLogoData);
 
   // En-tête : logo de la marque
   if (logoData) {
