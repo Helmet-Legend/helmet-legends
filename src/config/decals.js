@@ -14,6 +14,7 @@ import etPartiImg from "../assets/et-parti-decal.webp";
 import quistPolizeiImg from "../assets/quist-polizei-decal.webp";
 import quistPartiImg from "../assets/quist-parti-decal.webp";
 import nsPolizeiImg from "../assets/ns-polizei-decal.webp";
+import efSSImg from "../assets/ef-ss-decal.webp";
 
 export const AUTHENTIC_DECALS = [
   {
@@ -119,5 +120,12 @@ export const AUTHENTIC_DECALS = [
     img: nsPolizeiImg,
     description:
       "Insigne Polizei authentique de l'usine NS (Esslingen), aigle couronné d'une couronne de feuilles de chêne.",
+  },
+  {
+    id: "ef-ss",
+    name: "EF - Runes SS",
+    img: efSSImg,
+    description:
+      "Insigne Waffen-SS authentique de l'usine EF (Fulda), runes SS argentées sur fond clair.",
   },
 ];
