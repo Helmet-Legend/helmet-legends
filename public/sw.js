@@ -1,27 +1,45 @@
-const CACHE_NAME = "helmet-legends-v1";
-const ASSETS_TO_CACHE = ["/", "/index.html", "/manifest.json", "/icon-512.png"];
+const CACHE_NAME = "helmet-legends-v2";
+const ASSETS_TO_CACHE = ["/manifest.json", "/icon-512.png"];
 
-// Installation : on met en cache les fichiers critiques
+// Installation : on met en cache les fichiers statiques non versionnés
+// et on active immédiatement le nouveau Service Worker.
 self.addEventListener("install", (event) => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log("PWA : Fichiers mis en cache");
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
   );
 });
 
-// Activation : on nettoie les anciens caches si nécessaire
+// Activation : on supprime les anciens caches et on prend le contrôle
+// des onglets déjà ouverts, pour qu'un nouveau déploiement soit pris
+// en compte sans que l'utilisateur ait à vider son cache manuellement.
 self.addEventListener("activate", (event) => {
-  console.log("PWA : Service Worker activé");
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(
+          keys
+            .filter((key) => key !== CACHE_NAME)
+            .map((key) => caches.delete(key))
+        )
+      )
+      .then(() => self.clients.claim())
+  );
 });
 
-// Interception des requêtes
+// Requêtes : réseau en priorité (pour toujours servir le dernier build),
+// avec repli sur le cache uniquement si le réseau est indisponible.
 self.addEventListener("fetch", (event) => {
+  if (event.request.method !== "GET") return;
+
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      // On retourne le fichier du cache s'il existe, sinon on fait la requête réseau
-      return response || fetch(event.request);
-    })
+    fetch(event.request)
+      .then((response) => {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
