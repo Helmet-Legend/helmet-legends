@@ -12,7 +12,7 @@ import {
   Layers,
   Database,
   ShieldCheck,
-  Images,
+  HardHat,
   Lock,
 } from "lucide-react";
 import { translations } from "../data/translations";
@@ -136,7 +136,7 @@ export default function Home({ setScreen, lang, setLang, isUpgraded }) {
             }
           >
             <TexturedButton
-              icon={isUpgraded ? <Images size={18} /> : <Lock size={18} />}
+              icon={isUpgraded ? <HardHat size={18} /> : <Lock size={18} />}
               label={t.gallery}
               onClick={() => setScreen(isUpgraded ? "gallery" : "account")}
               variant="dark"
