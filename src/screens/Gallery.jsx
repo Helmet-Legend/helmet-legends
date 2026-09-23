@@ -1,5 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { X, Images, HardHat, EyeOff, Loader2, SearchX } from "lucide-react";
+import {
+  X,
+  Images,
+  HardHat,
+  EyeOff,
+  Loader2,
+  SearchX,
+  MessageCircle,
+} from "lucide-react";
 import galleryHelmetIcon from "../assets/gallery-helmet-icon.png";
 import { supabase } from "../supabaseClient";
 
@@ -11,7 +19,7 @@ const BRANCHES = ["Heer", "Luftwaffe", "Kriegsmarine", "Waffen-SS", "Polizei"];
 // aux comptes sécurisés (get_public_gallery le vérifie aussi côté
 // serveur). Le pseudo affiché est celui, définitif, choisi à
 // l'inscription -- jamais le user_id ni un nom générique du site.
-export default function Gallery({ setScreen, lang, isAdmin }) {
+export default function Gallery({ setScreen, lang, isAdmin, onContact }) {
   const isFr = lang === "fr";
   const [items, setItems] = useState([]);
   const [status, setStatus] = useState("loading"); // loading | ok | restricted | error
@@ -204,11 +212,20 @@ export default function Gallery({ setScreen, lang, isAdmin }) {
                   </div>
                 </a>
                 <div className="px-4 pb-4">
+                  {!it.is_own && onContact && (
+                    <button
+                      onClick={() => onContact(it.id)}
+                      className="w-full flex items-center justify-center gap-2 py-2.5 bg-amber-900/20 border border-amber-700/40 text-amber-400 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-amber-900/40 transition-colors"
+                    >
+                      <MessageCircle size={12} />
+                      {isFr ? "Contacter" : "Contact"}
+                    </button>
+                  )}
                   {isAdmin && (
                     <button
                       onClick={() => handleHide(it.id)}
                       disabled={hidingId === it.id}
-                      className="mt-3 w-full flex items-center justify-center gap-2 py-2 border border-red-900/40 text-red-400 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-red-900/10 transition-colors disabled:opacity-40"
+                      className="mt-2 w-full flex items-center justify-center gap-2 py-2 border border-red-900/40 text-red-400 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-red-900/10 transition-colors disabled:opacity-40"
                     >
                       {hidingId === it.id ? (
                         <Loader2 size={12} className="animate-spin" />

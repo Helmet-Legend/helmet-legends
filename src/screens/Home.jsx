@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 // --- IMPORT DE L'IMAGE DEPUIS ASSETS ---
 import monFondExpert from "../assets/helmet-bg.png";
 
@@ -15,12 +15,22 @@ import {
   ShieldCheck,
   Lock,
   Tag,
+  MessageCircle,
 } from "lucide-react";
 import { translations } from "../data/translations";
+import { supabase } from "../supabaseClient";
 
 export default function Home({ setScreen, lang, setLang, isUpgraded }) {
   const t = (translations[lang] || translations["fr"]).home;
   const isFr = lang === "fr";
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (!isUpgraded) return;
+    supabase
+      .rpc("get_unread_message_count")
+      .then(({ data }) => setUnreadCount(data || 0));
+  }, [isUpgraded]);
 
   return (
     <div className="flex flex-col h-screen bg-[#1a1812] items-center justify-center p-6 text-[#d0c7a8] relative overflow-hidden">
@@ -166,6 +176,29 @@ export default function Home({ setScreen, lang, setLang, isUpgraded }) {
               onClick={() => setScreen(isUpgraded ? "listings" : "account")}
               variant="dark"
             />
+          </div>
+
+          <div
+            className={`relative ${!isUpgraded ? "opacity-40 grayscale" : ""}`}
+            title={
+              !isUpgraded
+                ? isFr
+                  ? "Sécurise ton compte pour accéder à la messagerie"
+                  : "Secure your account to access messaging"
+                : undefined
+            }
+          >
+            <TexturedButton
+              icon={isUpgraded ? <MessageCircle size={18} /> : <Lock size={18} />}
+              label={t.messages}
+              onClick={() => setScreen(isUpgraded ? "messages" : "account")}
+              variant="dark"
+            />
+            {isUpgraded && unreadCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 bg-red-600 text-white text-[10px] font-black min-w-[20px] h-5 px-1 rounded-full flex items-center justify-center shadow-lg">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
           </div>
 
           <button

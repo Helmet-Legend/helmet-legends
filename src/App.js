@@ -12,6 +12,7 @@ import LotSearch from "./screens/LotSearch";
 import Account from "./screens/Account";
 import Gallery from "./screens/Gallery";
 import Listings from "./screens/Listings";
+import Messages from "./screens/Messages";
 
 export default function App() {
   const [screen, setScreen] = useState("home");
@@ -20,7 +21,21 @@ export default function App() {
   const [collection, setCollection] = useState([]);
   const [authUser, setAuthUser] = useState(null);
   const [profile, setProfile] = useState(null);
+  const [pendingConversationId, setPendingConversationId] = useState(null);
   const isUpgraded = !!authUser && authUser.is_anonymous === false;
+
+  // --- CONTACTER LE PROPRIÉTAIRE D'UNE PIÈCE (galerie / annonces) ---
+  const handleContact = async (helmetId) => {
+    const { data, error } = await supabase.rpc("start_conversation_about_helmet", {
+      p_helmet_id: helmetId,
+    });
+    if (error) {
+      alert("Erreur : " + error.message);
+      return;
+    }
+    setPendingConversationId(data);
+    setScreen("messages");
+  };
 
   // --- 1. RÉCUPÉRATION DE LA COLLECTION ---
   const fetchCollection = async () => {
@@ -271,6 +286,7 @@ export default function App() {
             setScreen={setScreen}
             lang={lang}
             isAdmin={!!profile?.is_admin}
+            onContact={handleContact}
           />
         );
 
@@ -280,6 +296,18 @@ export default function App() {
             setScreen={setScreen}
             lang={lang}
             isAdmin={!!profile?.is_admin}
+            onContact={handleContact}
+          />
+        );
+
+      case "messages":
+        return (
+          <Messages
+            setScreen={setScreen}
+            lang={lang}
+            authUserId={authUser?.id}
+            initialConversationId={pendingConversationId}
+            onConsumedInitial={() => setPendingConversationId(null)}
           />
         );
 

@@ -1,12 +1,21 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { X, Tag, HardHat, EyeOff, Loader2, SearchX, Repeat } from "lucide-react";
+import {
+  X,
+  Tag,
+  HardHat,
+  EyeOff,
+  Loader2,
+  SearchX,
+  Repeat,
+  MessageCircle,
+} from "lucide-react";
 import { supabase } from "../supabaseClient";
 
 // Vente & Échange : les pièces marquées avec un type d'annonce
 // (listing_type non nul), toujours aussi visibles dans la Galerie
 // (contrainte imposée côté serveur). Même restriction d'accès et même
 // principe de pseudo verrouillé que la Galerie.
-export default function Listings({ setScreen, lang, isAdmin }) {
+export default function Listings({ setScreen, lang, isAdmin, onContact }) {
   const isFr = lang === "fr";
   const [items, setItems] = useState([]);
   const [status, setStatus] = useState("loading"); // loading | ok | restricted | error
@@ -222,11 +231,20 @@ export default function Listings({ setScreen, lang, isAdmin }) {
                   </div>
                 </a>
                 <div className="px-4 pb-4">
+                  {!it.is_own && onContact && (
+                    <button
+                      onClick={() => onContact(it.id)}
+                      className="w-full flex items-center justify-center gap-2 py-2.5 bg-amber-900/20 border border-amber-700/40 text-amber-400 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-amber-900/40 transition-colors"
+                    >
+                      <MessageCircle size={12} />
+                      {isFr ? "Contacter" : "Contact"}
+                    </button>
+                  )}
                   {isAdmin && (
                     <button
                       onClick={() => handleHide(it.id)}
                       disabled={hidingId === it.id}
-                      className="mt-3 w-full flex items-center justify-center gap-2 py-2 border border-red-900/40 text-red-400 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-red-900/10 transition-colors disabled:opacity-40"
+                      className="mt-2 w-full flex items-center justify-center gap-2 py-2 border border-red-900/40 text-red-400 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-red-900/10 transition-colors disabled:opacity-40"
                     >
                       {hidingId === it.id ? (
                         <Loader2 size={12} className="animate-spin" />

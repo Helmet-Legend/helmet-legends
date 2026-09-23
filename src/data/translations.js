@@ -11,6 +11,7 @@ export const translations = {
       account: "Mon Compte",
       gallery: "Galerie",
       listings: "Vente & Échange",
+      messages: "Messagerie",
       lang: "English",
     },
     lotSearch: {
@@ -66,6 +67,7 @@ export const translations = {
       account: "My Account",
       gallery: "Gallery",
       listings: "Buy & Trade",
+      messages: "Messages",
       lang: "Français",
     },
     lotSearch: {
