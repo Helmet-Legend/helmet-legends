@@ -4,6 +4,7 @@ import monFondExpert from "../assets/helmet-bg.png";
 
 import monLogo from "../logo.jpg";
 import { TexturedButton } from "../components/TexturedButton";
+import { HelmetIcon } from "../components/HelmetIcon";
 import {
   Search,
   Shield,
@@ -12,7 +13,6 @@ import {
   Layers,
   Database,
   ShieldCheck,
-  HardHat,
   Lock,
 } from "lucide-react";
 import { translations } from "../data/translations";
@@ -136,7 +136,7 @@ export default function Home({ setScreen, lang, setLang, isUpgraded }) {
             }
           >
             <TexturedButton
-              icon={isUpgraded ? <HardHat size={18} /> : <Lock size={18} />}
+              icon={isUpgraded ? <HelmetIcon size={18} /> : <Lock size={18} />}
               label={t.gallery}
               onClick={() => setScreen(isUpgraded ? "gallery" : "account")}
               variant="dark"
