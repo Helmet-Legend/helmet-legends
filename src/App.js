@@ -9,12 +9,15 @@ import Expert from "./screens/Expert";
 import Compare from "./screens/Compare";
 import Handbook from "./screens/Handbook";
 import LotSearch from "./screens/LotSearch";
+import Account from "./screens/Account";
 
 export default function App() {
   const [screen, setScreen] = useState("home");
   const [selectedHelmet, setSelectedHelmet] = useState(null);
   const [lang, setLang] = useState("fr");
   const [collection, setCollection] = useState([]);
+  const [authUser, setAuthUser] = useState(null);
+  const [profile, setProfile] = useState(null);
 
   // --- 1. RÉCUPÉRATION DE LA COLLECTION ---
   const fetchCollection = async () => {
@@ -30,19 +33,45 @@ export default function App() {
     }
   };
 
-  // --- 1bis. CONNEXION AUTOMATIQUE (anonyme si aucune session) ---
+  // --- 1bis. PROFIL (pseudo) LIÉ AU COMPTE ---
+  const fetchProfile = async (userId) => {
+    if (!userId) {
+      setProfile(null);
+      return;
+    }
+    const { data } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", userId)
+      .maybeSingle();
+    setProfile(data || null);
+  };
+
+  // --- 1ter. SESSION : anonyme par défaut, réactif à la connexion/déconnexion ---
+  // Un compte "sécurisé" (email + mot de passe) est une conversion de la
+  // session anonyme existante (auth.updateUser), donc le même user_id et
+  // la même collection sont conservés. Se déconnecter d'un tel compte
+  // recrée automatiquement une session anonyme fraîche (l'app doit
+  // toujours avoir une session pour fonctionner, RLS oblige).
   useEffect(() => {
-    const ensureSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session) {
-        const { error } = await supabase.auth.signInAnonymously();
-        if (error) console.error("Erreur connexion anonyme :", error);
+    let mounted = true;
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!mounted) return;
+      if (session) {
+        setAuthUser(session.user);
+        fetchCollection();
+        fetchProfile(session.user.id);
+      } else {
+        setAuthUser(null);
+        setCollection([]);
+        setProfile(null);
+        supabase.auth.signInAnonymously();
       }
-      fetchCollection();
+    });
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
     };
-    ensureSession();
   }, []);
 
   // --- 2. SAUVEGARDE ---
@@ -186,6 +215,23 @@ export default function App() {
 
       case "lotsearch":
         return <LotSearch setScreen={setScreen} lang={lang} />;
+
+      case "account":
+        return (
+          <Account
+            setScreen={setScreen}
+            lang={lang}
+            user={authUser}
+            profile={profile}
+            onChanged={async () => {
+              const {
+                data: { session },
+              } = await supabase.auth.getSession();
+              setAuthUser(session?.user || null);
+              await fetchProfile(session?.user?.id);
+            }}
+          />
+        );
 
       default:
         return <Home setScreen={setScreen} lang={lang} setLang={setLang} />;

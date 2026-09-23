@@ -8,6 +8,7 @@ export const translations = {
       registry: "Ma Collection",
       compare: "Comparateur d'insigne",
       stats: "Voir mes statistiques",
+      account: "Mon Compte",
       lang: "English",
     },
     lotSearch: {
@@ -60,6 +61,7 @@ export const translations = {
       registry: "Registry",
       compare: "Compare Decal",
       stats: "View Statistics",
+      account: "My Account",
       lang: "Français",
     },
     lotSearch: {
