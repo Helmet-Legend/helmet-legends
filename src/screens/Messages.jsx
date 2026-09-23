@@ -7,8 +7,10 @@ import {
   HardHat,
   ShieldAlert,
   Loader2,
+  Paperclip,
 } from "lucide-react";
 import { supabase } from "../supabaseClient";
+import { uploadToCloudinary } from "../utils/cloudinary";
 
 // Messagerie entre membres sécurisés. Une seule conversation par paire
 // d'utilisateurs (comme une vraie messagerie), les nouveaux messages
@@ -29,6 +31,7 @@ export default function Messages({
   const [loadingThread, setLoadingThread] = useState(false);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [showTip, setShowTip] = useState(true);
   const scrollRef = useRef(null);
 
@@ -125,6 +128,26 @@ export default function Messages({
     if (error) {
       alert("Erreur : " + error.message);
       setDraft(body);
+    }
+  };
+
+  const handleAttach = async (e) => {
+    const file = e.target.files[0];
+    e.target.value = "";
+    if (!file || !activeConv) return;
+    setUploadingImage(true);
+    try {
+      const url = await uploadToCloudinary(file);
+      const { error } = await supabase.from("messages").insert({
+        conversation_id: activeConv.id,
+        sender_id: authUserId,
+        image_url: url,
+      });
+      if (error) throw error;
+    } catch (err) {
+      alert(isFr ? "Erreur d'envoi de la photo" : "Error sending photo");
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -287,13 +310,26 @@ export default function Messages({
                     className={`flex ${mine ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                      className={`max-w-[75%] rounded-2xl overflow-hidden ${
                         mine
                           ? "bg-amber-600 text-black rounded-br-sm"
                           : "bg-black/60 border border-amber-900/20 text-[#d0c7a8] rounded-bl-sm"
                       }`}
                     >
-                      {m.body}
+                      {m.image_url && (
+                        <a href={m.image_url} target="_blank" rel="noopener noreferrer">
+                          <img
+                            src={m.image_url}
+                            alt=""
+                            className="max-w-full max-h-64 object-cover block"
+                          />
+                        </a>
+                      )}
+                      {m.body && (
+                        <p className="px-4 py-2.5 text-sm leading-relaxed">
+                          {m.body}
+                        </p>
+                      )}
                     </div>
                   </div>
                 );
@@ -305,6 +341,20 @@ export default function Messages({
             onSubmit={handleSend}
             className="p-4 border-t border-amber-900/20 flex gap-2 shrink-0"
           >
+            <label className="p-3 bg-black/60 border border-amber-900/30 rounded-full shrink-0 text-amber-500 cursor-pointer flex items-center justify-center active:scale-90 transition-transform">
+              {uploadingImage ? (
+                <Loader2 size={18} className="animate-spin" />
+              ) : (
+                <Paperclip size={18} />
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                disabled={uploadingImage}
+                onChange={handleAttach}
+              />
+            </label>
             <input
               type="text"
               value={draft}

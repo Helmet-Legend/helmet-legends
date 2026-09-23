@@ -2,9 +2,7 @@ import React, { useState, useEffect } from "react";
 import { X, ImageIcon, AlertTriangle, CheckCircle, Upload } from "lucide-react";
 import { TexturedButton } from "../components/TexturedButton";
 import { translations } from "../data/translations";
-
-const CLOUD_NAME = "dmdoihdah";
-const UPLOAD_PRESET = "helmet_legends_unsigned";
+import { uploadToCloudinary } from "../utils/cloudinary";
 
 const MANUFACTURERS = {
   ET: "Eisenhüttenwerke, Thale",
@@ -155,19 +153,6 @@ export const getExpertise = (helmet, lang) => {
   if (dateMsg) messages.push(dateMsg);
 
   return messages.join(" — ");
-};
-
-const uploadToCloudinary = async (file) => {
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("upload_preset", UPLOAD_PRESET);
-  const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-    { method: "POST", body: formData }
-  );
-  const data = await res.json();
-  if (!data.secure_url) throw new Error("Upload échoué");
-  return data.secure_url;
 };
 
 export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
