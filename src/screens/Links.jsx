@@ -7,7 +7,7 @@ const USEFUL_LINKS = [
   {
     id: "facebook",
     icon: Facebook,
-    url: "https://www.facebook.com/helmetlegends",
+    url: "https://www.facebook.com/share/1ChPZkVCtP/",
     labelKey: "facebook",
     descKey: "facebookDesc",
   },
