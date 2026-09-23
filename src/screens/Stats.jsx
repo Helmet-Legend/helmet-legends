@@ -35,7 +35,7 @@ export default function Stats({ setScreen, helmets = [], lang }) {
     <div className="min-h-screen bg-[#1a1812] text-[#d0c7a8] font-serif relative overflow-hidden">
       {/* BACKGROUND (FLOU À 5px COMME LES AUTRES) */}
       <div
-        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat scale-110"
+        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat scale-110 pointer-events-none"
         style={{
           backgroundImage: `url(${monFondExpert})`,
           filter: "brightness(0.2) blur(5px)",

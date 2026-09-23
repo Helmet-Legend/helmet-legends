@@ -39,7 +39,7 @@ export default function Registry({
     <div className="h-screen overflow-y-auto bg-[#1a1812] text-[#d0c7a8] font-serif relative">
       {/* --- IMAGE DE FOND --- */}
       <div
-        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat scale-110"
+        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat scale-110 pointer-events-none"
         style={{
           backgroundImage: `url(${monFondExpert})`,
           filter: "brightness(0.15) blur(10px)",

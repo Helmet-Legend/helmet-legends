@@ -328,7 +328,7 @@ export default function Compare({ setScreen, lang }) {
     <div className="min-h-screen bg-[#1a1812] text-[#d0c7a8] font-serif relative overflow-hidden flex flex-col select-none touch-none">
       {/* FOND D'ÉCRAN FIXE */}
       <div
-        className="fixed inset-0 z-0 bg-cover bg-center"
+        className="fixed inset-0 z-0 bg-cover bg-center pointer-events-none"
         style={{
           backgroundImage: `url(${monFondExpert})`,
           filter: "brightness(0.2) blur(8px)",
