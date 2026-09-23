@@ -18,6 +18,11 @@ import { supabase } from "../supabaseClient";
 // et donc toute la collection déjà enregistrée. Aucune inscription n'est
 // jamais imposée pour utiliser l'app normalement — cet écran n'est
 // accessible que si l'utilisateur va lui-même le chercher.
+//
+// Le pseudo est choisi une seule fois, à la sécurisation du compte, et
+// devient définitif (verrouillé aussi côté serveur par un trigger) —
+// pour que l'identité derrière une annonce/fiche publiée reste fiable
+// et ne puisse pas être changée après coup.
 export default function Account({ setScreen, lang, user, profile, onChanged }) {
   const isFr = lang === "fr";
   const isUpgraded = user && user.is_anonymous === false;
@@ -26,7 +31,6 @@ export default function Account({ setScreen, lang, user, profile, onChanged }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [pseudo, setPseudo] = useState("");
-  const [editPseudo, setEditPseudo] = useState(profile?.username || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -83,24 +87,6 @@ export default function Account({ setScreen, lang, user, profile, onChanged }) {
     setScreen("home");
   };
 
-  const handleUpdatePseudo = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-    if (!editPseudo.trim()) return;
-    setLoading(true);
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .upsert({ id: user.id, username: editPseudo.trim() });
-    setLoading(false);
-    if (profileError) {
-      setError(profileError.message);
-      return;
-    }
-    setSuccess(isFr ? "Pseudo mis à jour." : "Display name updated.");
-    await onChanged();
-  };
-
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     setScreen("home");
@@ -133,44 +119,19 @@ export default function Account({ setScreen, lang, user, profile, onChanged }) {
               <p className="text-sm font-bold text-amber-100">{user.email}</p>
             </div>
 
-            <form onSubmit={handleUpdatePseudo} className="space-y-3">
-              <label className="text-[10px] uppercase font-black text-amber-600 tracking-widest block">
+            <div className="p-5 bg-black/40 border border-amber-900/20 rounded-2xl">
+              <p className="text-[10px] uppercase font-black opacity-40 mb-1 tracking-widest">
                 {isFr ? "Pseudo affiché" : "Display name"}
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={editPseudo}
-                  onChange={(e) => setEditPseudo(e.target.value)}
-                  className="flex-1 bg-black/60 border border-amber-900/30 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500"
-                  placeholder={isFr ? "Ton pseudo" : "Your display name"}
-                />
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="px-4 bg-amber-600 hover:bg-amber-500 disabled:opacity-40 text-black rounded-xl font-black text-xs uppercase"
-                >
-                  {loading ? (
-                    <Loader2 size={16} className="animate-spin" />
-                  ) : isFr ? (
-                    "Enregistrer"
-                  ) : (
-                    "Save"
-                  )}
-                </button>
-              </div>
-            </form>
-
-            {error && (
-              <p className="flex items-center gap-2 text-xs text-red-400">
-                <AlertCircle size={14} /> {error}
               </p>
-            )}
-            {success && (
-              <p className="flex items-center gap-2 text-xs text-green-400">
-                <CheckCircle2 size={14} /> {success}
+              <p className="text-sm font-bold text-amber-100">
+                {profile?.username || "—"}
               </p>
-            )}
+              <p className="text-[10px] italic opacity-40 mt-2">
+                {isFr
+                  ? "Définitif — choisi une seule fois pour garantir la fiabilité des annonces et fiches publiées."
+                  : "Permanent — chosen once to keep published listings and records trustworthy."}
+              </p>
+            </div>
 
             <button
               onClick={handleSignOut}
