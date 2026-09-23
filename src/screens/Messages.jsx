@@ -64,6 +64,9 @@ export default function Messages({
     setShowMenu(false);
     setShowReportForm(false);
     setReportReason("");
+    // Entrée d'historique dédiée pour que le geste "retour" ramène à la
+    // liste des conversations plutôt que de quitter la messagerie.
+    window.history.pushState({ screen: "messages", view: "thread" }, "");
 
     const { data } = await supabase
       .from("messages")
@@ -89,6 +92,21 @@ export default function Messages({
     })();
     // eslint-disable-next-line
   }, [initialConversationId]);
+
+  // Geste "retour" (ou bouton retour navigateur) depuis un fil ouvert :
+  // revient à la liste des conversations plutôt que de quitter la
+  // messagerie, en cohérence avec l'entrée d'historique poussée par
+  // openThread().
+  useEffect(() => {
+    const onPopState = (event) => {
+      if (event.state?.screen === "messages" && event.state?.view !== "thread") {
+        setView("inbox");
+        setActiveConv(null);
+      }
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
 
   // Temps réel : les nouveaux messages du fil ouvert apparaissent sans
   // avoir besoin de rafraîchir.
@@ -221,10 +239,7 @@ export default function Messages({
         <div className="flex items-center gap-3">
           {view === "thread" ? (
             <button
-              onClick={() => {
-                setView("inbox");
-                setActiveConv(null);
-              }}
+              onClick={() => window.history.back()}
               className="p-1 text-amber-500 active:scale-90 transition-transform"
             >
               <ArrowLeft size={22} />
