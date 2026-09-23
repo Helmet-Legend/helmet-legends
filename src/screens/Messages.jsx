@@ -216,7 +216,7 @@ export default function Messages({
   };
 
   return (
-    <div className="min-h-screen bg-[#1a1812] font-serif text-[#d0c7a8] relative flex flex-col">
+    <div className="h-screen overflow-y-auto bg-[#1a1812] font-serif text-[#d0c7a8] relative flex flex-col">
       <div className="sticky top-0 z-20 flex items-center justify-between mb-2 border-b-2 border-amber-800 pb-4 backdrop-blur-xl bg-black/40 p-4 shadow-2xl shrink-0">
         <div className="flex items-center gap-3">
           {view === "thread" ? (

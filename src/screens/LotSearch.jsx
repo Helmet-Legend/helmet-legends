@@ -396,7 +396,8 @@ const LotSearch = ({ setScreen, lang }) => {
 const styles = {
   container: {
     position: "relative",
-    minHeight: "100vh",
+    height: "100vh",
+    overflowY: "auto",
     backgroundColor: "#050505",
     color: "#d1d1d1",
     padding: "40px 20px",

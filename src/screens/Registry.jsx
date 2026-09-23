@@ -36,7 +36,7 @@ export default function Registry({
   };
 
   return (
-    <div className="min-h-screen bg-[#1a1812] text-[#d0c7a8] font-serif relative">
+    <div className="h-screen overflow-y-auto bg-[#1a1812] text-[#d0c7a8] font-serif relative">
       {/* --- IMAGE DE FOND --- */}
       <div
         className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat scale-110"

@@ -45,7 +45,7 @@ export default function PublicHelmet({ helmetId }) {
     : [];
 
   return (
-    <div className="min-h-screen bg-[#1a1812] font-serif text-[#d0c7a8] relative">
+    <div className="h-screen overflow-y-auto bg-[#1a1812] font-serif text-[#d0c7a8] relative">
       <div className="sticky top-0 left-0 right-0 z-30 p-4 md:p-6 flex justify-between items-center bg-black/60 backdrop-blur-lg border-b border-amber-900/20">
         <div className="flex items-center gap-3">
           <img src={monLogo} alt="Helmet Legends" className="h-9 w-auto" />
