@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowLeft, Link2, Facebook, ExternalLink } from "lucide-react";
+import { ArrowLeft, Link2, Facebook, Globe, ExternalLink } from "lucide-react";
 import { translations } from "../data/translations";
 
 // Ajoute une entrée ici pour chaque nouveau lien externe utile.
@@ -10,6 +10,41 @@ const USEFUL_LINKS = [
     url: "https://www.facebook.com/helmetlegends",
     labelKey: "facebook",
     descKey: "facebookDesc",
+  },
+  {
+    id: "germanHelmetVault",
+    icon: Globe,
+    url: "https://germanhelmetvault.com/",
+    labelKey: "germanHelmetVault",
+    descKey: "germanHelmetVaultDesc",
+  },
+  {
+    id: "germanWW2Helmet",
+    icon: Globe,
+    url: "https://german-ww2-helmet.com/",
+    labelKey: "germanWW2Helmet",
+    descKey: "germanWW2HelmetDesc",
+  },
+  {
+    id: "passionMilitaria",
+    icon: Globe,
+    url: "https://www.passionmilitaria.com/",
+    labelKey: "passionMilitaria",
+    descKey: "passionMilitariaDesc",
+  },
+  {
+    id: "germanHelmetWalhalla",
+    icon: Globe,
+    url: "https://www.germanhelmetwalhalla.com/",
+    labelKey: "germanHelmetWalhalla",
+    descKey: "germanHelmetWalhallaDesc",
+  },
+  {
+    id: "warHats",
+    icon: Globe,
+    url: "https://warhats.com/",
+    labelKey: "warHats",
+    descKey: "warHatsDesc",
   },
 ];
 
