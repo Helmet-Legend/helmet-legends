@@ -222,7 +222,7 @@ export default function Details({
             className="w-full py-5 bg-amber-600 hover:bg-amber-500 text-black rounded-xl flex items-center justify-center gap-4 text-xs uppercase font-black tracking-widest transition-all shadow-2xl mb-4"
           >
             <Printer size={20} />
-            {isFr ? "Générer Certificat PDF" : "Generate PDF Certificate"}
+            {isFr ? "Générer Fiche PDF" : "Generate PDF Sheet"}
           </button>
 
           {isUpgraded ? (
@@ -292,8 +292,8 @@ export default function Details({
 
           <p className="text-[8px] text-center uppercase opacity-30 italic tracking-widest">
             {isFr
-              ? "Base de données Helmet Legends - Archive Certifiée"
-              : "Helmet Legends Database - Certified Archive"}
+              ? "Base de données Helmet Legends - Archive de Référence"
+              : "Helmet Legends Database - Reference Archive"}
           </p>
         </div>
       </div>

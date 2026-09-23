@@ -273,6 +273,6 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
   doc.text(splitDisclaimer, 105, 280, { align: "center" });
 
   // Sauvegarde
-  const fileName = `HL_Archive_${helmet.model || "Certificat"}_${ref}.pdf`;
+  const fileName = `HL_Archive_${helmet.model || "Fiche"}_${ref}.pdf`;
   doc.save(fileName);
 };

@@ -1146,7 +1146,7 @@ const Handbook = ({ setScreen, lang }) => {
 
         <div className="mt-10 p-5 bg-black/60 backdrop-blur-md rounded-2xl border border-amber-600/10 shadow-2xl text-center">
           <p className="text-xs italic opacity-40 uppercase tracking-widest">
-            Helmet Legends Forensic Database v4.1 — Certified Sources
+            Helmet Legends Forensic Database v4.1 — Reference Sources
           </p>
         </div>
       </div>
