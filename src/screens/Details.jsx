@@ -222,7 +222,7 @@ export default function Details({
             className="w-full py-5 bg-amber-600 hover:bg-amber-500 text-black rounded-xl flex items-center justify-center gap-4 text-xs uppercase font-black tracking-widest transition-all shadow-2xl mb-4"
           >
             <Printer size={20} />
-            {isFr ? "Générer Fiche PDF" : "Generate PDF Sheet"}
+            {isFr ? "Générer Carte d'Identité PDF" : "Generate PDF Identity Card"}
           </button>
 
           {isUpgraded ? (

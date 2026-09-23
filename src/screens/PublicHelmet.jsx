@@ -51,7 +51,7 @@ export default function PublicHelmet({ helmetId }) {
           <img src={monLogo} alt="Helmet Legends" className="h-9 w-auto" />
           <div>
             <p className="text-[9px] uppercase tracking-[0.3em] text-amber-500 font-bold leading-none">
-              {isFr ? "Fiche Vérifiée" : "Verified Record"}
+              {isFr ? "Carte d'Identité Vérifiée" : "Verified Identity Card"}
             </p>
           </div>
         </div>
