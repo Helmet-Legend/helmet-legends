@@ -166,12 +166,7 @@ export default function App() {
 
       case "stats":
         return (
-          <Stats
-            setScreen={setScreen}
-            total={collection.length}
-            stats={{ total: collection.length }}
-            lang={lang}
-          />
+          <Stats setScreen={setScreen} helmets={collection} lang={lang} />
         );
 
       case "expert":
