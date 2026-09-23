@@ -173,29 +173,37 @@ export default function Gallery({ setScreen, lang, isAdmin }) {
                 key={it.id}
                 className="bg-black/50 border border-amber-900/30 rounded-2xl overflow-hidden shadow-xl"
               >
-                <div className="h-48 bg-black flex items-center justify-center">
-                  {it.image_url_main ? (
-                    <img
-                      src={it.image_url_main}
-                      alt={it.model}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <HardHat size={40} className="opacity-20" />
-                  )}
-                </div>
-                <div className="p-4">
-                  <h3 className="text-amber-500 font-black uppercase italic text-base truncate">
-                    {it.model || (isFr ? "Modèle Inconnu" : "Unknown Model")}
-                  </h3>
-                  <p className="text-[10px] text-white/40 font-bold tracking-widest mb-2">
-                    {[it.manufacturer, it.branch].filter(Boolean).join(" · ") ||
-                      "—"}
-                  </p>
-                  <p className="text-[10px] uppercase font-bold text-amber-200">
-                    {isFr ? "Par" : "By"} {it.username}
-                  </p>
-
+                <a
+                  href={`/helmet/${it.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  <div className="h-48 bg-black flex items-center justify-center">
+                    {it.image_url_main ? (
+                      <img
+                        src={it.image_url_main}
+                        alt={it.model}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <HardHat size={40} className="opacity-20" />
+                    )}
+                  </div>
+                  <div className="p-4 pb-2">
+                    <h3 className="text-amber-500 font-black uppercase italic text-base truncate">
+                      {it.model || (isFr ? "Modèle Inconnu" : "Unknown Model")}
+                    </h3>
+                    <p className="text-[10px] text-white/40 font-bold tracking-widest mb-2">
+                      {[it.manufacturer, it.branch].filter(Boolean).join(" · ") ||
+                        "—"}
+                    </p>
+                    <p className="text-[10px] uppercase font-bold text-amber-200">
+                      {isFr ? "Par" : "By"} {it.username}
+                    </p>
+                  </div>
+                </a>
+                <div className="px-4 pb-4">
                   {isAdmin && (
                     <button
                       onClick={() => handleHide(it.id)}
