@@ -8,6 +8,10 @@ import {
   ShieldAlert,
   Loader2,
   Paperclip,
+  MoreVertical,
+  UserX,
+  UserCheck,
+  Flag,
 } from "lucide-react";
 import { supabase } from "../supabaseClient";
 import { uploadToCloudinary } from "../utils/cloudinary";
@@ -33,6 +37,11 @@ export default function Messages({
   const [sending, setSending] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showTip, setShowTip] = useState(true);
+  const [showMenu, setShowMenu] = useState(false);
+  const [showReportForm, setShowReportForm] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [blocking, setBlocking] = useState(false);
+  const [reporting, setReporting] = useState(false);
   const scrollRef = useRef(null);
 
   const loadInbox = async () => {
@@ -52,6 +61,9 @@ export default function Messages({
     setView("thread");
     setLoadingThread(true);
     setShowTip(true);
+    setShowMenu(false);
+    setShowReportForm(false);
+    setReportReason("");
 
     const { data } = await supabase
       .from("messages")
@@ -126,7 +138,13 @@ export default function Messages({
     });
     setSending(false);
     if (error) {
-      alert("Erreur : " + error.message);
+      alert(
+        error.code === "42501"
+          ? isFr
+            ? "Impossible d'envoyer ce message."
+            : "This message could not be sent."
+          : "Erreur : " + error.message
+      );
       setDraft(body);
     }
   };
@@ -149,6 +167,52 @@ export default function Messages({
     } finally {
       setUploadingImage(false);
     }
+  };
+
+  const handleToggleBlock = async () => {
+    if (!activeConv) return;
+    setBlocking(true);
+    setShowMenu(false);
+    if (activeConv.i_blocked_them) {
+      const { error } = await supabase
+        .from("blocked_users")
+        .delete()
+        .eq("blocker_id", authUserId)
+        .eq("blocked_id", activeConv.other_user_id);
+      if (!error) {
+        setActiveConv((c) => ({ ...c, i_blocked_them: false }));
+      }
+    } else {
+      const { error } = await supabase.from("blocked_users").insert({
+        blocker_id: authUserId,
+        blocked_id: activeConv.other_user_id,
+      });
+      if (!error) {
+        setActiveConv((c) => ({ ...c, i_blocked_them: true }));
+      }
+    }
+    setBlocking(false);
+    loadInbox();
+  };
+
+  const handleReport = async (e) => {
+    e.preventDefault();
+    if (!activeConv || !reportReason.trim()) return;
+    setReporting(true);
+    const { error } = await supabase.from("reports").insert({
+      reporter_id: authUserId,
+      reported_id: activeConv.other_user_id,
+      conversation_id: activeConv.id,
+      reason: reportReason.trim(),
+    });
+    setReporting(false);
+    if (error) {
+      alert("Erreur : " + error.message);
+      return;
+    }
+    setShowReportForm(false);
+    setReportReason("");
+    alert(isFr ? "Signalement envoyé. Merci." : "Report sent. Thank you.");
   };
 
   return (
@@ -176,12 +240,56 @@ export default function Messages({
               : "Messages"}
           </h2>
         </div>
-        <button
-          onClick={() => setScreen("home")}
-          className="p-2 bg-amber-900/40 rounded-full border border-amber-700/50 text-amber-500 active:scale-90 transition-transform"
-        >
-          <X size={20} />
-        </button>
+        <div className="flex items-center gap-2">
+          {view === "thread" && (
+            <div className="relative">
+              <button
+                onClick={() => setShowMenu((v) => !v)}
+                className="p-2 bg-amber-900/40 rounded-full border border-amber-700/50 text-amber-500 active:scale-90 transition-transform"
+              >
+                <MoreVertical size={18} />
+              </button>
+              {showMenu && (
+                <div className="absolute right-0 top-full mt-2 w-52 bg-[#1a1812] border border-amber-900/40 rounded-xl shadow-2xl overflow-hidden z-30">
+                  <button
+                    onClick={handleToggleBlock}
+                    disabled={blocking}
+                    className="w-full flex items-center gap-2 px-4 py-3 text-xs font-bold text-left hover:bg-amber-900/20 disabled:opacity-40"
+                  >
+                    {activeConv?.i_blocked_them ? (
+                      <UserCheck size={14} />
+                    ) : (
+                      <UserX size={14} />
+                    )}
+                    {activeConv?.i_blocked_them
+                      ? isFr
+                        ? "Débloquer"
+                        : "Unblock"
+                      : isFr
+                      ? "Bloquer"
+                      : "Block"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowMenu(false);
+                      setShowReportForm(true);
+                    }}
+                    className="w-full flex items-center gap-2 px-4 py-3 text-xs font-bold text-left text-red-400 hover:bg-red-900/10"
+                  >
+                    <Flag size={14} />
+                    {isFr ? "Signaler" : "Report"}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+          <button
+            onClick={() => setScreen("home")}
+            className="p-2 bg-amber-900/40 rounded-full border border-amber-700/50 text-amber-500 active:scale-90 transition-transform"
+          >
+            <X size={20} />
+          </button>
+        </div>
       </div>
 
       {view === "inbox" && (
@@ -295,6 +403,50 @@ export default function Messages({
             </div>
           )}
 
+          {showReportForm && (
+            <form
+              onSubmit={handleReport}
+              className="mx-4 mt-3 p-3 bg-red-900/10 border border-red-900/30 rounded-xl shrink-0 space-y-2"
+            >
+              <p className="text-[10px] uppercase font-black text-red-400 tracking-widest">
+                {isFr ? "Signaler ce membre" : "Report this member"}
+              </p>
+              <textarea
+                value={reportReason}
+                onChange={(e) => setReportReason(e.target.value)}
+                placeholder={
+                  isFr
+                    ? "Explique le problème..."
+                    : "Describe the issue..."
+                }
+                rows={3}
+                className="w-full bg-black/60 border border-red-900/30 rounded-lg px-3 py-2 text-xs outline-none focus:border-red-500 resize-none"
+              />
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowReportForm(false)}
+                  className="flex-1 py-2 text-[10px] font-black uppercase tracking-widest opacity-60"
+                >
+                  {isFr ? "Annuler" : "Cancel"}
+                </button>
+                <button
+                  type="submit"
+                  disabled={reporting || !reportReason.trim()}
+                  className="flex-1 py-2 bg-red-900/40 border border-red-700/50 text-red-300 rounded-lg text-[10px] font-black uppercase tracking-widest disabled:opacity-40"
+                >
+                  {reporting
+                    ? isFr
+                      ? "Envoi..."
+                      : "Sending..."
+                    : isFr
+                    ? "Envoyer"
+                    : "Send"}
+                </button>
+              </div>
+            </form>
+          )}
+
           <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
             {loadingThread && (
               <div className="flex justify-center py-10 opacity-50">
@@ -337,39 +489,56 @@ export default function Messages({
             <div ref={scrollRef} />
           </div>
 
-          <form
-            onSubmit={handleSend}
-            className="p-4 border-t border-amber-900/20 flex gap-2 shrink-0"
-          >
-            <label className="p-3 bg-black/60 border border-amber-900/30 rounded-full shrink-0 text-amber-500 cursor-pointer flex items-center justify-center active:scale-90 transition-transform">
-              {uploadingImage ? (
-                <Loader2 size={18} className="animate-spin" />
-              ) : (
-                <Paperclip size={18} />
-              )}
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                disabled={uploadingImage}
-                onChange={handleAttach}
-              />
-            </label>
-            <input
-              type="text"
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              placeholder={isFr ? "Écris un message..." : "Write a message..."}
-              className="flex-1 bg-black/60 border border-amber-900/30 rounded-full px-4 py-3 text-sm outline-none focus:border-amber-500"
-            />
-            <button
-              type="submit"
-              disabled={sending || !draft.trim()}
-              className="p-3 bg-amber-600 hover:bg-amber-500 disabled:opacity-30 text-black rounded-full shrink-0"
+          {activeConv?.i_blocked_them ? (
+            <div className="p-4 border-t border-amber-900/20 shrink-0 flex items-center justify-between gap-3 bg-black/30">
+              <p className="text-xs italic opacity-60">
+                {isFr
+                  ? "Tu as bloqué ce membre."
+                  : "You've blocked this member."}
+              </p>
+              <button
+                onClick={handleToggleBlock}
+                disabled={blocking}
+                className="px-4 py-2 border border-amber-700/40 text-amber-400 rounded-full text-[10px] font-black uppercase tracking-widest shrink-0"
+              >
+                {isFr ? "Débloquer" : "Unblock"}
+              </button>
+            </div>
+          ) : (
+            <form
+              onSubmit={handleSend}
+              className="p-4 border-t border-amber-900/20 flex gap-2 shrink-0"
             >
-              <Send size={18} />
-            </button>
-          </form>
+              <label className="p-3 bg-black/60 border border-amber-900/30 rounded-full shrink-0 text-amber-500 cursor-pointer flex items-center justify-center active:scale-90 transition-transform">
+                {uploadingImage ? (
+                  <Loader2 size={18} className="animate-spin" />
+                ) : (
+                  <Paperclip size={18} />
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  disabled={uploadingImage}
+                  onChange={handleAttach}
+                />
+              </label>
+              <input
+                type="text"
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                placeholder={isFr ? "Écris un message..." : "Write a message..."}
+                className="flex-1 bg-black/60 border border-amber-900/30 rounded-full px-4 py-3 text-sm outline-none focus:border-amber-500"
+              />
+              <button
+                type="submit"
+                disabled={sending || !draft.trim()}
+                className="p-3 bg-amber-600 hover:bg-amber-500 disabled:opacity-30 text-black rounded-full shrink-0"
+              >
+                <Send size={18} />
+              </button>
+            </form>
+          )}
         </div>
       )}
 
