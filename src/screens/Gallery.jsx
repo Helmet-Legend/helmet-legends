@@ -5,6 +5,7 @@ import {
   HardHat,
   EyeOff,
   Loader2,
+  Search,
   SearchX,
   MessageCircle,
 } from "lucide-react";
@@ -26,16 +27,25 @@ export default function Gallery({ setScreen, lang, isAdmin, onContact }) {
   const [hidingId, setHidingId] = useState(null);
   const [modelFilter, setModelFilter] = useState("all");
   const [branchFilter, setBranchFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const filteredItems = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
     return items.filter((it) => {
       if (modelFilter !== "all" && it.model !== modelFilter) return false;
       if (branchFilter !== "all" && it.branch !== branchFilter) return false;
+      if (
+        q &&
+        !it.model?.toLowerCase().includes(q) &&
+        !it.branch?.toLowerCase().includes(q)
+      )
+        return false;
       return true;
     });
-  }, [items, modelFilter, branchFilter]);
+  }, [items, modelFilter, branchFilter, searchQuery]);
 
-  const isFiltering = modelFilter !== "all" || branchFilter !== "all";
+  const isFiltering =
+    modelFilter !== "all" || branchFilter !== "all" || searchQuery.trim() !== "";
 
   const load = async () => {
     setStatus("loading");
@@ -118,6 +128,26 @@ export default function Gallery({ setScreen, lang, isAdmin, onContact }) {
           <p className="text-center py-24 text-sm opacity-50 italic">
             {isFr ? "Une erreur est survenue." : "Something went wrong."}
           </p>
+        )}
+
+        {status === "ok" && items.length > 0 && (
+          <div className="relative mb-3">
+            <Search
+              size={16}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-amber-700"
+            />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={
+                isFr
+                  ? "Rechercher par modèle ou arme..."
+                  : "Search by model or branch..."
+              }
+              className="w-full bg-black/60 border border-amber-900/30 rounded-xl pl-11 pr-4 py-3 text-sm text-amber-100 outline-none focus:border-amber-500 placeholder:text-amber-900/60"
+            />
+          </div>
         )}
 
         {status === "ok" && items.length > 0 && (
