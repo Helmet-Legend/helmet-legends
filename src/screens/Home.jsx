@@ -11,6 +11,7 @@ import {
   BookOpen,
   Layers,
   Database,
+  ShieldCheck,
 } from "lucide-react";
 import { translations } from "../data/translations";
 
@@ -126,6 +127,13 @@ export default function Home({ setScreen, lang, setLang }) {
             className="w-full text-[10px] uppercase font-bold opacity-60 flex items-center justify-center gap-2 mt-6 hover:opacity-100 transition-opacity text-amber-200"
           >
             <PieChart size={14} /> {t.stats}
+          </button>
+
+          <button
+            onClick={() => setScreen("account")}
+            className="w-full text-[10px] uppercase font-bold opacity-60 flex items-center justify-center gap-2 mt-3 hover:opacity-100 transition-opacity text-amber-200"
+          >
+            <ShieldCheck size={14} /> {t.account}
           </button>
         </div>
       </div>
