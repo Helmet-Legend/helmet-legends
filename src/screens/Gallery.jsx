@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { X, Images, HardHat, EyeOff, Loader2, SearchX } from "lucide-react";
-import { HelmetIcon } from "../components/HelmetIcon";
+import galleryHelmetIcon from "../assets/gallery-helmet-icon.png";
 import { supabase } from "../supabaseClient";
 
 const MODELS = ["M35", "M40", "M42"];
@@ -63,7 +63,7 @@ export default function Gallery({ setScreen, lang, isAdmin }) {
     <div className="min-h-screen bg-[#1a1812] font-serif text-[#d0c7a8] relative">
       <div className="sticky top-0 z-20 flex items-center justify-between mb-2 border-b-2 border-amber-800 pb-4 backdrop-blur-xl bg-black/40 p-4 shadow-2xl">
         <div className="flex items-center gap-3">
-          <HelmetIcon className="text-amber-500" size={24} />
+          <img src={galleryHelmetIcon} alt="" className="h-6 w-auto" />
           <h2 className="text-xl font-black uppercase italic tracking-tighter">
             {isFr ? "Galerie" : "Gallery"}
           </h2>

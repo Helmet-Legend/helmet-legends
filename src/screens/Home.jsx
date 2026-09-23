@@ -3,8 +3,8 @@ import React from "react";
 import monFondExpert from "../assets/helmet-bg.png";
 
 import monLogo from "../logo.jpg";
+import galleryHelmetIcon from "../assets/gallery-helmet-icon.png";
 import { TexturedButton } from "../components/TexturedButton";
-import { HelmetIcon } from "../components/HelmetIcon";
 import {
   Search,
   Shield,
@@ -136,7 +136,13 @@ export default function Home({ setScreen, lang, setLang, isUpgraded }) {
             }
           >
             <TexturedButton
-              icon={isUpgraded ? <HelmetIcon size={18} /> : <Lock size={18} />}
+              icon={
+                isUpgraded ? (
+                  <img src={galleryHelmetIcon} alt="" className="h-[18px] w-auto" />
+                ) : (
+                  <Lock size={18} />
+                )
+              }
               label={t.gallery}
               onClick={() => setScreen(isUpgraded ? "gallery" : "account")}
               variant="dark"
