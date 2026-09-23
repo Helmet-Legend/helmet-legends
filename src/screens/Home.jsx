@@ -39,7 +39,7 @@ export default function Home({ setScreen, lang, setLang, isUpgraded }) {
     <div className="flex flex-col h-screen overflow-y-auto bg-[#1a1812] items-center p-6 text-[#d0c7a8] relative">
       {/* --- FOND D'ÉCRAN MODIFIÉ (PLUS CLAIR) --- */}
       <div
-        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 scale-105"
+        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 scale-105 pointer-events-none"
         style={{
           backgroundImage: `url(${monFondExpert})`,
           // Modification ici : brightness passe de 0.7 à 0.85

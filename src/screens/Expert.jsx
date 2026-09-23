@@ -60,7 +60,7 @@ export default function Expert({ setScreen, setSelectedHelmet, lang }) {
     <div className="min-h-screen flex flex-col bg-[#1a1812] font-serif text-[#d0c7a8] relative overflow-hidden">
       {/* BACKGROUND OPTIMISÉ */}
       <div
-        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat scale-110"
+        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat scale-110 pointer-events-none"
         style={{
           backgroundImage: `url(${fondExpertise})`,
           filter: "brightness(0.3) contrast(1.1) blur(2px)",
