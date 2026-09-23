@@ -33,10 +33,10 @@ export default function Home({ setScreen, lang, setLang, isUpgraded }) {
   }, [isUpgraded]);
 
   return (
-    <div className="flex flex-col h-screen bg-[#1a1812] items-center justify-center p-6 text-[#d0c7a8] relative overflow-hidden">
+    <div className="flex flex-col h-screen overflow-y-auto bg-[#1a1812] items-center p-6 text-[#d0c7a8] relative">
       {/* --- FOND D'ÉCRAN MODIFIÉ (PLUS CLAIR) --- */}
       <div
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 scale-105"
+        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 scale-105"
         style={{
           backgroundImage: `url(${monFondExpert})`,
           // Modification ici : brightness passe de 0.7 à 0.85
@@ -50,9 +50,9 @@ export default function Home({ setScreen, lang, setLang, isUpgraded }) {
       </div>
 
       {/* --- LE CONTENU (Z-INDEX 10) --- */}
-      <div className="relative z-10 flex flex-col items-center w-full max-w-xs">
-        {/* SÉLECTEUR MINIATURE */}
-        <div className="absolute -top-16 right-0 flex items-center gap-2 z-50 bg-black/60 p-1.5 px-3 rounded-full border border-amber-900/30 backdrop-blur-md shadow-lg">
+      <div className="relative z-10 flex flex-col items-center w-full max-w-xs py-6">
+        {/* SÉLECTEUR MINIATURE -- fixe (toujours visible, même en scrollant) */}
+        <div className="fixed top-4 right-4 flex items-center gap-2 z-50 bg-black/60 p-1.5 px-3 rounded-full border border-amber-900/30 backdrop-blur-md shadow-lg">
           <div
             onClick={() => setLang("fr")}
             className={`cursor-pointer transition-all duration-300 ${
