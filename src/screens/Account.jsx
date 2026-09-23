@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   X,
   ShieldCheck,
@@ -10,8 +10,16 @@ import {
   Loader2,
   CheckCircle2,
   AlertCircle,
+  Bell,
+  BellOff,
 } from "lucide-react";
 import { supabase } from "../supabaseClient";
+import {
+  isPushSupported,
+  subscribeToPush,
+  unsubscribeFromPush,
+  getCurrentPushSubscription,
+} from "../utils/push";
 
 // Compte optionnel : convertit la session anonyme existante en compte
 // email + mot de passe (auth.updateUser), en conservant le même user_id
@@ -34,6 +42,32 @@ export default function Account({ setScreen, lang, user, profile, onChanged }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [pushSubscribed, setPushSubscribed] = useState(false);
+  const [pushBusy, setPushBusy] = useState(false);
+  const [pushError, setPushError] = useState("");
+
+  useEffect(() => {
+    if (!isUpgraded) return;
+    getCurrentPushSubscription().then((sub) => setPushSubscribed(!!sub));
+  }, [isUpgraded]);
+
+  const handleTogglePush = async () => {
+    setPushBusy(true);
+    setPushError("");
+    try {
+      if (pushSubscribed) {
+        await unsubscribeFromPush();
+        setPushSubscribed(false);
+      } else {
+        await subscribeToPush(user.id);
+        setPushSubscribed(true);
+      }
+    } catch (e) {
+      setPushError(e.message);
+    } finally {
+      setPushBusy(false);
+    }
+  };
 
   const handleUpgrade = async (e) => {
     e.preventDefault();
@@ -132,6 +166,54 @@ export default function Account({ setScreen, lang, user, profile, onChanged }) {
                   : "Permanent — chosen once to keep published listings and records trustworthy."}
               </p>
             </div>
+
+            {isPushSupported() && (
+              <div className="p-5 bg-black/40 border border-amber-900/20 rounded-2xl">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-bold text-amber-100 flex items-center gap-2">
+                      {pushSubscribed ? <Bell size={16} /> : <BellOff size={16} />}
+                      {isFr
+                        ? "Notifications de messages"
+                        : "Message notifications"}
+                    </p>
+                    <p className="text-[10px] italic opacity-40 mt-1">
+                      {isFr
+                        ? "Reçois une alerte sur cet appareil pour chaque nouveau message."
+                        : "Get alerted on this device for every new message."}
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleTogglePush}
+                    disabled={pushBusy}
+                    className={`shrink-0 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest disabled:opacity-40 ${
+                      pushSubscribed
+                        ? "border border-amber-700/40 text-amber-400"
+                        : "bg-amber-600 text-black"
+                    }`}
+                  >
+                    {pushBusy ? (
+                      <Loader2 size={14} className="animate-spin" />
+                    ) : pushSubscribed ? (
+                      isFr ? (
+                        "Désactiver"
+                      ) : (
+                        "Disable"
+                      )
+                    ) : isFr ? (
+                      "Activer"
+                    ) : (
+                      "Enable"
+                    )}
+                  </button>
+                </div>
+                {pushError && (
+                  <p className="flex items-center gap-2 text-xs text-red-400 mt-3">
+                    <AlertCircle size={14} /> {pushError}
+                  </p>
+                )}
+              </div>
+            )}
 
             <button
               onClick={handleSignOut}
