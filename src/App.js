@@ -13,6 +13,7 @@ import Account from "./screens/Account";
 import Gallery from "./screens/Gallery";
 import Listings from "./screens/Listings";
 import Messages from "./screens/Messages";
+import Links from "./screens/Links";
 
 export default function App() {
   const [screen, setScreen] = useState("home");
@@ -310,6 +311,9 @@ export default function App() {
             onConsumedInitial={() => setPendingConversationId(null)}
           />
         );
+
+      case "links":
+        return <Links setScreen={setScreen} lang={lang} />;
 
       default:
         return (

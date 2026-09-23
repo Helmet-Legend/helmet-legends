@@ -12,7 +12,13 @@ export const translations = {
       gallery: "Galerie",
       listings: "Vente & Échange",
       messages: "Messagerie",
+      links: "Liens Utiles",
       lang: "English",
+    },
+    links: {
+      title: "Liens Utiles",
+      facebook: "Page Facebook Helmet Legends",
+      facebookDesc: "Actualités, nouveautés et communauté de collectionneurs",
     },
     lotSearch: {
       title: "Lot Search Expert",
@@ -68,7 +74,13 @@ export const translations = {
       gallery: "Gallery",
       listings: "Buy & Trade",
       messages: "Messages",
+      links: "Useful Links",
       lang: "Français",
+    },
+    links: {
+      title: "Useful Links",
+      facebook: "Helmet Legends Facebook Page",
+      facebookDesc: "News, updates and the collectors' community",
     },
     lotSearch: {
       title: "Expert Lot Search",

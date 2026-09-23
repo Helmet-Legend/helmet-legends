@@ -16,6 +16,7 @@ import {
   Lock,
   Tag,
   MessageCircle,
+  Link2,
 } from "lucide-react";
 import { translations } from "../data/translations";
 import { supabase } from "../supabaseClient";
@@ -213,6 +214,13 @@ export default function Home({ setScreen, lang, setLang, isUpgraded }) {
             className="w-full text-[10px] uppercase font-bold opacity-60 flex items-center justify-center gap-2 mt-3 hover:opacity-100 transition-opacity text-amber-200"
           >
             <ShieldCheck size={14} /> {t.account}
+          </button>
+
+          <button
+            onClick={() => setScreen("links")}
+            className="w-full text-[10px] uppercase font-bold opacity-60 flex items-center justify-center gap-2 mt-3 hover:opacity-100 transition-opacity text-amber-200"
+          >
+            <Link2 size={14} /> {t.links}
           </button>
         </div>
       </div>
