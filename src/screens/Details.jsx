@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   ChevronLeft,
   Edit3,
@@ -6,15 +6,31 @@ import {
   Printer,
   ShieldCheck,
   HardHat,
+  Images,
+  Loader2,
 } from "lucide-react";
 import { translations } from "../data/translations";
 import { generateHelmetPDF } from "../utils/pdfGenerator";
 
-export default function Details({ setScreen, helmet, onEdit, lang }) {
+export default function Details({
+  setScreen,
+  helmet,
+  onEdit,
+  lang,
+  isUpgraded,
+  onTogglePublic,
+}) {
   const labels = translations[lang]?.add || {};
   const isFr = lang === "fr";
+  const [publishing, setPublishing] = useState(false);
 
   if (!helmet) return null;
+
+  const handleTogglePublic = async () => {
+    setPublishing(true);
+    await onTogglePublic(helmet.id, !helmet.is_public);
+    setPublishing(false);
+  };
 
   const photos = [
     { id: "main", url: helmet.image_url_main },
@@ -180,11 +196,42 @@ export default function Details({ setScreen, helmet, onEdit, lang }) {
 
           <button
             onClick={handlePDF}
-            className="w-full py-5 bg-amber-600 hover:bg-amber-500 text-black rounded-xl flex items-center justify-center gap-4 text-xs uppercase font-black tracking-widest transition-all shadow-2xl mb-6"
+            className="w-full py-5 bg-amber-600 hover:bg-amber-500 text-black rounded-xl flex items-center justify-center gap-4 text-xs uppercase font-black tracking-widest transition-all shadow-2xl mb-4"
           >
             <Printer size={20} />
             {isFr ? "Générer Certificat PDF" : "Generate PDF Certificate"}
           </button>
+
+          {isUpgraded ? (
+            <button
+              onClick={handleTogglePublic}
+              disabled={publishing}
+              className={`w-full py-4 rounded-xl flex items-center justify-center gap-3 text-xs uppercase font-black tracking-widest transition-all shadow-lg mb-6 disabled:opacity-40 ${
+                helmet.is_public
+                  ? "bg-green-900/30 border border-green-700/40 text-green-400"
+                  : "bg-black/30 border border-amber-900/30 text-amber-300"
+              }`}
+            >
+              {publishing ? (
+                <Loader2 size={18} className="animate-spin" />
+              ) : (
+                <Images size={18} />
+              )}
+              {helmet.is_public
+                ? isFr
+                  ? "Publiée dans la galerie · Retirer"
+                  : "Published in gallery · Remove"
+                : isFr
+                ? "Publier dans la galerie"
+                : "Publish to gallery"}
+            </button>
+          ) : (
+            <p className="text-[10px] italic text-center opacity-40 mb-6">
+              {isFr
+                ? "Sécurise ton compte pour publier cette pièce dans la galerie."
+                : "Secure your account to publish this piece to the gallery."}
+            </p>
+          )}
 
           <p className="text-[8px] text-center uppercase opacity-30 italic tracking-widest">
             {isFr

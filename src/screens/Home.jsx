@@ -12,11 +12,14 @@ import {
   Layers,
   Database,
   ShieldCheck,
+  Images,
+  Lock,
 } from "lucide-react";
 import { translations } from "../data/translations";
 
-export default function Home({ setScreen, lang, setLang }) {
+export default function Home({ setScreen, lang, setLang, isUpgraded }) {
   const t = (translations[lang] || translations["fr"]).home;
+  const isFr = lang === "fr";
 
   return (
     <div className="flex flex-col h-screen bg-[#1a1812] items-center justify-center p-6 text-[#d0c7a8] relative overflow-hidden">
@@ -121,6 +124,24 @@ export default function Home({ setScreen, lang, setLang }) {
             onClick={() => setScreen("compare")}
             variant="dark"
           />
+
+          <div
+            className={!isUpgraded ? "opacity-40 grayscale" : ""}
+            title={
+              !isUpgraded
+                ? isFr
+                  ? "Sécurise ton compte pour accéder à la galerie"
+                  : "Secure your account to access the gallery"
+                : undefined
+            }
+          >
+            <TexturedButton
+              icon={isUpgraded ? <Images size={18} /> : <Lock size={18} />}
+              label={t.gallery}
+              onClick={() => setScreen(isUpgraded ? "gallery" : "account")}
+              variant="dark"
+            />
+          </div>
 
           <button
             onClick={() => setScreen("stats")}

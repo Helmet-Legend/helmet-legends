@@ -10,6 +10,7 @@ import Compare from "./screens/Compare";
 import Handbook from "./screens/Handbook";
 import LotSearch from "./screens/LotSearch";
 import Account from "./screens/Account";
+import Gallery from "./screens/Gallery";
 
 export default function App() {
   const [screen, setScreen] = useState("home");
@@ -18,6 +19,7 @@ export default function App() {
   const [collection, setCollection] = useState([]);
   const [authUser, setAuthUser] = useState(null);
   const [profile, setProfile] = useState(null);
+  const isUpgraded = !!authUser && authUser.is_anonymous === false;
 
   // --- 1. RÉCUPÉRATION DE LA COLLECTION ---
   const fetchCollection = async () => {
@@ -126,6 +128,23 @@ export default function App() {
     }
   };
 
+  // --- 3bis. PUBLICATION DANS LA GALERIE (compte sécurisé requis, imposé
+  // aussi côté serveur par un trigger) ---
+  const handleTogglePublic = async (id, isPublic) => {
+    const { error } = await supabase
+      .from("helmets")
+      .update({ is_public: isPublic })
+      .eq("id", id);
+    if (error) {
+      alert("Erreur : " + error.message);
+      return;
+    }
+    setSelectedHelmet((prev) =>
+      prev && prev.id === id ? { ...prev, is_public: isPublic } : prev
+    );
+    await fetchCollection();
+  };
+
   // --- 4. CONVERSION snake_case → camelCase pour édition ---
   const toEditFormat = (h) => {
     if (!h) return null;
@@ -155,7 +174,14 @@ export default function App() {
   const renderScreen = () => {
     switch (screen) {
       case "home":
-        return <Home setScreen={setScreen} lang={lang} setLang={setLang} />;
+        return (
+          <Home
+            setScreen={setScreen}
+            lang={lang}
+            setLang={setLang}
+            isUpgraded={isUpgraded}
+          />
+        );
 
       case "registry":
         return (
@@ -190,6 +216,8 @@ export default function App() {
               setScreen("add");
             }}
             lang={lang}
+            isUpgraded={isUpgraded}
+            onTogglePublic={handleTogglePublic}
           />
         );
 
@@ -233,8 +261,24 @@ export default function App() {
           />
         );
 
+      case "gallery":
+        return (
+          <Gallery
+            setScreen={setScreen}
+            lang={lang}
+            isAdmin={!!profile?.is_admin}
+          />
+        );
+
       default:
-        return <Home setScreen={setScreen} lang={lang} setLang={setLang} />;
+        return (
+          <Home
+            setScreen={setScreen}
+            lang={lang}
+            setLang={setLang}
+            isUpgraded={isUpgraded}
+          />
+        );
     }
   };
 
