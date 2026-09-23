@@ -42,7 +42,7 @@ const USEFUL_LINKS = [
   {
     id: "warHats",
     icon: Globe,
-    url: "https://warhats.com/",
+    url: "https://www.warhats.com/#/",
     labelKey: "warHats",
     descKey: "warHatsDesc",
   },
