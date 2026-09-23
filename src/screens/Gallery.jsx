@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { X, Images, HardHat, EyeOff, Loader2 } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import { X, Images, HardHat, EyeOff, Loader2, SearchX } from "lucide-react";
 import { supabase } from "../supabaseClient";
+
+const MODELS = ["M35", "M40", "M42"];
+const BRANCHES = ["Heer", "Luftwaffe", "Kriegsmarine", "Waffen-SS", "Polizei"];
 
 // Vitrine communautaire : uniquement les pièces publiées volontairement
 // par leur propriétaire (opt-in, depuis la fiche de détail), réservée
@@ -12,6 +15,18 @@ export default function Gallery({ setScreen, lang, isAdmin }) {
   const [items, setItems] = useState([]);
   const [status, setStatus] = useState("loading"); // loading | ok | restricted | error
   const [hidingId, setHidingId] = useState(null);
+  const [modelFilter, setModelFilter] = useState("all");
+  const [branchFilter, setBranchFilter] = useState("all");
+
+  const filteredItems = useMemo(() => {
+    return items.filter((it) => {
+      if (modelFilter !== "all" && it.model !== modelFilter) return false;
+      if (branchFilter !== "all" && it.branch !== branchFilter) return false;
+      return true;
+    });
+  }, [items, modelFilter, branchFilter]);
+
+  const isFiltering = modelFilter !== "all" || branchFilter !== "all";
 
   const load = async () => {
     setStatus("loading");
@@ -96,6 +111,35 @@ export default function Gallery({ setScreen, lang, isAdmin }) {
           </p>
         )}
 
+        {status === "ok" && items.length > 0 && (
+          <div className="flex flex-wrap gap-3 mb-6">
+            <select
+              value={modelFilter}
+              onChange={(e) => setModelFilter(e.target.value)}
+              className="bg-black/60 border border-amber-900/30 rounded-xl px-4 py-2.5 text-xs font-bold text-amber-200 outline-none focus:border-amber-500"
+            >
+              <option value="all">{isFr ? "Tous les modèles" : "All models"}</option>
+              {MODELS.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
+            <select
+              value={branchFilter}
+              onChange={(e) => setBranchFilter(e.target.value)}
+              className="bg-black/60 border border-amber-900/30 rounded-xl px-4 py-2.5 text-xs font-bold text-amber-200 outline-none focus:border-amber-500"
+            >
+              <option value="all">{isFr ? "Toutes les armes" : "All branches"}</option>
+              {BRANCHES.map((b) => (
+                <option key={b} value={b}>
+                  {b}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         {status === "ok" && items.length === 0 && (
           <div className="flex flex-col items-center justify-center py-24 px-6 text-center opacity-60">
             <Images size={48} className="mb-4 opacity-30" />
@@ -105,9 +149,25 @@ export default function Gallery({ setScreen, lang, isAdmin }) {
           </div>
         )}
 
-        {status === "ok" && items.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {items.map((it) => (
+        {status === "ok" && items.length > 0 && filteredItems.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-24 px-6 text-center opacity-60">
+            <SearchX size={48} className="mb-4 opacity-30" />
+            <p className="text-sm uppercase font-black tracking-widest">
+              {isFr ? "Aucune pièce ne correspond" : "No matching pieces"}
+            </p>
+          </div>
+        )}
+
+        {status === "ok" && filteredItems.length > 0 && (
+          <>
+            {isFiltering && (
+              <p className="text-[10px] uppercase font-bold text-amber-500 tracking-widest mb-4">
+                {filteredItems.length}{" "}
+                {isFr ? "résultat(s)" : "result(s)"}
+              </p>
+            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredItems.map((it) => (
               <div
                 key={it.id}
                 className="bg-black/50 border border-amber-900/30 rounded-2xl overflow-hidden shadow-xl"
@@ -152,7 +212,8 @@ export default function Gallery({ setScreen, lang, isAdmin }) {
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+          </>
         )}
       </div>
     </div>
