@@ -11,6 +11,7 @@ import Handbook from "./screens/Handbook";
 import LotSearch from "./screens/LotSearch";
 import Account from "./screens/Account";
 import Gallery from "./screens/Gallery";
+import Listings from "./screens/Listings";
 
 export default function App() {
   const [screen, setScreen] = useState("home");
@@ -128,20 +129,23 @@ export default function App() {
     }
   };
 
-  // --- 3bis. PUBLICATION DANS LA GALERIE (compte sécurisé requis, imposé
-  // aussi côté serveur par un trigger) ---
-  const handleTogglePublic = async (id, isPublic) => {
-    const { error } = await supabase
-      .from("helmets")
-      .update({ is_public: isPublic })
-      .eq("id", id);
+  // --- 3bis. PUBLICATION DANS LA GALERIE / VENTE & ÉCHANGE (compte
+  // sécurisé requis, imposé aussi côté serveur par des contraintes) ---
+  // status: "none" | "showcase" | "sale" | "trade"
+  const handleUpdateListing = async (id, status, extra = {}) => {
+    const updates = {
+      is_public: status !== "none",
+      listing_type:
+        status === "sale" ? "vente" : status === "trade" ? "echange" : null,
+      listing_price: status === "sale" ? extra.price || null : null,
+      listing_wanted: status === "trade" ? extra.wanted || null : null,
+    };
+    const { error } = await supabase.from("helmets").update(updates).eq("id", id);
     if (error) {
       alert("Erreur : " + error.message);
       return;
     }
-    setSelectedHelmet((prev) =>
-      prev && prev.id === id ? { ...prev, is_public: isPublic } : prev
-    );
+    setSelectedHelmet((prev) => (prev && prev.id === id ? { ...prev, ...updates } : prev));
     await fetchCollection();
   };
 
@@ -217,7 +221,7 @@ export default function App() {
             }}
             lang={lang}
             isUpgraded={isUpgraded}
-            onTogglePublic={handleTogglePublic}
+            onUpdateListing={handleUpdateListing}
           />
         );
 
@@ -264,6 +268,15 @@ export default function App() {
       case "gallery":
         return (
           <Gallery
+            setScreen={setScreen}
+            lang={lang}
+            isAdmin={!!profile?.is_admin}
+          />
+        );
+
+      case "listings":
+        return (
+          <Listings
             setScreen={setScreen}
             lang={lang}
             isAdmin={!!profile?.is_admin}

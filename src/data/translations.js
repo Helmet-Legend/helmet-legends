@@ -10,6 +10,7 @@ export const translations = {
       stats: "Voir mes statistiques",
       account: "Mon Compte",
       gallery: "Galerie",
+      listings: "Vente & Échange",
       lang: "English",
     },
     lotSearch: {
@@ -64,6 +65,7 @@ export const translations = {
       stats: "View Statistics",
       account: "My Account",
       gallery: "Gallery",
+      listings: "Buy & Trade",
       lang: "Français",
     },
     lotSearch: {

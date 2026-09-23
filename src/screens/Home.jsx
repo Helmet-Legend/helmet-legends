@@ -14,6 +14,7 @@ import {
   Database,
   ShieldCheck,
   Lock,
+  Tag,
 } from "lucide-react";
 import { translations } from "../data/translations";
 
@@ -145,6 +146,24 @@ export default function Home({ setScreen, lang, setLang, isUpgraded }) {
               }
               label={t.gallery}
               onClick={() => setScreen(isUpgraded ? "gallery" : "account")}
+              variant="dark"
+            />
+          </div>
+
+          <div
+            className={!isUpgraded ? "opacity-40 grayscale" : ""}
+            title={
+              !isUpgraded
+                ? isFr
+                  ? "Sécurise ton compte pour accéder aux annonces"
+                  : "Secure your account to access listings"
+                : undefined
+            }
+          >
+            <TexturedButton
+              icon={isUpgraded ? <Tag size={18} /> : <Lock size={18} />}
+              label={t.listings}
+              onClick={() => setScreen(isUpgraded ? "listings" : "account")}
               variant="dark"
             />
           </div>
