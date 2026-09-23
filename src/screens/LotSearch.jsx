@@ -24,18 +24,19 @@ const BRANCH_CONFIG = {
 };
 
 const MFR_STATS = [
-  { name: "ET (Thale)", count: 10797 },
-  { name: "EF (Fulda)", count: 6334 },
-  { name: "SE (Berlin)", count: 3769 },
-  { name: "NS (Esslingen)", count: 3600 },
-  { name: "CKL (Thale tardif)", count: 3463 },
-  { name: "Q (Quist)", count: 2426 },
-  { name: "HKP (Berlin tardif)", count: 2144 },
+  { name: "ET (Thale)", nameEn: "ET (Thale)", count: 10797 },
+  { name: "EF (Fulda)", nameEn: "EF (Fulda)", count: 6334 },
+  { name: "SE (Berlin)", nameEn: "SE (Berlin)", count: 3769 },
+  { name: "NS (Esslingen)", nameEn: "NS (Esslingen)", count: 3600 },
+  { name: "CKL (Thale tardif)", nameEn: "CKL (Late Thale)", count: 3463 },
+  { name: "Q (Quist)", nameEn: "Q (Quist)", count: 2426 },
+  { name: "HKP (Berlin tardif)", nameEn: "HKP (Late Berlin)", count: 2144 },
 ];
 
 const RESULTS_PAGE_SIZE = 20;
 
-const LotSearch = () => {
+const LotSearch = ({ setScreen, lang }) => {
+  const isFr = lang === "fr";
   const [db, setDb] = useState(null);
   const [dbLoading, setDbLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -97,18 +98,26 @@ const LotSearch = () => {
       <div style={styles.content}>
         <header style={styles.header}>
           <div>
-            <h1 style={styles.mainTitle}>Registre d'Expertise</h1>
+            <h1 style={styles.mainTitle}>
+              {isFr ? "Registre d'Expertise" : "Expertise Registry"}
+            </h1>
             <p style={styles.subTitle}>
               {db
-                ? `${db.length.toLocaleString()} ENTRÉES CERTIFIÉES`
-                : "BASE PRÊTE À L'ANALYSE"}
+                ? `${db.length.toLocaleString()} ${
+                    isFr ? "ENTRÉES CERTIFIÉES" : "CERTIFIED ENTRIES"
+                  }`
+                : isFr
+                ? "BASE PRÊTE À L'ANALYSE"
+                : "DATABASE READY FOR ANALYSIS"}
             </p>
           </div>
           <button
-            onClick={() => (window.location.href = "/")}
+            onClick={() =>
+              setScreen ? setScreen("home") : (window.location.href = "/")
+            }
             style={styles.backBtn}
           >
-            ← RETOUR
+            {isFr ? "← RETOUR" : "← BACK"}
           </button>
         </header>
 
@@ -118,7 +127,9 @@ const LotSearch = () => {
             onClick={() => setIsStatsOpen(!isStatsOpen)}
             style={styles.accordionHeader}
           >
-            <span>📊 STATISTIQUES DE PRODUCTION</span>
+            <span>
+              📊 {isFr ? "STATISTIQUES DE PRODUCTION" : "PRODUCTION STATISTICS"}
+            </span>
             <span>{isStatsOpen ? "▲" : "▼"}</span>
           </button>
 
@@ -126,7 +137,9 @@ const LotSearch = () => {
             <div style={styles.accordionBody}>
               <div style={styles.statsGrid}>
                 <div style={styles.statsCol}>
-                  <h4 style={styles.statsTitle}>RÉPARTITION PAR ARME</h4>
+                  <h4 style={styles.statsTitle}>
+                    {isFr ? "RÉPARTITION PAR ARME" : "BREAKDOWN BY BRANCH"}
+                  </h4>
                   {Object.entries(BRANCH_CONFIG)
                     .filter(([k]) => k !== "default")
                     .map(([key, cfg]) => (
@@ -154,7 +167,9 @@ const LotSearch = () => {
                       paddingTop: "10px",
                     }}
                   >
-                    <h4 style={styles.statsTitle}>MODÈLES</h4>
+                    <h4 style={styles.statsTitle}>
+                      {isFr ? "MODÈLES" : "MODELS"}
+                    </h4>
                   </div>
                   <div style={styles.statRow}>
                     <span style={styles.statLabel}>M35</span>
@@ -171,11 +186,13 @@ const LotSearch = () => {
                 </div>
 
                 <div style={styles.statsCol}>
-                  <h4 style={styles.statsTitle}>PRINCIPALES USINES</h4>
+                  <h4 style={styles.statsTitle}>
+                    {isFr ? "PRINCIPALES USINES" : "MAIN FACTORIES"}
+                  </h4>
                   {MFR_STATS.map((mfr, i) => (
                     <div key={i} style={styles.statRow}>
                       <span style={{ ...styles.statLabel, width: "110px" }}>
-                        {mfr.name}
+                        {isFr ? mfr.name : mfr.nameEn}
                       </span>
                       <div style={styles.progressBarBg}>
                         <div
@@ -190,7 +207,9 @@ const LotSearch = () => {
                     </div>
                   ))}
                   <p style={styles.statsFooter}>
-                    Données consolidées : Brian Ice, GHV & V3 Master.
+                    {isFr
+                      ? "Données consolidées : Brian Ice, GHV & V3 Master."
+                      : "Consolidated data: Brian Ice, GHV & V3 Master."}
                   </p>
                 </div>
               </div>
@@ -202,23 +221,31 @@ const LotSearch = () => {
         <div style={styles.searchBox}>
           <div style={styles.inputGrid}>
             <div style={{ flex: 1 }}>
-              <label style={styles.fieldLabel}>FABRICANT</label>
+              <label style={styles.fieldLabel}>
+                {isFr ? "FABRICANT" : "MANUFACTURER"}
+              </label>
               <select
                 value={selectedMfr}
                 onChange={(e) => setSelectedMfr(e.target.value)}
                 style={styles.select}
               >
                 <option value="ET">ET (Thale)</option>
-                <option value="CKL">CKL (Thale tardif)</option>
+                <option value="CKL">
+                  {isFr ? "CKL (Thale tardif)" : "CKL (Late Thale)"}
+                </option>
                 <option value="Q">Q (Quist)</option>
                 <option value="SE">SE (Berlin)</option>
-                <option value="HKP">HKP (Berlin tardif)</option>
+                <option value="HKP">
+                  {isFr ? "HKP (Berlin tardif)" : "HKP (Late Berlin)"}
+                </option>
                 <option value="NS">NS (Esslingen)</option>
                 <option value="EF">EF (Fulda)</option>
               </select>
             </div>
             <div style={{ flex: 1.5 }}>
-              <label style={styles.fieldLabel}>NUMÉRO DE LOT</label>
+              <label style={styles.fieldLabel}>
+                {isFr ? "NUMÉRO DE LOT" : "LOT NUMBER"}
+              </label>
               <div style={{ display: "flex", gap: "8px" }}>
                 <input
                   type="text"
@@ -238,12 +265,20 @@ const LotSearch = () => {
                     cursor: dbLoading ? "not-allowed" : "pointer",
                   }}
                 >
-                  {dbLoading ? "CHARGEMENT..." : "ANALYSER"}
+                  {dbLoading
+                    ? isFr
+                      ? "CHARGEMENT..."
+                      : "LOADING..."
+                    : isFr
+                    ? "ANALYSER"
+                    : "ANALYZE"}
                 </button>
               </div>
               {dbLoading && (
                 <p style={styles.loadingHint}>
-                  Chargement de la base de référence (32 668 entrées)…
+                  {isFr
+                    ? "Chargement de la base de référence (32 668 entrées)…"
+                    : "Loading the reference database (32,668 entries)…"}
                 </p>
               )}
             </div>
@@ -254,18 +289,25 @@ const LotSearch = () => {
         {hasSearched && results.length === 0 && (
           <div style={styles.emptyState}>
             <SearchX size={48} strokeWidth={1.5} color="#444" />
-            <p style={styles.emptyStateTitle}>Aucun résultat</p>
+            <p style={styles.emptyStateTitle}>
+              {isFr ? "Aucun résultat" : "No results"}
+            </p>
             <p style={styles.emptyStateHint}>
-              Aucune entrée ne correspond à ce fabricant et ce numéro de lot.
-              Vérifiez le numéro, ou essayez un autre fabricant.
+              {isFr
+                ? "Aucune entrée ne correspond à ce fabricant et ce numéro de lot. Vérifiez le numéro, ou essayez un autre fabricant."
+                : "No entry matches this manufacturer and lot number. Check the number, or try another manufacturer."}
             </p>
           </div>
         )}
         {hasSearched && results.length > 0 && (
           <p style={styles.resultsSummary}>
-            {`${results.length} résultat${
-              results.length > 1 ? "s" : ""
-            } trouvé${results.length > 1 ? "s" : ""}`}
+            {isFr
+              ? `${results.length} résultat${
+                  results.length > 1 ? "s" : ""
+                } trouvé${results.length > 1 ? "s" : ""}`
+              : `${results.length} result${
+                  results.length > 1 ? "s" : ""
+                } found`}
           </p>
         )}
         <div style={styles.resultsContainer}>
@@ -282,7 +324,7 @@ const LotSearch = () => {
                 <div style={styles.cardHeader}>
                   <div style={{ flex: 1 }}>
                     <span style={styles.sourceText}>
-                      SOURCE : {item.sources[0]}
+                      {isFr ? "SOURCE" : "SOURCE"} : {item.sources[0]}
                     </span>
                     <h2 style={styles.helmetTitle}>
                       {item.model} {item.manufacturer} {item.size || ""}
@@ -294,7 +336,11 @@ const LotSearch = () => {
                           backgroundColor: config.bg,
                         }}
                       >
-                        {config.label}
+                        {config === BRANCH_CONFIG.default
+                          ? isFr
+                            ? "À CONFIRMER"
+                            : "TO CONFIRM"
+                          : config.label}
                       </span>
                       {item.insignia_type && (
                         <span style={styles.insigniaBadge}>
@@ -316,12 +362,13 @@ const LotSearch = () => {
                 </div>
                 <div style={styles.dataSection}>
                   <p style={styles.dataValue}>
-                    {item.decals?.description_brute || "ND"}
+                    {item.decals?.description_brute ||
+                      (isFr ? "ND" : "N/A")}
                   </p>
                   {item.decals?.notes && (
                     <div style={styles.expertNotes}>
                       <span style={{ color: "#d3791d", fontWeight: "bold" }}>
-                        EXPERTISE :
+                        {isFr ? "EXPERTISE :" : "EXPERT NOTE:"}
                       </span>{" "}
                       {item.decals.notes}
                     </div>
@@ -336,7 +383,9 @@ const LotSearch = () => {
             onClick={() => setVisibleCount((c) => c + RESULTS_PAGE_SIZE)}
             style={styles.loadMoreBtn}
           >
-            VOIR PLUS ({results.length - visibleCount} restants)
+            {isFr
+              ? `VOIR PLUS (${results.length - visibleCount} restants)`
+              : `SHOW MORE (${results.length - visibleCount} remaining)`}
           </button>
         )}
       </div>

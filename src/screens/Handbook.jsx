@@ -77,7 +77,7 @@ const Handbook = ({ setScreen, lang }) => {
         ? "0. Genèse & Héraldique (1916-1934)"
         : "0. Genesis & Heraldry (1916-1934)",
       icon: <History size={20} />,
-      content: (
+      content: isFr ? (
         <div className="space-y-4 text-base leading-relaxed">
           <div className="bg-black/30 p-5 rounded-xl border border-amber-900/20">
             <p className="mb-3">
@@ -120,13 +120,56 @@ const Handbook = ({ setScreen, lang }) => {
             </p>
           </div>
         </div>
+      ) : (
+        <div className="space-y-4 text-base leading-relaxed">
+          <div className="bg-black/30 p-5 rounded-xl border border-amber-900/20">
+            <p className="mb-3">
+              •{" "}
+              <span className="text-amber-500 font-bold underline">
+                Heritage (1917):
+              </span>{" "}
+              First hand-painted emblems appear on the left side of the M16
+              and M18 models[cite: 8].
+            </p>
+            <p className="mb-3">
+              •{" "}
+              <span className="text-amber-500 font-bold underline">
+                Standardization (1933):
+              </span>{" "}
+              Decree of March 14, 1933 imposing the tricolor shield
+              (black-white-red) on the left, to standardize the Länder's
+              heterogeneous emblems[cite: 10].
+            </p>
+            <p className="mb-3">
+              •{" "}
+              <span className="text-amber-500 font-bold underline">
+                The Order of April 5, 1934:
+              </span>{" "}
+              Application of the national shield on the right and the branch
+              emblem on the left[cite: 39, 41].{" "}
+              <span className="text-white font-bold underline">
+                Placement rule:
+              </span>{" "}
+              the decal must be positioned precisely 3 mm below the air
+              vent.
+            </p>
+            <p>
+              •{" "}
+              <span className="text-amber-500 font-bold underline">
+                SS Configuration:
+              </span>{" "}
+              Reversed, with runes on the right and party shield on the
+              left. Pocher decals adopted from August 14, 1935[cite: 43].
+            </p>
+          </div>
+        </div>
       ),
     },
     {
       id: "shells",
       title: isFr ? "I. Modèles & Métallurgie" : "I. Models & Metallurgy",
       icon: <HardHat size={20} />,
-      content: (
+      content: isFr ? (
         <div className="space-y-6 text-base">
           <div className="bg-black/30 p-5 rounded-xl border border-amber-900/20 shadow-lg">
             <h4 className="font-black text-amber-500 text-lg uppercase mb-2">
@@ -179,6 +222,59 @@ const Handbook = ({ setScreen, lang }) => {
             </ul>
           </div>
         </div>
+      ) : (
+        <div className="space-y-6 text-base">
+          <div className="bg-black/30 p-5 rounded-xl border border-amber-900/20 shadow-lg">
+            <h4 className="font-black text-amber-500 text-lg uppercase mb-2">
+              M35 (The Peak)
+            </h4>
+            <ul className="space-y-3">
+              <li>
+                •{" "}
+                <span className="text-white font-bold">Molybdenum Steel:</span>{" "}
+                Chrome-Nickel-Molybdenum alloy offering superior
+                resistance[cite: 101].
+              </li>
+              <li>
+                •{" "}
+                <span className="text-white font-bold">
+                  Applied Vents:
+                </span>{" "}
+                Drilled openings with separately crimped hollow rivets, known
+                as "Donuts"[cite: 11].
+              </li>
+              <li>
+                • <span className="text-white font-bold">Finish:</span> Rolled
+                edge and smooth paint (Apfelgrün).
+              </li>
+            </ul>
+          </div>
+          <div className="bg-black/30 p-5 rounded-xl border border-amber-900/20 shadow-lg">
+            <h4 className="font-black text-amber-500 text-lg uppercase mb-2">
+              M40 & M42 (Streamlining)
+            </h4>
+            <ul className="space-y-3">
+              <li>
+                •{" "}
+                <span className="text-white font-bold">M40 (March 1940):</span>{" "}
+                Switch to Manganese-Silicon steel with vents stamped directly
+                into the shell[cite: 101].{" "}
+                <span className="text-red-400 font-bold">March 21, 1940:</span>{" "}
+                Removal of the tricolor shield for camouflage[cite: 45].
+              </li>
+              <li>
+                •{" "}
+                <span className="text-white font-bold">M42 (April 1942):</span>{" "}
+                Raw flared rim.{" "}
+                <span className="text-red-400 font-bold underline">
+                  Final phase-out:
+                </span>{" "}
+                the Heer eagle stops on August 28, 1943 [cite: 49] and the SS
+                runes on October 10, 1943[cite: 50].
+              </li>
+            </ul>
+          </div>
+        </div>
       ),
     },
     {
@@ -189,38 +285,72 @@ const Handbook = ({ setScreen, lang }) => {
       icon: <Search size={20} />,
       content: (
         <div className="space-y-4">
-          {[
-            {
-              code: "ET / ckl",
-              name: "Thale",
-              desc: "Plus gros producteur. Monopole M38. Seul fabricant des tailles 70-74[cite: 94]. Type ET.",
-            },
-            {
-              code: "Q",
-              name: "Quist",
-              desc: "Aciers robustes. Refus tardif du M42[cite: 94]. Aigle 'Bigfoot' et Runes Quist exclusifs[cite: 60, 77].",
-            },
-            {
-              code: "SE / hkp",
-              name: "Lauter",
-              desc: "Signature : évents coniques sur M40. Jupe arrière très évasée[cite: 94]. Style ET ou SE Polizei.",
-            },
-            {
-              code: "NS",
-              name: "Schwerte",
-              desc: "Visière pointue. Préfixe 'D' sur les lots M35[cite: 94]. HJ&K ou Pocher.",
-            },
-            {
-              code: "EF / FS",
-              name: "Fulda",
-              desc: "Fournisseur SS majeur[cite: 94]. M35 parfois mal finis. HJ&K ou Runes EF.",
-            },
-            {
-              code: "qvl / bvL",
-              name: "Dissimulation",
-              desc: "Production satellite de Thale (1944-45) liée au cryptage industriel.",
-            },
-          ].map((m) => (
+          {(isFr
+            ? [
+                {
+                  code: "ET / ckl",
+                  name: "Thale",
+                  desc: "Plus gros producteur. Monopole M38. Seul fabricant des tailles 70-74[cite: 94]. Type ET.",
+                },
+                {
+                  code: "Q",
+                  name: "Quist",
+                  desc: "Aciers robustes. Refus tardif du M42[cite: 94]. Aigle 'Bigfoot' et Runes Quist exclusifs[cite: 60, 77].",
+                },
+                {
+                  code: "SE / hkp",
+                  name: "Lauter",
+                  desc: "Signature : évents coniques sur M40. Jupe arrière très évasée[cite: 94]. Style ET ou SE Polizei.",
+                },
+                {
+                  code: "NS",
+                  name: "Schwerte",
+                  desc: "Visière pointue. Préfixe 'D' sur les lots M35[cite: 94]. HJ&K ou Pocher.",
+                },
+                {
+                  code: "EF / FS",
+                  name: "Fulda",
+                  desc: "Fournisseur SS majeur[cite: 94]. M35 parfois mal finis. HJ&K ou Runes EF.",
+                },
+                {
+                  code: "qvl / bvL",
+                  name: "Dissimulation",
+                  desc: "Production satellite de Thale (1944-45) liée au cryptage industriel.",
+                },
+              ]
+            : [
+                {
+                  code: "ET / ckl",
+                  name: "Thale",
+                  desc: "Largest producer. M38 monopoly. Sole maker of sizes 70-74[cite: 94]. Type ET.",
+                },
+                {
+                  code: "Q",
+                  name: "Quist",
+                  desc: "Sturdy steels. Late refusal to adopt the M42[cite: 94]. Exclusive 'Bigfoot' eagle and Quist runes[cite: 60, 77].",
+                },
+                {
+                  code: "SE / hkp",
+                  name: "Lauter",
+                  desc: "Signature: conical vents on the M40. Very flared rear skirt[cite: 94]. ET or SE Polizei style.",
+                },
+                {
+                  code: "NS",
+                  name: "Schwerte",
+                  desc: "Pointed visor. 'D' prefix on M35 lots[cite: 94]. HJ&K or Pocher.",
+                },
+                {
+                  code: "EF / FS",
+                  name: "Fulda",
+                  desc: "Major SS supplier[cite: 94]. M35s sometimes poorly finished. HJ&K or EF runes.",
+                },
+                {
+                  code: "qvl / bvL",
+                  name: "Concealment",
+                  desc: "Satellite production of Thale (1944-45) linked to industrial code-marking.",
+                },
+              ]
+          ).map((m) => (
             <div
               key={m.code}
               className="bg-black/40 p-4 rounded-lg border border-amber-900/30 text-base"
@@ -238,7 +368,7 @@ const Handbook = ({ setScreen, lang }) => {
       id: "heer_expert",
       title: isFr ? "III. Expertise : HEER" : "III. Expertise: HEER",
       icon: <Crosshair size={20} />,
-      content: (
+      content: isFr ? (
         <div className="bg-black/30 p-5 rounded-xl border border-amber-900/20 text-base leading-relaxed">
           <p className="mb-3">
             • <span className="text-white font-bold underline">Style ET :</span>{" "}
@@ -279,13 +409,53 @@ const Handbook = ({ setScreen, lang }) => {
             pour l'éclat métallique d'origine[cite: 20, 134].
           </p>
         </div>
+      ) : (
+        <div className="bg-black/30 p-5 rounded-xl border border-amber-900/20 text-base leading-relaxed">
+          <p className="mb-3">
+            • <span className="text-white font-bold underline">ET Style:</span>{" "}
+            Precise black line[cite: 55].{" "}
+            <span className="text-amber-500 font-bold italic">Detail:</span>{" "}
+            "dimple" on the right claw of the right foot[cite: 126].
+          </p>
+          <p className="mb-3">
+            •{" "}
+            <span className="text-white font-bold underline">
+              Big Foot (Quist):
+            </span>{" "}
+            Massive, disproportionate talons. Exclusive to Q shells[cite: 60].
+          </p>
+          <p className="mb-3">
+            •{" "}
+            <span className="text-white font-bold underline">
+              HJ&K (Thin Wing):
+            </span>{" "}
+            Thin wings, grainy texture. Typical of EF and NS shells[cite: 56,
+            57].
+          </p>
+          <p className="mb-3">
+            •{" "}
+            <span className="text-white font-bold underline">
+              Rare Variants:
+            </span>{" "}
+            Peiniger ("Mad Faced" [cite: 63]) and Methner & Burger (grey
+            lines).
+          </p>
+          <p>
+            • <span className="text-white font-bold underline">Chemistry:</span>{" "}
+            Integration of{" "}
+            <span className="text-white font-bold underline">
+              aluminum powder (Pulver)
+            </span>{" "}
+            for the original metallic shine[cite: 20, 134].
+          </p>
+        </div>
       ),
     },
     {
       id: "luft_expert",
       title: isFr ? "IV. Expertise : LUFTWAFFE" : "IV. Expertise: LUFTWAFFE",
       icon: <Cloud size={20} />,
-      content: (
+      content: isFr ? (
         <div className="bg-black/30 p-5 rounded-xl border border-amber-900/20 text-base leading-relaxed">
           <p className="mb-3">
             •{" "}
@@ -311,6 +481,32 @@ const Handbook = ({ setScreen, lang }) => {
             La griffe semble "flotter" au-dessus de la swastika.
           </p>
         </div>
+      ) : (
+        <div className="bg-black/30 p-5 rounded-xl border border-amber-900/20 text-base leading-relaxed">
+          <p className="mb-3">
+            •{" "}
+            <span className="text-white font-bold underline">
+              Drooptail (1st Model):
+            </span>{" "}
+            Tail feathers pointing downward. Exclusive to M35 SE, Q and
+            ET[cite: 66]. 'Snake Leg' and 'Straight Leg' variants[cite: 67].
+          </p>
+          <p className="mb-3">
+            •{" "}
+            <span className="text-white font-bold underline">
+              2nd Model (1937+):
+            </span>{" "}
+            Aggressive, detailed design[cite: 68]. Black registration dot at
+            the base of the wing on ET, Q and SE.
+          </p>
+          <p>
+            •{" "}
+            <span className="text-white font-bold underline">
+              NS Variant:
+            </span>{" "}
+            The claw appears to "float" above the swastika.
+          </p>
+        </div>
       ),
     },
     {
@@ -319,7 +515,7 @@ const Handbook = ({ setScreen, lang }) => {
         ? "V. Expertise : KRIEGSMARINE"
         : "V. Expertise: KRIEGSMARINE",
       icon: <Anchor size={20} />,
-      content: (
+      content: isFr ? (
         <div className="p-5 bg-amber-900/10 rounded-xl border border-amber-900/30 text-base leading-relaxed">
           <p className="mb-3">
             •{" "}
@@ -343,13 +539,37 @@ const Handbook = ({ setScreen, lang }) => {
             L'usine NS n'a jamais produit d'insignes Kriegsmarine d'usine.
           </p>
         </div>
+      ) : (
+        <div className="p-5 bg-amber-900/10 rounded-xl border border-amber-900/30 text-base leading-relaxed">
+          <p className="mb-3">
+            •{" "}
+            <span className="text-white font-bold underline">
+              The Ridge:
+            </span>{" "}
+            Absolute signature of the ET type. Palpable raised black border
+            running around the shield[cite: 72].
+          </p>
+          <p className="mb-3">
+            • <span className="text-white font-bold underline">True Gold:</span>{" "}
+            Uses a Bronze/Brass powder[cite: 70]. A yellowed Heer eagle
+            (toning) is a varnish oxidation with no granular structure[cite:
+            71].
+          </p>
+          <p>
+            •{" "}
+            <span className="text-red-400 font-bold underline">
+              NS Warning:
+            </span>{" "}
+            The NS factory never produced factory Kriegsmarine insignia.
+          </p>
+        </div>
       ),
     },
     {
       id: "ss_expert",
       title: isFr ? "VI. Expertise : WAFFEN-SS" : "VI. Expertise: WAFFEN-SS",
       icon: <Zap size={20} />,
-      content: (
+      content: isFr ? (
         <div className="p-5 bg-red-900/10 rounded-xl border border-red-900/30 text-base leading-relaxed">
           <p className="mb-3">
             • <span className="text-white font-bold underline">Style ET :</span>{" "}
@@ -392,13 +612,53 @@ const Handbook = ({ setScreen, lang }) => {
             jamais une production neuve.
           </p>
         </div>
+      ) : (
+        <div className="p-5 bg-red-900/10 rounded-xl border border-red-900/30 text-base leading-relaxed">
+          <p className="mb-3">
+            • <span className="text-white font-bold underline">ET Style:</span>{" "}
+            Standard Thale. Perfectly proportioned, pointed runes[cite: 76].
+          </p>
+          <p className="mb-3">
+            •{" "}
+            <span className="text-white font-bold underline">
+              Quist Style:
+            </span>{" "}
+            More massive, runes extend lower into the shield[cite: 78].
+          </p>
+          <p className="mb-3">
+            •{" "}
+            <span className="text-white font-bold underline">
+              Pocher Style:
+            </span>{" "}
+            Very common on reused M16/M18 transitional helmets[cite: 80].
+          </p>
+          <p className="mb-3">
+            •{" "}
+            <span className="text-amber-500 font-bold underline">
+              Champagne Runes:
+            </span>{" "}
+            2015 analyses revealing stencil-painted pigment rather than a
+            decal.
+          </p>
+          <p>
+            •{" "}
+            <span className="text-red-400 font-bold underline">
+              NS &amp; SE Taboo:
+            </span>{" "}
+            Neither Schwerte (NS) nor Lauter (SE/hkp) ever received an SS
+            factory contract. Any runes on an NS or SE shell are
+            statistically fake — the only documented exception is a depot
+            reconditioning with Pocher insignia applied to NS shells, never
+            new factory production.
+          </p>
+        </div>
       ),
     },
     {
       id: "polizei",
       title: isFr ? "VII. Expertise : POLIZEI" : "VII. Expertise: POLIZEI",
       icon: <ShieldCheck size={20} />,
-      content: (
+      content: isFr ? (
         <div className="bg-black/30 p-5 rounded-xl border border-amber-900/20 text-base leading-relaxed">
           <p className="mb-3">
             •{" "}
@@ -414,6 +674,22 @@ const Handbook = ({ setScreen, lang }) => {
             pour SE et EF[cite: 87, 88].
           </p>
         </div>
+      ) : (
+        <div className="bg-black/30 p-5 rounded-xl border border-amber-900/20 text-base leading-relaxed">
+          <p className="mb-3">
+            •{" "}
+            <span className="text-white font-bold underline">
+              Configurations:
+            </span>{" "}
+            Two insignia retained (Eagle on the left / Party shield on the
+            right)[cite: 82].
+          </p>
+          <p>
+            • <span className="text-white font-bold underline">Styles:</span>{" "}
+            Early Borderless (ET/Quist [cite: 85]) and standard late
+            Bordered for SE and EF[cite: 87, 88].
+          </p>
+        </div>
       ),
     },
     {
@@ -422,7 +698,7 @@ const Handbook = ({ setScreen, lang }) => {
         ? "VIII. Laboratoire Forensique"
         : "VIII. Forensic Laboratory",
       icon: <FlaskConical size={20} />,
-      content: (
+      content: isFr ? (
         <div className="space-y-5 text-base leading-relaxed">
           <div className="bg-black/30 p-5 rounded-xl border border-amber-900/20">
             <p className="mb-3">
@@ -456,6 +732,40 @@ const Handbook = ({ setScreen, lang }) => {
             </div>
           </div>
         </div>
+      ) : (
+        <div className="space-y-5 text-base leading-relaxed">
+          <div className="bg-black/30 p-5 rounded-xl border border-amber-900/20">
+            <p className="mb-3">
+              • <span className="text-white font-bold underline">Chemistry:</span>{" "}
+              Emulsion including glucose (adhesion [cite: 17]) and a
+              linseed-oil-based binder[cite: 19].
+            </p>
+            <p className="mb-3">
+              •{" "}
+              <span className="text-white font-bold underline">
+                Spidering:
+              </span>{" "}
+              Spiderweb-like micro-cracks from the varnish's natural drying
+              over 80 years[cite: 114].
+            </p>
+            <p className="mb-4">
+              •{" "}
+              <span className="text-white font-bold underline">
+                UV Reaction:
+              </span>{" "}
+              Period varnish is dark amber. Bright blue betrays the modern
+              brighteners used in fakes[cite: 158].
+            </p>
+            <div className="p-4 bg-amber-900/10 rounded-xl flex items-center gap-4 italic border border-amber-900/30">
+              <Microscope size={24} className="text-amber-500 shrink-0" />
+              <p>
+                "Saw Tooth" pattern: visible at x200 magnification on digital
+                fakes[cite: 132]. Originals show smooth, fluid fills[cite:
+                133].
+              </p>
+            </div>
+          </div>
+        </div>
       ),
     },
     {
@@ -464,7 +774,7 @@ const Handbook = ({ setScreen, lang }) => {
         ? "IX. Reconditionnement & Volontaires"
         : "IX. Reissue & Volunteers",
       icon: <Layers size={20} />,
-      content: (
+      content: isFr ? (
         <div className="bg-black/30 p-5 rounded-xl border border-amber-900/20 text-base leading-relaxed">
           <p className="mb-3">
             •{" "}
@@ -484,6 +794,26 @@ const Handbook = ({ setScreen, lang }) => {
             Hollandais) dues à des initiatives locales[cite: 106, 107].
           </p>
         </div>
+      ) : (
+        <div className="bg-black/30 p-5 rounded-xl border border-amber-900/20 text-base leading-relaxed">
+          <p className="mb-3">
+            •{" "}
+            <span className="text-white font-bold underline">
+              Heereszeugamt:
+            </span>{" "}
+            Depots sandblasted or repainted helmets with a matte
+            aluminum-oxide paint[cite: 101]. Use of Pocher or Methner &
+            Bürger insignia[cite: 103].
+          </p>
+          <p>
+            •{" "}
+            <span className="text-white font-bold underline">
+              Reverse Decals:
+            </span>{" "}
+            SS runes on the left among foreign volunteers (Belgian, Dutch)
+            due to local initiatives[cite: 106, 107].
+          </p>
+        </div>
       ),
     },
     {
@@ -492,7 +822,7 @@ const Handbook = ({ setScreen, lang }) => {
         ? "X. Casques Parachutistes (M38)"
         : "X. Paratrooper Helmets (M38)",
       icon: <Wind size={20} />,
-      content: (
+      content: isFr ? (
         <div className="bg-amber-900/10 p-5 rounded-xl border border-amber-600/20 text-base leading-relaxed">
           <h4 className="text-amber-500 font-black uppercase mb-3">
             Architecture Aérodynamique
@@ -514,6 +844,28 @@ const Handbook = ({ setScreen, lang }) => {
             </li>
           </ul>
         </div>
+      ) : (
+        <div className="bg-amber-900/10 p-5 rounded-xl border border-amber-600/20 text-base leading-relaxed">
+          <h4 className="text-amber-500 font-black uppercase mb-3">
+            Aerodynamic Architecture
+          </h4>
+          <ul className="space-y-3">
+            <li>
+              • <span className="text-white font-bold">Reinforced steel:</span>{" "}
+              1.5mm thickness. Spherical shell with no protruding edges.
+            </li>
+            <li>
+              •{" "}
+              <span className="text-white font-bold underline">Bolts:</span>{" "}
+              Transition from 'Spanner' to 'Slotted' (single-slot)
+              models[cite: 173].
+            </li>
+            <li>
+              • <span className="text-white font-bold">Retention:</span>{" "}
+              Complex four-point "Y" chinstrap.
+            </li>
+          </ul>
+        </div>
       ),
     },
     {
@@ -522,7 +874,7 @@ const Handbook = ({ setScreen, lang }) => {
         ? "XI. Modèles Civiques & M34"
         : "XI. Civic Models & Formations",
       icon: <Flame size={20} />,
-      content: (
+      content: isFr ? (
         <div className="bg-black/30 p-5 rounded-xl border border-amber-900/20 text-base leading-relaxed">
           <p className="mb-3">
             •{" "}
@@ -549,13 +901,39 @@ const Handbook = ({ setScreen, lang }) => {
             pour interdire l'usage au front[cite: 156].
           </p>
         </div>
+      ) : (
+        <div className="bg-black/30 p-5 rounded-xl border border-amber-900/20 text-base leading-relaxed">
+          <p className="mb-3">
+            •{" "}
+            <span className="text-amber-500 font-bold underline">
+              M34 Square Dip:
+            </span>{" "}
+            Abrupt visor-to-skirt transition for gas-mask sealing[cite: 146].
+          </p>
+          <p className="mb-3">
+            •{" "}
+            <span className="text-amber-500 font-bold underline">
+              Gladiator:
+            </span>{" "}
+            3-piece or monobloc construction for the Luftschutz (winged
+            frontal insignia)[cite: 147, 148].
+          </p>
+          <p>
+            •{" "}
+            <span className="text-amber-500 font-bold underline">
+              Beaded:
+            </span>{" "}
+            Combat shells with metallurgical defects, marked with a bead to
+            bar front-line use[cite: 156].
+          </p>
+        </div>
       ),
     },
     {
       id: "lot_logic",
       title: isFr ? "XII. Archivistique des Lots" : "XII. Lot Number Archiving",
       icon: <Binary size={20} />,
-      content: (
+      content: isFr ? (
         <div className="bg-black/30 p-5 rounded-xl border border-amber-900/20 text-base leading-relaxed">
           <h4 className="text-amber-500 font-black uppercase mb-3">
             Méthode de Triangulation
@@ -573,6 +951,26 @@ const Handbook = ({ setScreen, lang }) => {
             </span>{" "}
             Des coques du même lot peuvent porter des insignes de branches
             différentes[cite: 165].
+          </p>
+        </div>
+      ) : (
+        <div className="bg-black/30 p-5 rounded-xl border border-amber-900/20 text-base leading-relaxed">
+          <h4 className="text-amber-500 font-black uppercase mb-3">
+            Triangulation Method
+          </h4>
+          <p className="mb-3">
+            •{" "}
+            <span className="text-white font-bold underline">Lotnummer:</span>{" "}
+            Designates a steel heat processed into sheets. Triangulation is
+            required to validate the branch of origin.
+          </p>
+          <p>
+            •{" "}
+            <span className="text-white font-bold underline">
+              Lot Twins:
+            </span>{" "}
+            Shells from the same lot can carry insignia from different
+            branches[cite: 165].
           </p>
         </div>
       ),
@@ -634,9 +1032,9 @@ const Handbook = ({ setScreen, lang }) => {
           <table className="w-full text-base border-collapse">
             <thead>
               <tr className="text-amber-500 uppercase border-b border-amber-900/30 text-left">
-                <th className="p-2">Coque</th>
-                <th className="p-2">Tête (cm)</th>
-                <th className="p-2">Poids (g)</th>
+                <th className="p-2">{isFr ? "Coque" : "Shell"}</th>
+                <th className="p-2">{isFr ? "Tête (cm)" : "Head (cm)"}</th>
+                <th className="p-2">{isFr ? "Poids (g)" : "Weight (g)"}</th>
               </tr>
             </thead>
             <tbody className="text-amber-100/60 italic">
@@ -658,15 +1056,31 @@ const Handbook = ({ setScreen, lang }) => {
             </tbody>
           </table>
           <div className="mt-5 p-4 bg-amber-900/10 rounded-xl border border-amber-900/30 text-sm italic leading-relaxed">
-            <span className="text-amber-500 font-bold not-italic uppercase text-xs tracking-widest">
-              L'épreuve de la balance :
-            </span>{" "}
-            l'acier allemand d'époque, d'épaisseur constante (1,1-1,2 mm),
-            donne une coque nue dans une fourchette générale d'environ
-            850 à 1 100 g selon la taille. De nombreuses reproductions
-            modernes utilisent un acier d'épaisseur différente, d'où un
-            poids sensiblement décalé — un test simple et peu coûteux, à
-            utiliser en complément des critères visuels, jamais seul.
+            {isFr ? (
+              <>
+                <span className="text-amber-500 font-bold not-italic uppercase text-xs tracking-widest">
+                  L'épreuve de la balance :
+                </span>{" "}
+                l'acier allemand d'époque, d'épaisseur constante (1,1-1,2 mm),
+                donne une coque nue dans une fourchette générale d'environ
+                850 à 1 100 g selon la taille. De nombreuses reproductions
+                modernes utilisent un acier d'épaisseur différente, d'où un
+                poids sensiblement décalé — un test simple et peu coûteux, à
+                utiliser en complément des critères visuels, jamais seul.
+              </>
+            ) : (
+              <>
+                <span className="text-amber-500 font-bold not-italic uppercase text-xs tracking-widest">
+                  The Scale Test:
+                </span>{" "}
+                period German steel, of constant thickness (1.1-1.2 mm),
+                gives a bare shell in a general range of roughly 850 to
+                1,100 g depending on size. Many modern reproductions use
+                steel of a different thickness, resulting in a noticeably
+                different weight — a simple, low-cost test to use alongside
+                visual criteria, never alone.
+              </>
+            )}
           </div>
         </div>
       ),
