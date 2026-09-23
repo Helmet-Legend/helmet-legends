@@ -16,7 +16,7 @@ import Messages from "./screens/Messages";
 import Links from "./screens/Links";
 
 export default function App() {
-  const [screen, setScreen] = useState("home");
+  const [screen, setScreenState] = useState("home");
   const [selectedHelmet, setSelectedHelmet] = useState(null);
   const [lang, setLang] = useState("fr");
   const [collection, setCollection] = useState([]);
@@ -24,6 +24,24 @@ export default function App() {
   const [profile, setProfile] = useState(null);
   const [pendingConversationId, setPendingConversationId] = useState(null);
   const isUpgraded = !!authUser && authUser.is_anonymous === false;
+
+  // --- NAVIGATION AVEC HISTORIQUE NATIF (geste "retour" mobile) ---
+  // Chaque écran devient une entrée d'historique, pour que le geste de
+  // balayage retour d'Android (ou le bouton retour du navigateur) navigue
+  // entre les écrans de l'app au lieu de la fermer.
+  const setScreen = (next) => {
+    setScreenState(next);
+    window.history.pushState({ screen: next }, "");
+  };
+
+  useEffect(() => {
+    window.history.replaceState({ screen: "home" }, "");
+    const onPopState = (event) => {
+      setScreenState(event.state?.screen || "home");
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
 
   // --- CONTACTER LE PROPRIÉTAIRE D'UNE PIÈCE (galerie / annonces) ---
   const handleContact = async (helmetId) => {
