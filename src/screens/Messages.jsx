@@ -391,8 +391,8 @@ export default function Messages({
               <ShieldAlert size={16} className="text-amber-500 shrink-0 mt-0.5" />
               <p className="text-[10px] leading-relaxed text-amber-200/90 flex-1">
                 {isFr
-                  ? "Ne paie jamais avant d'avoir reçu ou inspecté la pièce, méfie-toi des offres trop urgentes, et utilise le certificat de vérification pour confirmer qu'une fiche est authentique."
-                  : "Never pay before receiving or inspecting the piece, be wary of urgent pressure, and use the verification certificate to confirm a listing is genuine."}
+                  ? "Ne paie jamais avant d'avoir reçu ou inspecté la pièce, méfie-toi des offres trop urgentes, et utilise la fiche vérifiée pour t'assurer que l'annonce correspond bien à une pièce enregistrée sur l'app."
+                  : "Never pay before receiving or inspecting the piece, be wary of urgent pressure, and use the verified record to make sure the listing matches a piece registered on the app."}
               </p>
               <button
                 onClick={() => setShowTip(false)}

@@ -99,7 +99,7 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
   doc.setFont("helvetica", "normal");
   doc.setTextColor(muted[0], muted[1], muted[2]);
   doc.text(
-    isFr ? "FICHE DESCRIPTIVE D'ARCHIVE" : "ARCHIVE DESCRIPTIVE SHEET",
+    isFr ? "CARTE D'IDENTITÉ DE LA PIÈCE" : "PIECE IDENTITY CARD",
     105,
     55,
     { align: "center" }
@@ -273,6 +273,6 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
   doc.text(splitDisclaimer, 105, 280, { align: "center" });
 
   // Sauvegarde
-  const fileName = `HL_Archive_${helmet.model || "Certificat"}_${ref}.pdf`;
+  const fileName = `HL_CarteIdentite_${helmet.model || "Piece"}_${ref}.pdf`;
   doc.save(fileName);
 };

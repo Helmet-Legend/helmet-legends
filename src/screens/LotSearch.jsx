@@ -104,7 +104,7 @@ const LotSearch = ({ setScreen, lang }) => {
             <p style={styles.subTitle}>
               {db
                 ? `${db.length.toLocaleString()} ${
-                    isFr ? "ENTRÉES CERTIFIÉES" : "CERTIFIED ENTRIES"
+                    isFr ? "ENTRÉES RÉPERTORIÉES" : "LISTED ENTRIES"
                   }`
                 : isFr
                 ? "BASE PRÊTE À L'ANALYSE"

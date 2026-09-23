@@ -51,7 +51,7 @@ export default function PublicHelmet({ helmetId }) {
           <img src={monLogo} alt="Helmet Legends" className="h-9 w-auto" />
           <div>
             <p className="text-[9px] uppercase tracking-[0.3em] text-amber-500 font-bold leading-none">
-              {isFr ? "Certificat Vérifié" : "Verified Certificate"}
+              {isFr ? "Carte d'Identité Vérifiée" : "Verified Identity Card"}
             </p>
           </div>
         </div>
@@ -81,8 +81,8 @@ export default function PublicHelmet({ helmetId }) {
           </p>
           <p className="text-xs italic opacity-60 max-w-xs">
             {isFr
-              ? "Ce certificat ne correspond à aucune fiche active, ou a été supprimé."
-              : "This certificate doesn't match any active record, or was deleted."}
+              ? "Cette fiche ne correspond à aucune archive active, ou a été supprimée."
+              : "This record doesn't match any active archive, or was deleted."}
           </p>
         </div>
       )}
@@ -120,8 +120,8 @@ export default function PublicHelmet({ helmetId }) {
               <BadgeCheck className="text-green-500" size={20} />
               <p className="text-[10px] uppercase font-black tracking-[0.3em] text-green-500">
                 {isFr
-                  ? "Authenticité de l'archive confirmée"
-                  : "Archive authenticity confirmed"}
+                  ? "Fiche vérifiée dans notre base de données"
+                  : "Record verified in our database"}
               </p>
             </div>
             <h2 className="text-2xl md:text-3xl font-black italic uppercase text-[#f0ede0] leading-none mb-8">
@@ -205,8 +205,8 @@ export default function PublicHelmet({ helmetId }) {
 
             <p className="text-[8px] text-center uppercase opacity-30 italic tracking-widest">
               {isFr
-                ? "Base de données Helmet Legends - Archive Certifiée"
-                : "Helmet Legends Database - Certified Archive"}
+                ? "Base de données Helmet Legends - Archive de Référence"
+                : "Helmet Legends Database - Reference Archive"}
             </p>
           </div>
         </div>
