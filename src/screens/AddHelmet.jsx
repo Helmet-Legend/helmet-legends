@@ -406,7 +406,7 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
             </label>
             <select
               className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-xs font-bold text-[#f0ede0] outline-none"
-              value={current.decals}
+              value={current.decals || ""}
               onChange={(e) =>
                 setCurrent({ ...current, decals: e.target.value })
               }
@@ -448,7 +448,7 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
             <input
               placeholder="ex: 1234"
               className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-xs text-amber-500 font-bold h-[52px] outline-none"
-              value={current.lotNumber}
+              value={current.lotNumber || ""}
               onChange={(e) =>
                 setCurrent({ ...current, lotNumber: e.target.value })
               }
@@ -497,7 +497,7 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
             </label>
             <select
               className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-xs text-white outline-none"
-              value={current.shellSize}
+              value={current.shellSize || ""}
               onChange={(e) =>
                 setCurrent({ ...current, shellSize: e.target.value })
               }
@@ -522,7 +522,7 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
             </label>
             <select
               className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-xs text-white outline-none"
-              value={current.linerSize}
+              value={current.linerSize || ""}
               onChange={(e) =>
                 setCurrent({ ...current, linerSize: e.target.value })
               }
@@ -541,7 +541,7 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
             </label>
             <select
               className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-xs font-bold text-amber-500 outline-none"
-              value={current.paintCondition}
+              value={current.paintCondition || ""}
               onChange={(e) =>
                 setCurrent({ ...current, paintCondition: e.target.value })
               }
@@ -562,7 +562,7 @@ export default function AddHelmet({ setScreen, onSave, helmet, lang }) {
           </label>
           <select
             className="w-full bg-[#1a1812] border-2 border-[#3a3832] p-4 rounded-xl text-xs text-[#f0ede0] outline-none"
-            value={current.chinstrapState}
+            value={current.chinstrapState || ""}
             onChange={(e) =>
               setCurrent({ ...current, chinstrapState: e.target.value })
             }
