@@ -117,15 +117,18 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
   doc.setLineWidth(0.3);
   doc.line(15, 64, 195, 64);
 
-  // QR Code (coin supérieur droit, en miroir du logo)
+  // QR Code (coin supérieur droit, en miroir du logo) — pointe vers la
+  // fiche de vérification publique (lecture seule) de cette pièce précise.
   try {
-    const helmetUrl = `https://app.helmetlegends.com/helmet/${
-      helmet.id || "view"
-    }`;
-    const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
-      helmetUrl
-    )}&color=${brightGold}&bgcolor=1a1812`;
-    const qrBase64 = await getImageData(qrImageUrl);
+    const helmetUrl = helmet.id
+      ? `https://app.helmetlegends.com/helmet/${helmet.id}`
+      : null;
+    const qrImageUrl = helmetUrl
+      ? `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
+          helmetUrl
+        )}&color=${brightGold}&bgcolor=1a1812`
+      : null;
+    const qrBase64 = qrImageUrl ? await getImageData(qrImageUrl) : null;
     if (qrBase64) {
       doc.setDrawColor(gold[0], gold[1], gold[2]);
       doc.rect(171, 11, 24, 24);
