@@ -159,61 +159,69 @@ export default function Listings({ setScreen, lang, isAdmin }) {
                 key={it.id}
                 className="bg-black/50 border border-amber-900/30 rounded-2xl overflow-hidden shadow-xl"
               >
-                <div className="h-48 bg-black flex items-center justify-center relative">
-                  {it.image_url_main ? (
-                    <img
-                      src={it.image_url_main}
-                      alt={it.model}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <HardHat size={40} className="opacity-20" />
-                  )}
-                  <span
-                    className={`absolute top-3 left-3 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-1 ${
-                      it.listing_type === "vente"
-                        ? "bg-green-900/80 text-green-300 border border-green-500/40"
-                        : "bg-blue-900/80 text-blue-300 border border-blue-500/40"
-                    }`}
-                  >
-                    {it.listing_type === "vente" ? (
-                      isFr ? (
-                        "À vendre"
-                      ) : (
-                        "For sale"
-                      )
+                <a
+                  href={`/helmet/${it.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  <div className="h-48 bg-black flex items-center justify-center relative">
+                    {it.image_url_main ? (
+                      <img
+                        src={it.image_url_main}
+                        alt={it.model}
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
-                      <>
-                        <Repeat size={10} /> {isFr ? "Échange" : "Trade"}
-                      </>
+                      <HardHat size={40} className="opacity-20" />
                     )}
-                  </span>
-                </div>
-                <div className="p-4">
-                  <h3 className="text-amber-500 font-black uppercase italic text-base truncate">
-                    {it.model || (isFr ? "Modèle Inconnu" : "Unknown Model")}
-                  </h3>
-                  <p className="text-[10px] text-white/40 font-bold tracking-widest mb-2">
-                    {[it.manufacturer, it.branch].filter(Boolean).join(" · ") ||
-                      "—"}
-                  </p>
-
-                  {it.listing_type === "vente" && it.listing_price && (
-                    <p className="text-lg font-black text-green-400 mb-2">
-                      {it.listing_price}
+                    <span
+                      className={`absolute top-3 left-3 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-1 ${
+                        it.listing_type === "vente"
+                          ? "bg-green-900/80 text-green-300 border border-green-500/40"
+                          : "bg-blue-900/80 text-blue-300 border border-blue-500/40"
+                      }`}
+                    >
+                      {it.listing_type === "vente" ? (
+                        isFr ? (
+                          "À vendre"
+                        ) : (
+                          "For sale"
+                        )
+                      ) : (
+                        <>
+                          <Repeat size={10} /> {isFr ? "Échange" : "Trade"}
+                        </>
+                      )}
+                    </span>
+                  </div>
+                  <div className="p-4 pb-2">
+                    <h3 className="text-amber-500 font-black uppercase italic text-base truncate">
+                      {it.model || (isFr ? "Modèle Inconnu" : "Unknown Model")}
+                    </h3>
+                    <p className="text-[10px] text-white/40 font-bold tracking-widest mb-2">
+                      {[it.manufacturer, it.branch].filter(Boolean).join(" · ") ||
+                        "—"}
                     </p>
-                  )}
-                  {it.listing_type === "echange" && it.listing_wanted && (
-                    <p className="text-xs italic text-blue-300 mb-2">
-                      {isFr ? "Recherché : " : "Wanted: "}
-                      {it.listing_wanted}
+
+                    {it.listing_type === "vente" && it.listing_price && (
+                      <p className="text-lg font-black text-green-400 mb-2">
+                        {it.listing_price}
+                      </p>
+                    )}
+                    {it.listing_type === "echange" && it.listing_wanted && (
+                      <p className="text-xs italic text-blue-300 mb-2">
+                        {isFr ? "Recherché : " : "Wanted: "}
+                        {it.listing_wanted}
+                      </p>
+                    )}
+
+                    <p className="text-[10px] uppercase font-bold text-amber-200">
+                      {isFr ? "Par" : "By"} {it.username}
                     </p>
-                  )}
-
-                  <p className="text-[10px] uppercase font-bold text-amber-200">
-                    {isFr ? "Par" : "By"} {it.username}
-                  </p>
-
+                  </div>
+                </a>
+                <div className="px-4 pb-4">
                   {isAdmin && (
                     <button
                       onClick={() => handleHide(it.id)}
