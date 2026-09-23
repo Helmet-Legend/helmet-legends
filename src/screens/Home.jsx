@@ -17,9 +17,11 @@ import {
   Tag,
   MessageCircle,
   Link2,
+  Clock,
 } from "lucide-react";
 import { translations } from "../data/translations";
 import { supabase } from "../supabaseClient";
+import { COMPARATOR_ENABLED } from "../config/features";
 
 export default function Home({ setScreen, lang, setLang, isUpgraded }) {
   const t = (translations[lang] || translations["fr"]).home;
@@ -130,12 +132,29 @@ export default function Home({ setScreen, lang, setLang, isUpgraded }) {
             onClick={() => setScreen("registry")}
             variant="dark"
           />
-          <TexturedButton
-            icon={<Layers size={18} />}
-            label={t.compare}
-            onClick={() => setScreen("compare")}
-            variant="dark"
-          />
+          <div
+            className={!COMPARATOR_ENABLED ? "opacity-40 grayscale" : ""}
+            title={
+              !COMPARATOR_ENABLED
+                ? isFr
+                  ? "Temporairement suspendu"
+                  : "Temporarily suspended"
+                : undefined
+            }
+          >
+            <TexturedButton
+              icon={
+                COMPARATOR_ENABLED ? (
+                  <Layers size={18} />
+                ) : (
+                  <Clock size={18} />
+                )
+              }
+              label={t.compare}
+              onClick={() => setScreen("compare")}
+              variant="dark"
+            />
+          </div>
 
           <div
             className={!isUpgraded ? "opacity-40 grayscale" : ""}

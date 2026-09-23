@@ -16,10 +16,13 @@ import {
   Wand2,
   CheckCircle2,
   AlertCircle,
+  Clock,
+  ArrowLeft,
 } from "lucide-react";
 
 // Assure-toi que ce fichier existe dans ton dossier config
 import { AUTHENTIC_DECALS } from "../config/decals";
+import { COMPARATOR_ENABLED } from "../config/features";
 
 // Taille de la grille utilisée pour la comparaison structurelle (SSIM)
 const SAMPLE_SIZE = 48;
@@ -287,6 +290,39 @@ export default function Compare({ setScreen, lang }) {
     setZoom(1);
     setPosition({ x: 0, y: 0 });
   };
+
+  if (!COMPARATOR_ENABLED) {
+    return (
+      <div
+        className="h-screen overflow-y-auto bg-[#1a1812] font-serif text-[#d0c7a8] relative flex flex-col items-center justify-center p-6 text-center"
+        style={{
+          backgroundImage: `url(${monFondExpert})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="absolute inset-0 bg-black/70" />
+        <div className="relative z-10 max-w-sm">
+          <Clock size={48} className="mx-auto mb-4 text-amber-500 opacity-70" />
+          <h2 className="text-lg font-black uppercase italic tracking-tighter text-[#f0ede0] mb-3">
+            {isFr ? "Comparateur temporairement suspendu" : "Comparator temporarily suspended"}
+          </h2>
+          <p className="text-xs italic opacity-70 leading-relaxed mb-8">
+            {isFr
+              ? "Les photos de référence utilisées par cet outil proviennent de sources externes dont nous clarifions actuellement les droits d'usage. Le comparateur sera réactivé dès que ce point sera réglé."
+              : "The reference photos used by this tool come from external sources whose usage rights we're currently clarifying. The comparator will be reactivated once this is resolved."}
+          </p>
+          <button
+            onClick={() => setScreen("home")}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-amber-900/40 rounded-full border border-amber-700/50 text-amber-500 hover:bg-amber-600 hover:text-black transition-all text-[10px] font-black uppercase tracking-widest"
+          >
+            <ArrowLeft size={16} />
+            {isFr ? "Retour à l'accueil" : "Back to home"}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#1a1812] text-[#d0c7a8] font-serif relative overflow-hidden flex flex-col select-none touch-none">
