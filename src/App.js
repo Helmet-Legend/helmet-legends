@@ -14,6 +14,7 @@ import Gallery from "./screens/Gallery";
 import Listings from "./screens/Listings";
 import Messages from "./screens/Messages";
 import Links from "./screens/Links";
+import Dashboard from "./screens/Dashboard";
 
 export default function App() {
   const [screen, setScreenState] = useState("home");
@@ -218,6 +219,7 @@ export default function App() {
             lang={lang}
             setLang={setLang}
             isUpgraded={isUpgraded}
+            isAdmin={!!profile?.is_admin}
           />
         );
 
@@ -333,6 +335,9 @@ export default function App() {
       case "links":
         return <Links setScreen={setScreen} lang={lang} />;
 
+      case "dashboard":
+        return <Dashboard setScreen={setScreen} lang={lang} />;
+
       default:
         return (
           <Home
@@ -340,6 +345,7 @@ export default function App() {
             lang={lang}
             setLang={setLang}
             isUpgraded={isUpgraded}
+            isAdmin={!!profile?.is_admin}
           />
         );
     }
