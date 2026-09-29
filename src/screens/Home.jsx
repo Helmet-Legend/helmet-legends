@@ -18,12 +18,13 @@ import {
   MessageCircle,
   Link2,
   Clock,
+  LayoutDashboard,
 } from "lucide-react";
 import { translations } from "../data/translations";
 import { supabase } from "../supabaseClient";
 import { COMPARATOR_ENABLED } from "../config/features";
 
-export default function Home({ setScreen, lang, setLang, isUpgraded }) {
+export default function Home({ setScreen, lang, setLang, isUpgraded, isAdmin }) {
   const t = (translations[lang] || translations["fr"]).home;
   const isFr = lang === "fr";
   const [unreadCount, setUnreadCount] = useState(0);
@@ -241,6 +242,16 @@ export default function Home({ setScreen, lang, setLang, isUpgraded }) {
           >
             <Link2 size={14} /> {t.links}
           </button>
+
+          {isAdmin && (
+            <button
+              onClick={() => setScreen("dashboard")}
+              className="w-full text-[10px] uppercase font-bold opacity-60 flex items-center justify-center gap-2 mt-3 hover:opacity-100 transition-opacity text-amber-200"
+            >
+              <LayoutDashboard size={14} />
+              {isFr ? "Tableau de bord" : "Dashboard"}
+            </button>
+          )}
         </div>
       </div>
     </div>
