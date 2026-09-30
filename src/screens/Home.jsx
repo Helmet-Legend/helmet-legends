@@ -19,15 +19,30 @@ import {
   Link2,
   Clock,
   LayoutDashboard,
+  Plus,
+  Sparkles,
+  X,
 } from "lucide-react";
 import { translations } from "../data/translations";
 import { supabase } from "../supabaseClient";
 import { COMPARATOR_ENABLED } from "../config/features";
 
-export default function Home({ setScreen, lang, setLang, isUpgraded, isAdmin }) {
+const WELCOME_SEEN_KEY = "hl_welcome_seen";
+
+export default function Home({
+  setScreen,
+  lang,
+  setLang,
+  isUpgraded,
+  isAdmin,
+  collectionCount = 0,
+  onAddHelmet,
+}) {
   const t = (translations[lang] || translations["fr"]).home;
   const isFr = lang === "fr";
   const [unreadCount, setUnreadCount] = useState(0);
+  const hasHelmets = collectionCount > 0;
+  const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
     if (!isUpgraded) return;
@@ -36,8 +51,72 @@ export default function Home({ setScreen, lang, setLang, isUpgraded, isAdmin }) 
       .then(({ data }) => setUnreadCount(data || 0));
   }, [isUpgraded]);
 
+  // Bienvenue affichée une seule fois, au tout premier lancement, tant
+  // que la collection est vide.
+  useEffect(() => {
+    if (hasHelmets) return;
+    try {
+      if (!localStorage.getItem(WELCOME_SEEN_KEY)) {
+        setShowWelcome(true);
+      }
+    } catch (e) {
+      // localStorage indisponible (navigation privée, etc.) : pas grave,
+      // on affiche simplement pas la modale.
+    }
+  }, [hasHelmets]);
+
+  const dismissWelcome = () => {
+    setShowWelcome(false);
+    try {
+      localStorage.setItem(WELCOME_SEEN_KEY, "1");
+    } catch (e) {
+      // ignore
+    }
+  };
+
+  const handleWelcomeAdd = () => {
+    dismissWelcome();
+    onAddHelmet?.();
+  };
+
   return (
     <div className="flex flex-col h-screen overflow-y-auto bg-[#1a1812] items-center p-6 text-[#d0c7a8] relative">
+      {/* --- MODALE DE BIENVENUE (une seule fois, tant que la collection est vide) --- */}
+      {showWelcome && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
+          <div className="relative max-w-xs w-full bg-[#2a2822] border-2 border-amber-700/40 rounded-3xl p-6 shadow-2xl text-center">
+            <button
+              onClick={dismissWelcome}
+              className="absolute top-3 right-3 text-amber-500/50 hover:text-amber-500"
+            >
+              <X size={18} />
+            </button>
+            <Sparkles className="mx-auto mb-3 text-amber-500" size={32} />
+            <h3 className="text-lg font-black italic uppercase text-[#f0ede0] mb-2">
+              {isFr ? "Bienvenue !" : "Welcome!"}
+            </h3>
+            <p className="text-xs italic opacity-70 leading-relaxed mb-6">
+              {isFr
+                ? "Helmet Legends t'aide à documenter et identifier ta collection de casques militaires. Commence par ajouter ta première pièce, ça prend 30 secondes."
+                : "Helmet Legends helps you document and identify your military helmet collection. Start by adding your first piece, it takes 30 seconds."}
+            </p>
+            <button
+              onClick={handleWelcomeAdd}
+              className="w-full py-4 bg-amber-600 hover:bg-amber-500 text-black rounded-xl flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest transition-all shadow-lg"
+            >
+              <Plus size={16} />
+              {isFr ? "Ajouter mon premier casque" : "Add my first helmet"}
+            </button>
+            <button
+              onClick={dismissWelcome}
+              className="w-full py-3 mt-2 text-[10px] uppercase font-bold opacity-50 hover:opacity-100 transition-opacity"
+            >
+              {isFr ? "Plus tard" : "Later"}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* --- FOND D'ÉCRAN MODIFIÉ (PLUS CLAIR) --- */}
       <div
         className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 scale-105 pointer-events-none"
@@ -107,6 +186,26 @@ export default function Home({ setScreen, lang, setLang, isUpgraded, isAdmin }) 
             alt="Logo"
           />
         </div>
+
+        {/* CARTE "PREMIER CASQUE" -- uniquement tant que la collection est vide */}
+        {!hasHelmets && (
+          <button
+            onClick={onAddHelmet}
+            className="w-full mb-6 p-5 bg-gradient-to-br from-amber-600 to-amber-700 rounded-2xl border-2 border-amber-500/40 shadow-[0_10px_30px_rgba(217,119,6,0.25)] flex items-center gap-4 text-left active:scale-[0.98] transition-transform"
+          >
+            <div className="shrink-0 w-11 h-11 rounded-full bg-black/20 flex items-center justify-center">
+              <Plus size={22} className="text-black" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-black font-black uppercase italic text-sm leading-tight">
+                {isFr ? "Commence ta collection" : "Start your collection"}
+              </p>
+              <p className="text-black/70 text-[10px] font-bold uppercase tracking-widest">
+                {isFr ? "Ajoute ton premier casque" : "Add your first helmet"}
+              </p>
+            </div>
+          </button>
+        )}
 
         {/* MENU */}
         <div className="space-y-4 w-full">
