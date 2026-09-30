@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.helmetlegends.app",
+      "sha256_cert_fingerprints": [
+        "49:FD:C3:5F:91:A0:D7:0B:ED:B1:10:CF:18:ED:60:1D:D7:7D:72:FF:98:B4:52:E9:20:09:B4:D5:21:B2:D1:D5"
+      ]
+    }
+  }
+]
