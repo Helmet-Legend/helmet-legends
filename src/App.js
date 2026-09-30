@@ -26,6 +26,15 @@ export default function App() {
   const [pendingConversationId, setPendingConversationId] = useState(null);
   const isUpgraded = !!authUser && authUser.is_anonymous === false;
 
+  // --- AJOUTER UN NOUVEAU CASQUE DEPUIS L'ACCUEIL (CTA premier casque) ---
+  // Réinitialise explicitement la sélection : sans ça, un ancien
+  // selectedHelmet (laissé par une précédente édition) ferait atterrir
+  // sur une modification au lieu d'une nouvelle fiche vierge.
+  const handleAddNew = () => {
+    setSelectedHelmet(null);
+    setScreen("add");
+  };
+
   // --- NAVIGATION AVEC HISTORIQUE NATIF (geste "retour" mobile) ---
   // Chaque écran devient une entrée d'historique, pour que le geste de
   // balayage retour d'Android (ou le bouton retour du navigateur) navigue
@@ -220,6 +229,8 @@ export default function App() {
             setLang={setLang}
             isUpgraded={isUpgraded}
             isAdmin={!!profile?.is_admin}
+            collectionCount={collection.length}
+            onAddHelmet={handleAddNew}
           />
         );
 
@@ -346,6 +357,8 @@ export default function App() {
             setLang={setLang}
             isUpgraded={isUpgraded}
             isAdmin={!!profile?.is_admin}
+            collectionCount={collection.length}
+            onAddHelmet={handleAddNew}
           />
         );
     }
