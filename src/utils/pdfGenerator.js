@@ -137,7 +137,9 @@ export const generateHelmetPDF = async (helmet, lang = "fr") => {
       doc.setTextColor(muted[0], muted[1], muted[2]);
       doc.text(isFr ? "Vérifier" : "Verify", 183, 37, { align: "center" });
     }
-  } catch (err) {}
+  } catch (err) {
+    console.warn("QR code non généré pour le certificat PDF :", err);
+  }
 
   // Photo principale + photos secondaires
   // Le bloc visuel occupe toujours 69→160 ; la photo principale s'étend
