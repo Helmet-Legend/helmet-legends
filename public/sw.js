@@ -1,4 +1,6 @@
-const CACHE_NAME = "helmet-legends-v2";
+// Version bumpée pour purger les entrées cross-origin (Supabase) mises en
+// cache par erreur par les versions précédentes de ce fichier.
+const CACHE_NAME = "helmet-legends-v3";
 const ASSETS_TO_CACHE = ["/manifest.json", "/icon-512.png"];
 
 // Installation : on met en cache les fichiers statiques non versionnés
@@ -30,17 +32,23 @@ self.addEventListener("activate", (event) => {
 
 // Requêtes : réseau en priorité (pour toujours servir le dernier build),
 // avec repli sur le cache uniquement si le réseau est indisponible.
+// Seules les requêtes same-origin sont mises en cache : les appels vers
+// Supabase (API privée, jeton d'authentification dans l'en-tête) ou tout
+// autre service tiers ne doivent jamais finir dans le Cache Storage local.
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+  const isSameOrigin = new URL(event.request.url).origin === self.location.origin;
 
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        const clone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        if (isSameOrigin) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        }
         return response;
       })
-      .catch(() => caches.match(event.request))
+      .catch(() => (isSameOrigin ? caches.match(event.request) : Promise.reject()))
   );
 });
 
