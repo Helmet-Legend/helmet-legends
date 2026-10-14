@@ -39,6 +39,7 @@ const LotSearch = ({ setScreen, lang }) => {
   const isFr = lang === "fr";
   const [db, setDb] = useState(null);
   const [dbLoading, setDbLoading] = useState(false);
+  const [dbError, setDbError] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMfr, setSelectedMfr] = useState("ET");
   const [results, setResults] = useState([]);
@@ -79,13 +80,16 @@ const LotSearch = ({ setScreen, lang }) => {
       return;
     }
     setDbLoading(true);
+    setDbError(false);
     try {
       const res = await fetch("/DATABASE_ULTIME_NORMALISEE.json");
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       setDb(data);
       runSearch(data);
     } catch (err) {
       console.error(err);
+      setDbError(true);
     } finally {
       setDbLoading(false);
     }
@@ -280,6 +284,18 @@ const LotSearch = ({ setScreen, lang }) => {
                     ? "Chargement de la base de référence (32 668 entrées)…"
                     : "Loading the reference database (32,668 entries)…"}
                 </p>
+              )}
+              {dbError && !dbLoading && (
+                <div style={styles.errorHint}>
+                  <span>
+                    {isFr
+                      ? "Impossible de charger la base de référence. Vérifiez votre connexion."
+                      : "Couldn't load the reference database. Check your connection."}
+                  </span>
+                  <button onClick={handleSearch} style={styles.retryBtn}>
+                    {isFr ? "RÉESSAYER" : "RETRY"}
+                  </button>
+                </div>
               )}
             </div>
           </div>
@@ -530,6 +546,25 @@ const styles = {
     fontSize: "0.7rem",
     color: "#777",
     fontStyle: "italic",
+  },
+  errorHint: {
+    marginTop: "10px",
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    fontSize: "0.75rem",
+    color: "#e67373",
+  },
+  retryBtn: {
+    background: "transparent",
+    border: "1px solid #e67373",
+    color: "#e67373",
+    padding: "4px 12px",
+    fontSize: "0.65rem",
+    fontWeight: "bold",
+    letterSpacing: "0.5px",
+    borderRadius: "4px",
+    cursor: "pointer",
   },
   resultsSummary: {
     fontSize: "0.75rem",

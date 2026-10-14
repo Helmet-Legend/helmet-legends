@@ -6,7 +6,6 @@
   "main": "src/index.js",
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
-    "firebase": "^11.0.0",
     "jspdf": "^4.2.0",
     "lucide-react": "^0.462.0",
     "qrcode": "^1.5.3",
