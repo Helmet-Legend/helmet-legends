@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 // Assure-toi que le chemin de ton image de fond est correct
-import monFondExpert from "../assets/helmet-bg.png";
+import monFondExpert from "../assets/helmet-bg.webp";
 import {
   Plus,
   Trash2,

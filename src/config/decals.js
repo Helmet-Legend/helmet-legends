@@ -1,6 +1,6 @@
 // Importation de ton image depuis le dossier assets
-import bigfootImg from "../assets/bigfoot-quist.png";
-import luftNSImg from "../assets/LUFT-NSM42.png";
+import bigfootImg from "../assets/bigfoot-quist.webp";
+import luftNSImg from "../assets/LUFT-NSM42.webp";
 import etHeerImg from "../assets/et-heer-decal.webp";
 import quistHeerImg from "../assets/quist-heer-decal.webp";
 import quistTricoloreImg from "../assets/quist-tricolore-decal.webp";

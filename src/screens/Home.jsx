@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 // --- IMPORT DE L'IMAGE DEPUIS ASSETS ---
-import monFondExpert from "../assets/helmet-bg.png";
+import monFondExpert from "../assets/helmet-bg.webp";
 
 import monLogo from "../logo.jpg";
-import galleryHelmetIcon from "../assets/gallery-helmet-icon.png";
+import galleryHelmetIcon from "../assets/gallery-helmet-icon.webp";
 import { TexturedButton } from "../components/TexturedButton";
 import {
   Search,

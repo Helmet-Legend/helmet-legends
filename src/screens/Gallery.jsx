@@ -9,7 +9,7 @@ import {
   SearchX,
   MessageCircle,
 } from "lucide-react";
-import galleryHelmetIcon from "../assets/gallery-helmet-icon.png";
+import galleryHelmetIcon from "../assets/gallery-helmet-icon.webp";
 import { supabase } from "../supabaseClient";
 
 const MODELS = ["M35", "M40", "M42"];

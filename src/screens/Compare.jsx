@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 // --- IMPORT DU FOND ---
-import monFondExpert from "../assets/helmet-bg.png";
+import monFondExpert from "../assets/helmet-bg.webp";
 import {
   X,
   Upload,

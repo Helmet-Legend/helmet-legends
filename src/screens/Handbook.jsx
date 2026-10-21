@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import monFondExpert from "../assets/helmet-bg.png";
+import monFondExpert from "../assets/helmet-bg.webp";
 
 import {
   BookOpen,

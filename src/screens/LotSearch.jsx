@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { SearchX } from "lucide-react";
-import expertBg from "../assets/expert-bg.jpg";
+import expertBg from "../assets/expert-bg.webp";
 
 // IMPORTATION DES ASSETS
-import heerImg from "../assets/heer_decal.png";
-import kmImg from "../assets/km_decal.png";
-import ssImg from "../assets/SS_decal.png";
-import poliImg from "../assets/polize_decali.png";
-import lwImg from "../assets/lw_decal.png";
+import heerImg from "../assets/heer_decal.webp";
+import kmImg from "../assets/km_decal.webp";
+import ssImg from "../assets/SS_decal.webp";
+import poliImg from "../assets/polize_decali.webp";
+import lwImg from "../assets/lw_decal.webp";
 
 const BRANCH_CONFIG = {
   Heer: { bg: "#4a5d43", label: "HEER", img: heerImg, count: 14560 },
